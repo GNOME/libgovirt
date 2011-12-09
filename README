@@ -1,0 +1,11 @@
+GoVirt is a GObject wrapper for the oVirt REST API [1]. It will
+only provide very basic functionality as the goal is to
+autogenerate a full wrapper as it is already done for the python
+bindings
+
+Note: GoVirt is not API or ABI stable at this time, so don't complain
+when we break your compile. That said, we're not going to break API
+without a good readon. Caveat emptor.
+
+[1] http://ovirt.org/wiki/Category:Api
+[2] http://ovirt.org/wiki/API_-_oVirt_workshop_November_2011_Notes

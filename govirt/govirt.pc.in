@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: govirt
+Description: goVirt is a GLib binding for oVirt REST API
+Version: @VERSION@
+Requires: glib-2.0, gobject-2.0, rest-0.7
+Libs: -L${libdir} -lgovirt
+Cflags: -I${includedir}/govirt-1
