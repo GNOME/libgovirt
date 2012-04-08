@@ -1,5 +1,12 @@
 GOVIRT_0.0.1 {
   global:
+        ovirt_proxy_get_type;
+        ovirt_proxy_new;
+        ovirt_proxy_lookup_vm;
+        ovirt_proxy_vm_get_ticket;
+        ovirt_proxy_vm_start;
+        ovirt_proxy_vm_stop;
+
         ovirt_rest_call_error_quark;
         ovirt_rest_call_get_type;
         ovirt_rest_call_error_get_type;
