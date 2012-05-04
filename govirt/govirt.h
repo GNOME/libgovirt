@@ -24,5 +24,6 @@
 
 #include <govirt/ovirt-enum-types.h>
 #include <govirt/ovirt-rest-call.h>
+#include <govirt/ovirt-vm-display.h>
 
 #endif /* __OVIRT_H__ */

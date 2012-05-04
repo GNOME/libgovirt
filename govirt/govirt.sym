@@ -5,6 +5,10 @@ GOVIRT_0.0.1 {
         ovirt_rest_call_error_get_type;
         ovirt_rest_call_new;
 
+        ovirt_vm_display_get_type;
+        ovirt_vm_display_type_get_type;
+        ovirt_vm_display_new;
+
   local:
         *;
 };
