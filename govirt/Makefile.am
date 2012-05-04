@@ -16,11 +16,13 @@ libgovirt_ladir = $(includedir)/govirt-1/govirt
 libgovirt_la_HEADERS =						\
 	govirt.h						\
 	ovirt-rest-call.h					\
+	ovirt-vm.h						\
 	ovirt-vm-display.h					\
 	$(NULL)
 
 libgovirt_la_SOURCES =						\
 	ovirt-rest-call.c					\
+	ovirt-vm.c						\
 	ovirt-vm-display.c					\
 	$(NULL)
 
