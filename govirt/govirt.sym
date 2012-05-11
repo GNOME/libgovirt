@@ -1,5 +1,9 @@
 GOVIRT_0.0.1 {
   global:
+        ovirt_rest_call_error_quark;
+        ovirt_rest_call_get_type;
+        ovirt_rest_call_error_get_type;
+        ovirt_rest_call_new;
 
   local:
         *;

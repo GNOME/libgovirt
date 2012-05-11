@@ -11,9 +11,11 @@ lib_LTLIBRARIES =						\
 	libgovirt.la
 
 libgovirt_ladir = $(includedir)/govirt-1/govirt
-libgovirt_la_HEADERS =
+libgovirt_la_HEADERS =						\
+	ovirt-rest-call.h
 
-libgovirt_la_SOURCES =
+libgovirt_la_SOURCES =						\
+	ovirt-rest-call.c
 
 libgovirt_la_LIBADD =						\
 	$(GLIB_LIBS)						\
