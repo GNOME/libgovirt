@@ -61,6 +61,8 @@ typedef enum {
 
 GType ovirt_vm_get_type(void);
 OvirtVm *ovirt_vm_new(void);
+void ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url);
+const char *ovirt_vm_get_action(OvirtVm *vm, const char *action);
 
 G_END_DECLS
 

@@ -198,3 +198,22 @@ OvirtVm *ovirt_vm_new(void)
 {
     return OVIRT_VM(g_object_new(OVIRT_TYPE_VM, NULL));
 }
+
+void ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url)
+{
+    g_return_if_fail(OVIRT_IS_VM(vm));
+
+    if (vm->priv->actions == NULL) {
+        vm->priv->actions = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                                  g_free, g_free);
+    }
+    g_hash_table_insert(vm->priv->actions, g_strdup(action), g_strdup(url));
+}
+
+const char *ovirt_vm_get_action(OvirtVm *vm, const char *action)
+{
+    g_return_val_if_fail(OVIRT_IS_VM(vm), NULL);
+    g_return_val_if_fail(vm->priv->actions != NULL, NULL);
+
+    return g_hash_table_lookup(vm->priv->actions, action);
+}

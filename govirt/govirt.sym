@@ -8,6 +8,8 @@ GOVIRT_0.0.1 {
         ovirt_vm_get_type;
         ovirt_vm_state_get_type;
         ovirt_vm_new;
+        ovirt_vm_add_action;
+        ovirt_vm_get_action;
 
         ovirt_vm_display_get_type;
         ovirt_vm_display_type_get_type;
