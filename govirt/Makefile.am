@@ -1,3 +1,5 @@
+NULL =
+
 INCLUDES = \
 	$(GLIB_CFLAGS)						\
 	$(REST_CFLAGS)						\
@@ -16,6 +18,14 @@ libgovirt_la_HEADERS =						\
 
 libgovirt_la_SOURCES =						\
 	ovirt-rest-call.c
+
+nodist_libgovirt_la_HEADERS =					\
+	$(builddir)/ovirt-enum-types.h				\
+	$(NULL)
+
+nodist_libgovirt_la_SOURCES =					\
+	$(builddir)/ovirt-enum-types.c				\
+	$(NULL)
 
 libgovirt_la_LIBADD =						\
 	$(GLIB_LIBS)						\
@@ -36,10 +46,26 @@ libgovirt_la_CFLAGS =						\
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = govirt.pc
 
+ovirt-enum-types.h: $(libgovirt_la_HEADERS) ovirt-enum-types.h.template
+	$(AM_V_GEN) ( $(GLIB_MKENUMS) --template $(srcdir)/ovirt-enum-types.h.template $(libgovirt_la_HEADERS:%=$(srcdir)/%) ) \
+	    > ovirt-enum-types.h
+
+ovirt-enum-types.c: $(libgovirt_la_HEADERS) ovirt-enum-types.h ovirt-enum-types.c.template
+	$(AM_V_GEN) ( $(GLIB_MKENUMS) --template $(srcdir)/ovirt-enum-types.c.template $(libgovirt_la_HEADERS:%=$(srcdir)/%) ) \
+	    > ovirt-enum-types.c
+
+BUILT_SOURCES =							\
+	ovirt-enum-types.h					\
+	ovirt-enum-types.c					\
+	$(NULL)
+
 EXTRA_DIST =							\
 	govirt-version.h.in					\
 	govirt.pc.in						\
-	govirt.sym
+	govirt.sym						\
+	ovirt-enum-types.h.template				\
+	ovirt-enum-types.c.template				\
+	$(NULL)
 
 CLEANFILES = $(BUILT_SOURCES)
 
