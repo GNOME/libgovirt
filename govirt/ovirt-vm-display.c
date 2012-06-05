@@ -32,6 +32,7 @@ struct _OvirtVmDisplayPrivate {
     OvirtVmDisplayType type;
     char *address;
     guint port;
+    guint secure_port;
     guint monitor_count;
     char *ticket;
     guint expiry;
@@ -44,6 +45,7 @@ enum {
     PROP_TYPE,
     PROP_ADDRESS,
     PROP_PORT,
+    PROP_SECURE_PORT,
     PROP_MONITOR_COUNT,
     PROP_TICKET,
     PROP_EXPIRY
@@ -65,6 +67,9 @@ static void ovirt_vm_display_get_property(GObject *object,
         break;
     case PROP_PORT:
         g_value_set_uint(value, display->priv->port);
+        break;
+    case PROP_SECURE_PORT:
+        g_value_set_uint(value, display->priv->secure_port);
         break;
     case PROP_MONITOR_COUNT:
         g_value_set_uint(value, display->priv->monitor_count);
@@ -97,6 +102,9 @@ static void ovirt_vm_display_set_property(GObject *object,
         break;
     case PROP_PORT:
         display->priv->port = g_value_get_uint(value);
+        break;
+    case PROP_SECURE_PORT:
+        display->priv->secure_port = g_value_get_uint(value);
         break;
     case PROP_MONITOR_COUNT:
         display->priv->monitor_count = g_value_get_uint(value);
@@ -155,6 +163,15 @@ static void ovirt_vm_display_class_init(OvirtVmDisplayClass *klass)
                                     g_param_spec_uint("port",
                                                       "Port",
                                                       "Display Port",
+                                                      0, G_MAXUINT16,
+                                                      0,
+                                                      G_PARAM_READWRITE |
+                                                      G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_SECURE_PORT,
+                                    g_param_spec_uint("secure-port",
+                                                      "Secure Port",
+                                                      "Secure Display Port",
                                                       0, G_MAXUINT16,
                                                       0,
                                                       G_PARAM_READWRITE |

@@ -67,6 +67,7 @@ static void dump_display(OvirtVmDisplay *display)
     guint monitor_count;
     gchar *address;
     guint port;
+    guint secure_port;
     gchar *ticket;
     guint expiry;
 
@@ -75,6 +76,7 @@ static void dump_display(OvirtVmDisplay *display)
                  "monitor-count", &monitor_count,
                  "address", &address,
                  "port", &port,
+                 "secure-port", &secure_port,
                  "ticket", &ticket,
                  "expiry", &expiry,
                  NULL);
@@ -84,6 +86,7 @@ static void dump_display(OvirtVmDisplay *display)
     g_print("\t\tMonitors: %d\n", monitor_count);
     g_print("\t\tAddress: %s\n", address);
     g_print("\t\tPort: %d\n", port);
+    g_print("\t\tSecure Port: %d\n", secure_port);
     g_print("\t\tTicket: %s\n", ticket);
     g_print("\t\tExpiry: %d\n", expiry);
     g_free(address);
@@ -161,6 +164,7 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
     const char *type_key = g_intern_string("type");
     const char *address_key = g_intern_string("address");
     const char *port_key = g_intern_string("port");
+    const char *secure_port_key = g_intern_string("secure_port");
     const char *monitors_key = g_intern_string("monitors");
 
     if (root == NULL) {
@@ -197,6 +201,13 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
     if (node != NULL) {
         g_object_set(G_OBJECT(display),
                      "port", strtoul(node->content, NULL, 0),
+                     NULL);
+    }
+
+    node = g_hash_table_lookup(root->children, secure_port_key);
+    if (node != NULL) {
+        g_object_set(G_OBJECT(display),
+                     "secure-port", strtoul(node->content, NULL, 0),
                      NULL);
     }
 
