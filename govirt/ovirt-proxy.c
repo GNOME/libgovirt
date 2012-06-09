@@ -416,6 +416,77 @@ OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name,
     return g_object_ref(vm);
 }
 
+typedef struct {
+    OvirtProxyLookupVmAsyncCallback async_cb;
+    gpointer user_data;
+    char *vm_name;
+} OvirtProxyLookupVmData;
+
+static void fetch_vms_async_cb(RestProxyCall *call, const GError *error,
+                               GObject *weak_object, gpointer user_data)
+{
+
+    OvirtProxyLookupVmData *data = (OvirtProxyLookupVmData *)user_data;
+    OvirtVm *vm;
+    OvirtProxy *proxy = OVIRT_PROXY(weak_object);
+
+    g_return_if_fail(data != NULL);
+
+    if (error == NULL) {
+        if (proxy->priv->vms != NULL) {
+            g_hash_table_unref(proxy->priv->vms);
+        }
+        proxy->priv->vms = parse_vms_xml(call);
+        vm = g_hash_table_lookup(proxy->priv->vms, data->vm_name);
+    } else {
+        vm = NULL;
+    }
+    if (data->async_cb != NULL) {
+        data->async_cb(proxy, vm, error, data->user_data);
+    }
+    g_object_unref(G_OBJECT(call));
+    g_free(data->vm_name);
+    g_slice_free(OvirtProxyLookupVmData, data);
+}
+
+gboolean ovirt_proxy_lookup_vm_async(OvirtProxy *proxy, const char *vm_name,
+                                     OvirtProxyLookupVmAsyncCallback async_cb,
+                                     gpointer user_data, GError **error)
+{
+    OvirtVm *vm;
+
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
+    g_return_val_if_fail(REST_IS_PROXY(proxy->priv->rest_proxy), FALSE);
+    g_return_val_if_fail(vm_name != NULL, FALSE);
+    g_return_val_if_fail(async_cb != NULL, FALSE);
+
+    if (proxy->priv->vms != NULL) {
+        vm = g_hash_table_lookup(proxy->priv->vms, vm_name);
+        async_cb(proxy, vm, NULL, user_data);
+    } else {
+        RestProxyCall *call;
+        OvirtProxyLookupVmData *data;
+
+        data = g_slice_new(OvirtProxyLookupVmData);
+        data->async_cb = async_cb;
+        data->user_data = user_data;
+        data->vm_name = g_strdup(vm_name);
+        call = REST_PROXY_CALL(ovirt_rest_call_new(proxy->priv->rest_proxy));
+        rest_proxy_call_set_function(call, "vms");
+
+        if (!rest_proxy_call_async(call, fetch_vms_async_cb, G_OBJECT(proxy),
+                                   data, error)) {
+            g_warning("Error while getting VM list");
+            g_free(data->vm_name);
+            g_slice_free(OvirtProxyLookupVmData, data);
+            g_object_unref(G_OBJECT(call));
+            return FALSE;
+        }
+    }
+
+    return TRUE;
+}
+
 static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm, GError **error)
 {
     RestXmlNode *node;
