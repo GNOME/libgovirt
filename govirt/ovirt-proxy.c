@@ -611,6 +611,9 @@ ovirt_set_property(GObject *object, guint property_id,
         if (self->priv->rest_proxy)
             g_object_unref(self->priv->rest_proxy);
         self->priv->rest_proxy = rest_proxy_new(g_value_get_string(value), FALSE);
+        g_object_set(G_OBJECT(self->priv->rest_proxy),
+                     "ssl-strict", FALSE,
+                     NULL);
         break;
 
     default:
