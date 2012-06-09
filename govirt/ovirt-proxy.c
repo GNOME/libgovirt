@@ -674,6 +674,116 @@ gboolean ovirt_proxy_vm_stop(OvirtProxy *proxy, OvirtVm *vm, GError **error)
     return ovirt_proxy_vm_action(proxy, vm, "stop", NULL, error);
 }
 
+typedef struct {
+    OvirtProxyActionAsyncCallback async_cb;
+    gpointer user_data;
+    OvirtVm *vm;
+    char *action;
+    ActionResponseParser response_parser;
+} OvirtProxyActionData;
+
+static void action_async_cb(RestProxyCall *call, const GError *librest_error,
+                            GObject *weak_object, gpointer user_data)
+{
+    OvirtProxyActionData *data = (OvirtProxyActionData *)user_data;
+    OvirtProxy *proxy = OVIRT_PROXY(weak_object);
+    const GError *error;
+    GError *action_error = NULL;
+
+    g_return_if_fail(data != NULL);
+
+    if (librest_error == NULL) {
+        parse_action_response(call, data->vm, data->response_parser, &action_error);
+        error = action_error;
+    } else {
+        error = librest_error;
+    }
+
+    if (data->async_cb != NULL) {
+        data->async_cb(proxy, data->vm, error, data->user_data);
+    }
+
+    if (action_error != NULL) {
+        g_error_free(action_error);
+    }
+    g_free(data->action);
+    g_object_unref(G_OBJECT(data->vm));
+    g_slice_free(OvirtProxyActionData, data);
+    g_object_unref(G_OBJECT(call));
+}
+
+static gboolean
+ovirt_proxy_vm_action_async(OvirtProxy *proxy, OvirtVm *vm,
+                            const char *action,
+                            ActionResponseParser response_parser,
+                            OvirtProxyActionAsyncCallback async_cb,
+                            gpointer user_data, GError **error)
+{
+    RestProxyCall *call;
+    OvirtProxyActionData *data;
+    const char *function;
+
+    g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
+    g_return_val_if_fail(action != NULL, FALSE);
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
+    g_return_val_if_fail(REST_IS_PROXY(proxy->priv->rest_proxy), FALSE);
+    g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
+
+    function = ovirt_vm_get_action(vm, action);
+    g_return_val_if_fail(function != NULL, FALSE);
+
+    call = REST_PROXY_CALL(ovirt_rest_call_new(proxy->priv->rest_proxy));
+    rest_proxy_call_set_method(call, "POST");
+    rest_proxy_call_set_function(call, function);
+    rest_proxy_call_add_param(call, "async", "false");
+    data = g_slice_new(OvirtProxyActionData);
+    data->async_cb = async_cb;
+    data->user_data = user_data;
+    data->action = g_strdup(action);
+    data->vm = g_object_ref(G_OBJECT(vm));
+    data->response_parser = response_parser;
+
+    if (!rest_proxy_call_async(call, action_async_cb, G_OBJECT(proxy),
+                               data, error)) {
+        g_warning("Error while running %s on %p", action, vm);
+        g_free(data->action);
+        g_object_unref(G_OBJECT(data->vm));
+        g_slice_free(OvirtProxyActionData, data);
+        g_object_unref(G_OBJECT(call));
+        return FALSE;
+    }
+    return TRUE;
+}
+
+gboolean
+ovirt_proxy_vm_get_ticket_async(OvirtProxy *proxy, OvirtVm *vm,
+                                OvirtProxyActionAsyncCallback async_cb,
+                                gpointer user_data, GError **error)
+{
+    return ovirt_proxy_vm_action_async(proxy, vm, "ticket",
+                                       parse_ticket_status,
+                                       async_cb, user_data,
+                                       error);
+}
+
+gboolean
+ovirt_proxy_vm_start_async(OvirtProxy *proxy, OvirtVm *vm,
+                           OvirtProxyActionAsyncCallback async_cb,
+                           gpointer user_data, GError **error)
+{
+    return ovirt_proxy_vm_action_async(proxy, vm, "start", NULL,
+                                       async_cb, user_data, error);
+}
+
+gboolean
+ovirt_proxy_vm_stop_async(OvirtProxy *proxy, OvirtVm *vm,
+                          OvirtProxyActionAsyncCallback async_cb,
+                          gpointer user_data, GError **error)
+{
+    return ovirt_proxy_vm_action_async(proxy, vm, "stop", NULL,
+                                       async_cb, user_data, error);
+}
+
 static void
 ovirt_get_property(GObject *object, guint property_id,
                    GValue *value, GParamSpec *pspec)

@@ -80,4 +80,15 @@ typedef void (*OvirtProxyLookupVmAsyncCallback)(OvirtProxy *proxy, OvirtVm *vm, 
 gboolean ovirt_proxy_lookup_vm_async(OvirtProxy *proxy, const char *vm_name,
                                      OvirtProxyLookupVmAsyncCallback async_cb,
                                      gpointer user_data, GError **error);
+
+typedef void (*OvirtProxyActionAsyncCallback)(OvirtProxy *proxy, OvirtVm *vm, const GError *error, gpointer user_data);
+gboolean ovirt_proxy_vm_get_ticket_async(OvirtProxy *proxy, OvirtVm *vm,
+                                         OvirtProxyActionAsyncCallback async_cb,
+                                         gpointer user_data, GError **error);
+gboolean ovirt_proxy_vm_start_async(OvirtProxy *proxy, OvirtVm *vm,
+                                    OvirtProxyActionAsyncCallback async_cb,
+                                    gpointer user_data, GError **error);
+gboolean ovirt_proxy_vm_stop_async(OvirtProxy *proxy, OvirtVm *vm,
+                                   OvirtProxyActionAsyncCallback async_cb,
+                                   gpointer user_data, GError **error);
 #endif
