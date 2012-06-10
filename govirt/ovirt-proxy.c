@@ -515,8 +515,11 @@ static void parse_fault(RestXmlNode *root, GError **error)
     g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_FAULT, node->content);
 }
 
+typedef gboolean (*ActionResponseParser)(RestXmlNode *node, OvirtVm *vm, GError **error);
+
 static gboolean
-parse_action_response(RestProxyCall *call, OvirtVm *vm, GError **error)
+parse_action_response(RestProxyCall *call, OvirtVm *vm,
+                      ActionResponseParser response_parser, GError **error)
 {
     RestXmlParser *parser;
     RestXmlNode *root;
@@ -531,7 +534,11 @@ parse_action_response(RestProxyCall *call, OvirtVm *vm, GError **error)
 
     if (g_strcmp0(root->name, "action") == 0) {
         if (parse_action_status(root, error) == OVIRT_RESPONSE_COMPLETE) {
-            result = parse_ticket_status(root, vm, error);
+            if (response_parser) {
+                result = response_parser(root, vm, error);
+            } else {
+                result = TRUE;
+            }
         }
     } else if (g_strcmp0(root->name, "fault") == 0) {
         parse_fault(root, error);
@@ -545,9 +552,9 @@ parse_action_response(RestProxyCall *call, OvirtVm *vm, GError **error)
     return result;
 }
 
-
-static gboolean ovirt_proxy_vm_action(OvirtProxy *proxy, OvirtVm *vm,
-                                      const char *action, GError **error)
+static gboolean
+ovirt_proxy_vm_action(OvirtProxy *proxy, OvirtVm *vm, const char *action,
+                      ActionResponseParser response_parser, GError **error)
 {
     RestProxyCall *call;
     const char *function;
@@ -572,7 +579,7 @@ static gboolean ovirt_proxy_vm_action(OvirtProxy *proxy, OvirtVm *vm,
         return FALSE;
     }
 
-    parse_action_response(call, vm, error);
+    parse_action_response(call, vm, response_parser, error);
 
     g_object_unref(G_OBJECT(call));
 
@@ -581,17 +588,19 @@ static gboolean ovirt_proxy_vm_action(OvirtProxy *proxy, OvirtVm *vm,
 
 gboolean ovirt_proxy_vm_get_ticket(OvirtProxy *proxy, OvirtVm *vm, GError **error)
 {
-    return ovirt_proxy_vm_action(proxy, vm, "ticket", error);
+    return ovirt_proxy_vm_action(proxy, vm, "ticket",
+                                 parse_ticket_status,
+                                 error);
 }
 
 gboolean ovirt_proxy_vm_start(OvirtProxy *proxy, OvirtVm *vm, GError **error)
 {
-    return ovirt_proxy_vm_action(proxy, vm, "start", error);
+    return ovirt_proxy_vm_action(proxy, vm, "start", NULL, error);
 }
 
 gboolean ovirt_proxy_vm_stop(OvirtProxy *proxy, OvirtVm *vm, GError **error)
 {
-    return ovirt_proxy_vm_action(proxy, vm, "stop", error);
+    return ovirt_proxy_vm_action(proxy, vm, "stop", NULL, error);
 }
 
 static void
