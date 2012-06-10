@@ -59,6 +59,10 @@ enum OvirtResponseStatus {
     OVIRT_RESPONSE_COMPLETE
 };
 
+GQuark ovirt_proxy_error_quark(void)
+{
+      return g_quark_from_static_string ("ovirt-proxy-error-quark");
+}
 
 #ifdef OVIRT_DEBUG
 static void dump_display(OvirtVmDisplay *display)
@@ -412,7 +416,7 @@ OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name,
     return g_object_ref(vm);
 }
 
-static void parse_ticket_status(RestXmlNode *root, OvirtVm *vm, GError **error)
+static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm, GError **error)
 {
     RestXmlNode *node;
     const char *ticket_key = g_intern_string("ticket");
@@ -420,34 +424,39 @@ static void parse_ticket_status(RestXmlNode *root, OvirtVm *vm, GError **error)
     const char *expiry_key = g_intern_string("expiry");
     OvirtVmDisplay *display;
 
-    g_return_if_fail(root != NULL);
-    g_return_if_fail(vm != NULL);
-    g_return_if_fail(error == NULL || *error == NULL);
+    g_return_val_if_fail(root != NULL, FALSE);
+    g_return_val_if_fail(vm != NULL, FALSE);
+    g_return_val_if_fail(error == NULL || *error == NULL, FALSE);
 
     root = g_hash_table_lookup(root->children, ticket_key);
     if (root == NULL) {
-        g_return_if_reached();
+        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, NULL);
+        g_return_val_if_reached(FALSE);
     }
     node = g_hash_table_lookup(root->children, value_key);
     if (node == NULL) {
-        g_return_if_reached();
+        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, NULL);
+        g_return_val_if_reached(FALSE);
     }
 
     g_object_get(G_OBJECT(vm), "display", &display, NULL);
-    g_return_if_fail(display != NULL);
+    g_return_val_if_fail(display != NULL, FALSE);
     g_object_set(G_OBJECT(display), "ticket", node->content, NULL);
 
     g_debug("Ticket: %s\n", node->content);
 
     node = g_hash_table_lookup(root->children, expiry_key);
     if (node == NULL) {
+        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, NULL);
         g_object_unref(G_OBJECT(display));
-        g_return_if_reached();
+        g_return_val_if_reached(FALSE);
     }
     g_object_set(G_OBJECT(display),
                  "expiry", strtoul(node->content, NULL, 0),
                  NULL);
     g_object_unref(G_OBJECT(display));
+
+    return TRUE;
 }
 
 static enum OvirtResponseStatus parse_action_status(RestXmlNode *root,
@@ -464,23 +473,29 @@ static enum OvirtResponseStatus parse_action_status(RestXmlNode *root,
 
     node = g_hash_table_lookup(root->children, status_key);
     if (node == NULL) {
+        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, NULL);
         g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
     }
     node = g_hash_table_lookup(node->children, state_key);
     if (node == NULL) {
+        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, NULL);
         g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
     }
     g_debug("State: %s\n", node->content);
     if (g_strcmp0(node->content, "complete") == 0) {
         return OVIRT_RESPONSE_COMPLETE;
     } else if (g_strcmp0(node->content, "pending") == 0) {
+        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_ACTION_FAILED, NULL);
         return OVIRT_RESPONSE_PENDING;
     } else if (g_strcmp0(node->content, "in_progress") == 0) {
+        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_ACTION_FAILED, NULL);
         return OVIRT_RESPONSE_IN_PROGRESS;
     } else if (g_strcmp0(node->content, "failed") == 0) {
+        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_ACTION_FAILED, NULL);
         return OVIRT_RESPONSE_FAILED;
     }
 
+    g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, NULL);
     g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
 }
 
@@ -488,27 +503,26 @@ static void parse_fault(RestXmlNode *root, GError **error)
 {
     RestXmlNode *node;
     const char *reason_key = g_intern_string("reason");
-    const char *detail_key = g_intern_string("detail");
 
     g_return_if_fail(g_strcmp0(root->name, "fault") == 0);
 
     node = g_hash_table_lookup(root->children, reason_key);
     if (node == NULL) {
+        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, NULL);
         g_return_if_reached();
     }
     g_debug("Reason: %s\n", node->content);
-    node = g_hash_table_lookup(root->children, detail_key);
-    if (node == NULL) {
-        g_return_if_reached();
-    }
-    g_debug("Detail: %s\n", node->content);
+    g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_FAULT, node->content);
 }
 
-static void parse_action_response(RestProxyCall *call, OvirtVm *vm, GError **error)
+static gboolean
+parse_action_response(RestProxyCall *call, OvirtVm *vm, GError **error)
 {
     RestXmlParser *parser;
     RestXmlNode *root;
+    gboolean result;
 
+    result = FALSE;
     parser = rest_xml_parser_new ();
 
     root = rest_xml_parser_parse_from_data (parser,
@@ -517,7 +531,7 @@ static void parse_action_response(RestProxyCall *call, OvirtVm *vm, GError **err
 
     if (g_strcmp0(root->name, "action") == 0) {
         if (parse_action_status(root, error) == OVIRT_RESPONSE_COMPLETE) {
-            parse_ticket_status(root, vm, error);
+            result = parse_ticket_status(root, vm, error);
         }
     } else if (g_strcmp0(root->name, "fault") == 0) {
         parse_fault(root, error);
@@ -527,6 +541,8 @@ static void parse_action_response(RestProxyCall *call, OvirtVm *vm, GError **err
 
     rest_xml_node_unref(root);
     g_object_unref(G_OBJECT(parser));
+
+    return result;
 }
 
 
@@ -552,12 +568,11 @@ static gboolean ovirt_proxy_vm_action(OvirtProxy *proxy, OvirtVm *vm,
 
     if (!rest_proxy_call_sync(call, error)) {
         g_warning("Error while running %s on %p", action, vm);
-        parse_action_response(call, vm, NULL);
         g_object_unref(G_OBJECT(call));
         return FALSE;
     }
 
-    parse_action_response(call, vm, NULL);
+    parse_action_response(call, vm, error);
 
     g_object_unref(G_OBJECT(call));
 

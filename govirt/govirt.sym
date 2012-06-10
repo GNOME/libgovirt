@@ -1,6 +1,8 @@
 GOVIRT_0.0.1 {
   global:
+        ovirt_proxy_error_quark;
         ovirt_proxy_get_type;
+        ovirt_proxy_error_get_type;
         ovirt_proxy_new;
         ovirt_proxy_lookup_vm;
         ovirt_proxy_vm_get_ticket;

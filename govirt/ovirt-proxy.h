@@ -58,6 +58,15 @@ struct _OvirtProxyClass {
     GObjectClass parent_class;
 };
 
+typedef enum {
+  OVIRT_PROXY_PARSING_FAILED,
+  OVIRT_PROXY_ACTION_FAILED,
+  OVIRT_PROXY_FAULT
+} OvirtProxyError;
+
+GQuark ovirt_proxy_error_quark(void);
+#define OVIRT_PROXY_ERROR ovirt_proxy_error_quark()
+
 GType ovirt_proxy_get_type(void);
 
 OvirtProxy *ovirt_proxy_new(const char *uri);
