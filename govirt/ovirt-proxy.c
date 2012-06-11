@@ -31,23 +31,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <rest/rest-proxy.h>
 #include <rest/rest-xml-node.h>
 #include <rest/rest-xml-parser.h>
 
-G_DEFINE_TYPE (OvirtProxy, ovirt_proxy, G_TYPE_OBJECT);
+G_DEFINE_TYPE (OvirtProxy, ovirt_proxy, REST_TYPE_PROXY);
 
 struct _OvirtProxyPrivate {
-    RestProxy *rest_proxy;
     GHashTable *vms;
 };
 
 #define OVIRT_PROXY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE((o), OVIRT_TYPE_PROXY, OvirtProxyPrivate))
-
-enum {
-    PROP_0,
-    PROP_URI,
-};
 
 #define API_ENTRY_POINT "/api/"
 
@@ -371,9 +364,8 @@ static gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
     RestProxyCall *call;
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
-    g_return_val_if_fail(REST_IS_PROXY(proxy->priv->rest_proxy), FALSE);
 
-    call = REST_PROXY_CALL(ovirt_rest_call_new(proxy->priv->rest_proxy));
+    call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
     rest_proxy_call_set_function(call, "vms");
 
     if (!rest_proxy_call_sync(call, error)) {
@@ -456,7 +448,6 @@ gboolean ovirt_proxy_lookup_vm_async(OvirtProxy *proxy, const char *vm_name,
     OvirtVm *vm;
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
-    g_return_val_if_fail(REST_IS_PROXY(proxy->priv->rest_proxy), FALSE);
     g_return_val_if_fail(vm_name != NULL, FALSE);
     g_return_val_if_fail(async_cb != NULL, FALSE);
 
@@ -471,7 +462,7 @@ gboolean ovirt_proxy_lookup_vm_async(OvirtProxy *proxy, const char *vm_name,
         data->async_cb = async_cb;
         data->user_data = user_data;
         data->vm_name = g_strdup(vm_name);
-        call = REST_PROXY_CALL(ovirt_rest_call_new(proxy->priv->rest_proxy));
+        call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
         rest_proxy_call_set_function(call, "vms");
 
         if (!rest_proxy_call_async(call, fetch_vms_async_cb, G_OBJECT(proxy),
@@ -633,13 +624,12 @@ ovirt_proxy_vm_action(OvirtProxy *proxy, OvirtVm *vm, const char *action,
     g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
     g_return_val_if_fail(action != NULL, FALSE);
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
-    g_return_val_if_fail(REST_IS_PROXY(proxy->priv->rest_proxy), FALSE);
     g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
 
     function = ovirt_vm_get_action(vm, action);
     g_return_val_if_fail(function != NULL, FALSE);
 
-    call = REST_PROXY_CALL(ovirt_rest_call_new(proxy->priv->rest_proxy));
+    call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
     rest_proxy_call_set_method(call, "POST");
     rest_proxy_call_set_function(call, function);
     rest_proxy_call_add_param(call, "async", "false");
@@ -726,13 +716,12 @@ ovirt_proxy_vm_action_async(OvirtProxy *proxy, OvirtVm *vm,
     g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
     g_return_val_if_fail(action != NULL, FALSE);
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
-    g_return_val_if_fail(REST_IS_PROXY(proxy->priv->rest_proxy), FALSE);
     g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
 
     function = ovirt_vm_get_action(vm, action);
     g_return_val_if_fail(function != NULL, FALSE);
 
-    call = REST_PROXY_CALL(ovirt_rest_call_new(proxy->priv->rest_proxy));
+    call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
     rest_proxy_call_set_method(call, "POST");
     rest_proxy_call_set_function(call, function);
     rest_proxy_call_add_param(call, "async", "false");
@@ -785,54 +774,10 @@ ovirt_proxy_vm_stop_async(OvirtProxy *proxy, OvirtVm *vm,
 }
 
 static void
-ovirt_get_property(GObject *object, guint property_id,
-                   GValue *value, GParamSpec *pspec)
-{
-    OvirtProxy *self = OVIRT_PROXY(object);
-
-    switch (property_id) {
-    case PROP_URI: {
-        char *uri;
-        g_object_get(G_OBJECT(self->priv->rest_proxy),
-                     "url-format", &uri,
-                     NULL);
-        g_value_take_string(value, uri);
-        break;
-    }
-
-    default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-    }
-}
-
-static void
-ovirt_set_property(GObject *object, guint property_id,
-                   const GValue *value G_GNUC_UNUSED, GParamSpec *pspec)
-{
-    OvirtProxy *self = OVIRT_PROXY(object);
-
-    switch (property_id) {
-    case PROP_URI:
-        if (self->priv->rest_proxy)
-            g_object_unref(self->priv->rest_proxy);
-        self->priv->rest_proxy = rest_proxy_new(g_value_get_string(value), FALSE);
-        g_object_set(G_OBJECT(self->priv->rest_proxy),
-                     "ssl-strict", FALSE,
-                     NULL);
-        break;
-
-    default:
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-    }
-}
-
-
-static void
 ovirt_proxy_dispose(GObject *obj)
 {
     OvirtProxy *proxy = OVIRT_PROXY(obj);
 
-    g_clear_object(&proxy->priv->rest_proxy);
     if (proxy->priv->vms) {
         g_hash_table_unref(proxy->priv->vms);
         proxy->priv->vms = NULL;
@@ -847,20 +792,8 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
     GObjectClass *oclass = G_OBJECT_CLASS(klass);
 
     oclass->dispose = ovirt_proxy_dispose;
-    oclass->get_property = ovirt_get_property;
-    oclass->set_property = ovirt_set_property;
 
     g_type_class_add_private(klass, sizeof(OvirtProxyPrivate));
-
-    g_object_class_install_property(oclass,
-                                    PROP_URI,
-                                    g_param_spec_string("uri",
-                                                        "REST URI",
-                                                        "REST URI",
-                                                        NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -871,5 +804,8 @@ ovirt_proxy_init(OvirtProxy *self)
 
 OvirtProxy *ovirt_proxy_new(const char *uri)
 {
-    return g_object_new(OVIRT_TYPE_PROXY, "uri", uri, NULL);
+    return g_object_new(OVIRT_TYPE_PROXY,
+                        "url-format", uri,
+                        "ssl-strict", FALSE,
+                        NULL);
 }

@@ -22,7 +22,7 @@
 #ifndef __OVIRT_PROXY_H__
 #define __OVIRT_PROXY_H__
 
-#include <glib-object.h>
+#include <rest/rest-proxy.h>
 #include <govirt/ovirt-vm.h>
 
 G_BEGIN_DECLS
@@ -49,13 +49,13 @@ typedef struct _OvirtProxyClass OvirtProxyClass;
 typedef struct _OvirtProxyPrivate OvirtProxyPrivate;
 
 struct _OvirtProxy {
-    GObject parent;
+    RestProxy parent;
 
     OvirtProxyPrivate *priv;
 };
 
 struct _OvirtProxyClass {
-    GObjectClass parent_class;
+    RestProxyClass parent_class;
 };
 
 typedef enum {
