@@ -574,7 +574,7 @@ static void parse_fault(RestXmlNode *root, GError **error)
         g_return_if_reached();
     }
     g_debug("Reason: %s\n", node->content);
-    g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_FAULT, node->content);
+    g_set_error_literal(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_FAULT, node->content);
 }
 
 typedef gboolean (*ActionResponseParser)(RestXmlNode *node, OvirtVm *vm, GError **error);
