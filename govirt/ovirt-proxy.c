@@ -903,3 +903,21 @@ OvirtProxy *ovirt_proxy_new(const char *uri)
                         "ssl-strict", FALSE,
                         NULL);
 }
+
+/**
+ * ovirt_proxy_get_vms:
+ *
+ * Return value: (transfer none) (element-type GoVirt.Vm): the list of
+ * #OvirtVm associated with #OvirtProxy. It must be populated with a call
+ * to ovirt_proxy_fetch_vms_async() before being non-NULL. The returned
+ * list should not be freed nor modified, and can become invalid any time
+ * a #OvirtProxy call completes.
+ */
+GList *ovirt_proxy_get_vms(OvirtProxy *proxy)
+{
+    if (proxy->priv->vms != NULL) {
+        return g_hash_table_get_values(proxy->priv->vms);
+    }
+
+    return NULL;
+}

@@ -5,6 +5,7 @@ GOVIRT_0.0.1 {
         ovirt_proxy_error_get_type;
         ovirt_proxy_new;
         ovirt_proxy_get_vms_async;
+        ovirt_proxy_get_vms;
         ovirt_proxy_lookup_vm;
         ovirt_proxy_lookup_vm_async;
         ovirt_proxy_vm_get_ticket;

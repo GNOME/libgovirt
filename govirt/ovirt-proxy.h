@@ -72,6 +72,7 @@ GType ovirt_proxy_get_type(void);
 OvirtProxy *ovirt_proxy_new(const char *uri);
 OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name,
                                GError **error);
+GList *ovirt_proxy_get_vms(OvirtProxy *proxy);
 gboolean ovirt_proxy_vm_get_ticket(OvirtProxy *proxy, OvirtVm *vm, GError **error);
 gboolean ovirt_proxy_vm_start(OvirtProxy *proxy, OvirtVm *vm, GError **error);
 gboolean ovirt_proxy_vm_stop(OvirtProxy *proxy, OvirtVm *vm, GError **error);
