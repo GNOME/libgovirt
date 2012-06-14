@@ -381,6 +381,17 @@ static gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
     return TRUE;
 }
 
+/**
+ * ovirt_proxy_lookup_vm:
+ * @proxy: a #OvirtProxy
+ * @vm_name: name of the virtual machine to lookup
+ * @error: a #GError or NULL
+ *
+ * Looks up a virtual machine whose name is @name. If it cannot be found,
+ * NULL is returned.
+ *
+ * Return value: (transfer full): a #OvirtVm whose name is @name or NULL
+ */
 OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name,
                                GError **error)
 {
@@ -441,6 +452,13 @@ static void fetch_vms_async_cb(RestProxyCall *call, const GError *error,
     g_slice_free(OvirtProxyLookupVmData, data);
 }
 
+/**
+ * ovirt_proxy_lookup_vm_async:
+ * @proxy: a #OvirtProxy
+ * @vm_name: name of the VM to lookup
+ * @async_cb: (scope async): completion callback
+ * @user_data: (closure): opaque data for callback
+ */
 gboolean ovirt_proxy_lookup_vm_async(OvirtProxy *proxy, const char *vm_name,
                                      OvirtProxyLookupVmAsyncCallback async_cb,
                                      gpointer user_data, GError **error)
@@ -744,6 +762,13 @@ ovirt_proxy_vm_action_async(OvirtProxy *proxy, OvirtVm *vm,
     return TRUE;
 }
 
+/**
+ * ovirt_proxy_vm_get_ticket_async:
+ * @proxy: a #OvirtProxy
+ * @vm: a #OvirtVM
+ * @async_cb: (scope async): completion callback
+ * @user_data: (closure): opaque data for callback
+ */
 gboolean
 ovirt_proxy_vm_get_ticket_async(OvirtProxy *proxy, OvirtVm *vm,
                                 OvirtProxyActionAsyncCallback async_cb,
@@ -755,6 +780,13 @@ ovirt_proxy_vm_get_ticket_async(OvirtProxy *proxy, OvirtVm *vm,
                                        error);
 }
 
+/**
+ * ovirt_proxy_vm_start_async:
+ * @proxy: a #OvirtProxy
+ * @vm: a #OvirtVM
+ * @async_cb: (scope async): completion callback
+ * @user_data: (closure): opaque data for callback
+ */
 gboolean
 ovirt_proxy_vm_start_async(OvirtProxy *proxy, OvirtVm *vm,
                            OvirtProxyActionAsyncCallback async_cb,
@@ -764,6 +796,13 @@ ovirt_proxy_vm_start_async(OvirtProxy *proxy, OvirtVm *vm,
                                        async_cb, user_data, error);
 }
 
+/**
+ * ovirt_proxy_vm_stop_async:
+ * @proxy: a #OvirtProxy
+ * @vm: a #OvirtVM
+ * @async_cb: (scope async): completion callback
+ * @user_data: (closure): opaque data for callback
+ */
 gboolean
 ovirt_proxy_vm_stop_async(OvirtProxy *proxy, OvirtVm *vm,
                           OvirtProxyActionAsyncCallback async_cb,

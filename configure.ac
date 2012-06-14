@@ -98,6 +98,8 @@ PKG_CHECK_MODULES([GLIB], [gobject-2.0])
 GLIB_MKENUMS=`$PKG_CONFIG --variable=glib_mkenums glib-2.0`
 AC_SUBST(GLIB_MKENUMS)
 
+GOBJECT_INTROSPECTION_CHECK([1.30.0])
+
 dnl **** Check for librest ****
 PKG_CHECK_MODULES([REST], [rest-0.7 >= 0.7.13])
 
