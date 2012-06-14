@@ -492,21 +492,16 @@ typedef struct {
     char *vm_name;
 } OvirtProxyLookupVmData;
 
-static void fetch_vms_async_cb(RestProxyCall *call, const GError *error,
-                               GObject *weak_object, gpointer user_data)
+static void lookup_vm_async_cb(OvirtProxy *proxy, G_GNUC_UNUSED GList *vms,
+                               const GError *error, gpointer user_data)
 {
 
     OvirtProxyLookupVmData *data = (OvirtProxyLookupVmData *)user_data;
     OvirtVm *vm;
-    OvirtProxy *proxy = OVIRT_PROXY(weak_object);
 
     g_return_if_fail(data != NULL);
 
     if (error == NULL) {
-        if (proxy->priv->vms != NULL) {
-            g_hash_table_unref(proxy->priv->vms);
-        }
-        proxy->priv->vms = parse_vms_xml(call);
         vm = g_hash_table_lookup(proxy->priv->vms, data->vm_name);
     } else {
         vm = NULL;
@@ -514,7 +509,6 @@ static void fetch_vms_async_cb(RestProxyCall *call, const GError *error,
     if (data->async_cb != NULL) {
         data->async_cb(proxy, vm, error, data->user_data);
     }
-    g_object_unref(G_OBJECT(call));
     g_free(data->vm_name);
     g_slice_free(OvirtProxyLookupVmData, data);
 }
@@ -540,22 +534,16 @@ gboolean ovirt_proxy_lookup_vm_async(OvirtProxy *proxy, const char *vm_name,
         vm = g_hash_table_lookup(proxy->priv->vms, vm_name);
         async_cb(proxy, vm, NULL, user_data);
     } else {
-        RestProxyCall *call;
         OvirtProxyLookupVmData *data;
 
         data = g_slice_new(OvirtProxyLookupVmData);
         data->async_cb = async_cb;
         data->user_data = user_data;
         data->vm_name = g_strdup(vm_name);
-        call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
-        rest_proxy_call_set_function(call, "vms");
-
-        if (!rest_proxy_call_async(call, fetch_vms_async_cb, G_OBJECT(proxy),
-                                   data, error)) {
+        if (!ovirt_proxy_get_vms_async(proxy, lookup_vm_async_cb, data, error)) {
             g_warning("Error while getting VM list");
             g_free(data->vm_name);
             g_slice_free(OvirtProxyLookupVmData, data);
-            g_object_unref(G_OBJECT(call));
             return FALSE;
         }
     }
