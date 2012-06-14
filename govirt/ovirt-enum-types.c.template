@@ -1,6 +1,5 @@
 /*** BEGIN file-header ***/
-#include "ovirt-enum-types.h"
-#include "ovirt-rest-call.h"
+#include <govirt/govirt.h>
 /*** END file-header ***/
 
 /*** BEGIN file-production ***/
