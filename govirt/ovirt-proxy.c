@@ -381,6 +381,73 @@ static gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
     return TRUE;
 }
 
+typedef struct {
+    OvirtProxyGetVmsAsyncCallback async_cb;
+    gpointer user_data;
+} OvirtProxyGetVmsData;
+
+static void get_vms_async_cb(RestProxyCall *call, const GError *error,
+                             GObject *weak_object, gpointer user_data)
+{
+    OvirtProxyGetVmsData *data = (OvirtProxyGetVmsData *)user_data;
+    OvirtProxy *proxy = OVIRT_PROXY(weak_object);
+
+    g_return_if_fail(data != NULL);
+
+    if (error == NULL) {
+        proxy->priv->vms = parse_vms_xml(call);
+    }
+    if (data->async_cb != NULL) {
+        GList *vms;
+        if (proxy->priv->vms != NULL) {
+            vms = g_hash_table_get_keys(proxy->priv->vms);
+        } else {
+            vms = NULL;
+        }
+        data->async_cb(proxy, vms, error, data->user_data);
+    }
+    g_object_unref(G_OBJECT(call));
+    g_slice_free(OvirtProxyGetVmsData, data);
+}
+
+/**
+ * ovirt_proxy_get_vms_async:
+ * @proxy: a #OvirtProxy
+ * @async_cb: (scope async): completion callback
+ * @user_data: (closure): opaque data for callback
+ */
+gboolean ovirt_proxy_get_vms_async(OvirtProxy *proxy,
+                                   OvirtProxyGetVmsAsyncCallback async_cb,
+                                   gpointer user_data, GError **error)
+{
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
+    g_return_val_if_fail(async_cb != NULL, FALSE);
+
+    if (proxy->priv->vms != NULL) {
+        GList *vms = g_hash_table_get_values(proxy->priv->vms);
+        async_cb(proxy, vms, NULL, user_data);
+    } else {
+        RestProxyCall *call;
+        OvirtProxyGetVmsData *data;
+
+        data = g_slice_new(OvirtProxyGetVmsData);
+        data->async_cb = async_cb;
+        data->user_data = user_data;
+        call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
+        rest_proxy_call_set_function(call, "vms");
+
+        if (!rest_proxy_call_async(call, get_vms_async_cb, G_OBJECT(proxy),
+                                   data, error)) {
+            g_warning("Error while getting VM list");
+            g_slice_free(OvirtProxyGetVmsData, data);
+            g_object_unref(G_OBJECT(call));
+            return FALSE;
+        }
+    }
+
+    return TRUE;
+}
+
 /**
  * ovirt_proxy_lookup_vm:
  * @proxy: a #OvirtProxy
