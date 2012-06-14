@@ -77,6 +77,14 @@ gboolean ovirt_proxy_vm_get_ticket(OvirtProxy *proxy, OvirtVm *vm, GError **erro
 gboolean ovirt_proxy_vm_start(OvirtProxy *proxy, OvirtVm *vm, GError **error);
 gboolean ovirt_proxy_vm_stop(OvirtProxy *proxy, OvirtVm *vm, GError **error);
 
+void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
+                                 GCancellable *cancellable,
+                                 GAsyncReadyCallback callback,
+                                 gpointer user_data);
+GList *ovirt_proxy_fetch_vms_finish(OvirtProxy *proxy,
+                                    GAsyncResult *result,
+                                    GError **err);
+
 typedef void (*OvirtProxyLookupVmAsyncCallback)(OvirtProxy *proxy, OvirtVm *vm, const GError *error, gpointer user_data);
 gboolean ovirt_proxy_lookup_vm_async(OvirtProxy *proxy, const char *vm_name,
                                      OvirtProxyLookupVmAsyncCallback async_cb,

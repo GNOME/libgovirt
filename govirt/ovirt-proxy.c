@@ -448,6 +448,105 @@ gboolean ovirt_proxy_get_vms_async(OvirtProxy *proxy,
     return TRUE;
 }
 
+static void
+fetch_vms_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
+                        RestProxyCall *call)
+{
+  rest_proxy_call_cancel (call);
+}
+
+static void
+fetch_vms_async_cb(RestProxyCall *call, const GError *error,
+                   G_GNUC_UNUSED GObject *weak_object, gpointer user_data)
+{
+  GSimpleAsyncResult *result = user_data;
+
+  if (error != NULL) {
+      g_simple_async_result_set_from_error(result, error);
+  } else {
+      OvirtProxy *proxy;
+      proxy = OVIRT_PROXY (
+              g_async_result_get_source_object (G_ASYNC_RESULT (result)));
+
+      if (proxy->priv->vms != NULL) {
+          g_hash_table_unref(proxy->priv->vms);
+      }
+      proxy->priv->vms = parse_vms_xml(call);
+
+      g_simple_async_result_set_op_res_gboolean (result, TRUE);
+      g_object_unref (proxy);
+  }
+
+  g_simple_async_result_complete (result);
+
+  g_object_unref (result);
+}
+
+/**
+ * ovirt_proxy_fetch_vms_async:
+ * @proxy: a #OvirtProxy
+ * @callback: (scope async): completion callback
+ * @user_data: (closure): opaque data for callback
+ */
+void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
+                                 GCancellable *cancellable,
+                                 GAsyncReadyCallback callback,
+                                 gpointer user_data)
+{
+    GSimpleAsyncResult *result;
+    RestProxyCall *call;
+    GError *error;
+
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
+
+    result = g_simple_async_result_new (G_OBJECT(proxy), callback,
+                                        user_data,
+                                        ovirt_proxy_fetch_vms_async);
+
+    call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
+    rest_proxy_call_set_function(call, "vms");
+    if (cancellable != NULL) {
+        g_signal_connect (cancellable, "cancelled",
+                          G_CALLBACK (fetch_vms_cancelled_cb), call);
+    }
+
+    if (!rest_proxy_call_async(call, fetch_vms_async_cb, NULL,
+                               result, &error)) {
+        g_warning("Error while getting VM list");
+        g_simple_async_result_set_from_error(result, error);
+        g_simple_async_result_complete(result);
+        g_object_unref(G_OBJECT(result));
+        g_object_unref(G_OBJECT(call));
+    }
+}
+
+/**
+ * ovirt_proxy_fetch_vms_finish:
+ * @proxy: a #OvirtProxy
+ * @result: (transfer none): async method result
+ *
+ * Return value: (transfer none) (element-type GoVirt.Vm): the list of
+ * #OvirtVm associated with #OvirtProxy. The returned list should not be
+ * freed nor modified, and can become invalid any time a #OvirtProxy call
+ * completes.
+ */
+GList *
+ovirt_proxy_fetch_vms_finish(OvirtProxy *proxy,
+                             GAsyncResult *result,
+                             GError **err)
+{
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
+    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(proxy),
+                                                        ovirt_proxy_fetch_vms_async),
+                         NULL);
+
+    if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
+        return NULL;
+
+    return ovirt_proxy_get_vms(proxy);
+}
+
 /**
  * ovirt_proxy_lookup_vm:
  * @proxy: a #OvirtProxy
