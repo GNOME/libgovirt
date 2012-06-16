@@ -17,6 +17,7 @@ libgovirt_la_HEADERS =						\
 	govirt.h						\
 	ovirt-proxy.h						\
 	ovirt-rest-call.h					\
+	ovirt-types.h						\
 	ovirt-vm.h						\
 	ovirt-vm-display.h					\
 	$(NULL)

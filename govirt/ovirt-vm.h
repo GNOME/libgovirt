@@ -22,7 +22,9 @@
 #ifndef __OVIRT_VM_H__
 #define __OVIRT_VM_H__
 
+#include <gio/gio.h>
 #include <glib-object.h>
+#include <govirt/ovirt-types.h>
 
 G_BEGIN_DECLS
 
@@ -63,6 +65,21 @@ GType ovirt_vm_get_type(void);
 OvirtVm *ovirt_vm_new(void);
 void ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url);
 const char *ovirt_vm_get_action(OvirtVm *vm, const char *action);
+
+gboolean ovirt_vm_get_ticket(OvirtVm *vm, OvirtProxy *proxy, GError **error);
+gboolean ovirt_vm_start(OvirtVm *vm, OvirtProxy *proxy, GError **error);
+gboolean ovirt_vm_stop(OvirtVm *vm, OvirtProxy *proxy, GError **error);
+
+typedef void (*OvirtVmActionAsyncCallback)(OvirtVm *vm, OvirtProxy *proxy, const GError *error, gpointer user_data);
+gboolean ovirt_vm_get_ticket_async(OvirtVm *vm, OvirtProxy *proxy,
+                                   OvirtVmActionAsyncCallback async_cb,
+                                   gpointer user_data, GError **error);
+gboolean ovirt_vm_start_async(OvirtVm *vm, OvirtProxy *proxy,
+                              OvirtVmActionAsyncCallback async_cb,
+                              gpointer user_data, GError **error);
+gboolean ovirt_vm_stop_async(OvirtVm *vm, OvirtProxy *proxy,
+                             OvirtVmActionAsyncCallback async_cb,
+                             gpointer user_data, GError **error);
 
 G_END_DECLS
 

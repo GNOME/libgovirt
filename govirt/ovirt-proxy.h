@@ -23,6 +23,7 @@
 #define __OVIRT_PROXY_H__
 
 #include <rest/rest-proxy.h>
+#include <govirt/ovirt-types.h>
 #include <govirt/ovirt-vm.h>
 
 G_BEGIN_DECLS
@@ -44,7 +45,6 @@ G_BEGIN_DECLS
 #define OVIRT_PROXY_GET_CLASS(obj) \
     (G_TYPE_INSTANCE_GET_CLASS ((obj), OVIRT_TYPE_PROXY, OvirtProxyClass))
 
-typedef struct _OvirtProxy OvirtProxy;
 typedef struct _OvirtProxyClass OvirtProxyClass;
 typedef struct _OvirtProxyPrivate OvirtProxyPrivate;
 
@@ -73,9 +73,6 @@ OvirtProxy *ovirt_proxy_new(const char *uri);
 OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name,
                                GError **error);
 GList *ovirt_proxy_get_vms(OvirtProxy *proxy);
-gboolean ovirt_proxy_vm_get_ticket(OvirtProxy *proxy, OvirtVm *vm, GError **error);
-gboolean ovirt_proxy_vm_start(OvirtProxy *proxy, OvirtVm *vm, GError **error);
-gboolean ovirt_proxy_vm_stop(OvirtProxy *proxy, OvirtVm *vm, GError **error);
 
 void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
                                  GCancellable *cancellable,
@@ -94,14 +91,4 @@ typedef void (*OvirtProxyGetVmsAsyncCallback)(OvirtProxy *proxy, GList *vms, con
 gboolean ovirt_proxy_get_vms_async(OvirtProxy *proxy, OvirtProxyGetVmsAsyncCallback async_cb,
                                    gpointer user_data, GError **error);
 
-typedef void (*OvirtProxyActionAsyncCallback)(OvirtProxy *proxy, OvirtVm *vm, const GError *error, gpointer user_data);
-gboolean ovirt_proxy_vm_get_ticket_async(OvirtProxy *proxy, OvirtVm *vm,
-                                         OvirtProxyActionAsyncCallback async_cb,
-                                         gpointer user_data, GError **error);
-gboolean ovirt_proxy_vm_start_async(OvirtProxy *proxy, OvirtVm *vm,
-                                    OvirtProxyActionAsyncCallback async_cb,
-                                    gpointer user_data, GError **error);
-gboolean ovirt_proxy_vm_stop_async(OvirtProxy *proxy, OvirtVm *vm,
-                                   OvirtProxyActionAsyncCallback async_cb,
-                                   gpointer user_data, GError **error);
 #endif
