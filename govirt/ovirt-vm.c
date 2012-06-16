@@ -27,6 +27,7 @@
 #include "ovirt-rest-call.h"
 #include "ovirt-vm.h"
 #include "ovirt-vm-display.h"
+#include "ovirt-vm-private.h"
 
 #include <rest/rest-xml-node.h>
 #include <rest/rest-xml-parser.h>
@@ -219,7 +220,8 @@ OvirtVm *ovirt_vm_new(void)
     return OVIRT_VM(g_object_new(OVIRT_TYPE_VM, NULL));
 }
 
-void ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url)
+G_GNUC_INTERNAL void
+ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url)
 {
     g_return_if_fail(OVIRT_IS_VM(vm));
 
@@ -230,7 +232,8 @@ void ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url)
     g_hash_table_insert(vm->priv->actions, g_strdup(action), g_strdup(url));
 }
 
-const char *ovirt_vm_get_action(OvirtVm *vm, const char *action)
+static const char *
+ovirt_vm_get_action(OvirtVm *vm, const char *action)
 {
     g_return_val_if_fail(OVIRT_IS_VM(vm), NULL);
     g_return_val_if_fail(vm->priv->actions != NULL, NULL);

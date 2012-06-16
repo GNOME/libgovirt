@@ -27,6 +27,7 @@
 #include "ovirt-proxy.h"
 #include "ovirt-vm.h"
 #include "ovirt-vm-display.h"
+#include "ovirt-vm-private.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -22,6 +22,10 @@ libgovirt_la_HEADERS =						\
 	ovirt-vm-display.h					\
 	$(NULL)
 
+noinst_HEADERS =						\
+	ovirt-vm-private.h					\
+	$(NULL)
+
 libgovirt_la_SOURCES =						\
 	ovirt-proxy.c						\
 	ovirt-rest-call.c					\

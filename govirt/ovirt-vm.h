@@ -63,8 +63,6 @@ typedef enum {
 
 GType ovirt_vm_get_type(void);
 OvirtVm *ovirt_vm_new(void);
-void ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url);
-const char *ovirt_vm_get_action(OvirtVm *vm, const char *action);
 
 gboolean ovirt_vm_get_ticket(OvirtVm *vm, OvirtProxy *proxy, GError **error);
 gboolean ovirt_vm_start(OvirtVm *vm, OvirtProxy *proxy, GError **error);
