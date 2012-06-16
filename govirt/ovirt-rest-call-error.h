@@ -1,5 +1,5 @@
 /*
- * govirt.h: main header
+ * ovirt-rest-call-error.h: oVirt librest call proxy errors
  *
  * Copyright (C) 2012 Red Hat, Inc.
  *
@@ -19,13 +19,19 @@
  *
  * Author: Christophe Fergeau <cfergeau@redhat.com>
  */
-#ifndef __OVIRT_H__
-#define __OVIRT_H__
+#ifndef __OVIRT_REST_CALL_ERROR_H__
+#define __OVIRT_REST_CALL_ERROR_H__
 
-#include <govirt/ovirt-enum-types.h>
-#include <govirt/ovirt-proxy.h>
-#include <govirt/ovirt-rest-call-error.h>
-#include <govirt/ovirt-vm.h>
-#include <govirt/ovirt-vm-display.h>
+G_BEGIN_DECLS
 
-#endif /* __OVIRT_H__ */
+typedef enum {
+    OVIRT_REST_CALL_ERROR_XML
+} OvirtRestCallError;
+
+#define OVIRT_REST_CALL_ERROR ovirt_rest_call_error_quark()
+
+GQuark ovirt_rest_call_error_quark(void);
+
+G_END_DECLS
+
+#endif /* __OVIRT_REST_CALL_ERROR_H__ */

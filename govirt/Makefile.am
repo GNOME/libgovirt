@@ -16,13 +16,14 @@ libgovirt_ladir = $(includedir)/govirt-1/govirt
 libgovirt_la_HEADERS =						\
 	govirt.h						\
 	ovirt-proxy.h						\
-	ovirt-rest-call.h					\
+	ovirt-rest-call-error.h					\
 	ovirt-types.h						\
 	ovirt-vm.h						\
 	ovirt-vm-display.h					\
 	$(NULL)
 
 noinst_HEADERS =						\
+	ovirt-rest-call.h					\
 	ovirt-vm-private.h					\
 	$(NULL)
 

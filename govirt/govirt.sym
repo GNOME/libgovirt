@@ -12,9 +12,7 @@ GOVIRT_0.0.1 {
         ovirt_proxy_lookup_vm_async;
 
         ovirt_rest_call_error_quark;
-        ovirt_rest_call_get_type;
         ovirt_rest_call_error_get_type;
-        ovirt_rest_call_new;
 
         ovirt_vm_get_type;
         ovirt_vm_state_get_type;

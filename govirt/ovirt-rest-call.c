@@ -23,6 +23,7 @@
 #include <config.h>
 
 #include "ovirt-rest-call.h"
+#include "ovirt-rest-call-error.h"
 #include <rest/rest-params.h>
 
 #define OVIRT_REST_CALL_GET_PRIVATE(obj)                         \

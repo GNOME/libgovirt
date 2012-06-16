@@ -53,15 +53,8 @@ struct _OvirtRestCallClass
     gpointer padding[20];
 };
 
-typedef enum {
-    OVIRT_REST_CALL_ERROR_XML
-} OvirtRestCallError;
-
-#define OVIRT_REST_CALL_ERROR ovirt_rest_call_error_quark()
-
-GQuark ovirt_rest_call_error_quark(void);
-GType ovirt_rest_call_get_type(void);
-OvirtRestCall *ovirt_rest_call_new(RestProxy *proxy);
+G_GNUC_INTERNAL GType ovirt_rest_call_get_type(void);
+G_GNUC_INTERNAL OvirtRestCall *ovirt_rest_call_new(RestProxy *proxy);
 
 G_END_DECLS
 
