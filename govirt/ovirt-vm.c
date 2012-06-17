@@ -239,137 +239,142 @@ const char *ovirt_vm_get_action(OvirtVm *vm, const char *action)
 }
 
 typedef struct {
-    OvirtVmActionAsyncCallback async_cb;
-    gpointer user_data;
-    OvirtVm *vm;
-    char *action;
     ActionResponseParser response_parser;
-} OvirtVmActionData;
+} OvirtProxyActionData;
 
 static void action_async_cb(RestProxyCall *call, const GError *librest_error,
                             GObject *weak_object, gpointer user_data)
 {
-    OvirtVmActionData *data = (OvirtVmActionData *)user_data;
-    OvirtProxy *proxy = OVIRT_PROXY(weak_object);
-    const GError *error;
-    GError *action_error = NULL;
+    GSimpleAsyncResult *result = user_data;
+    OvirtProxyActionData *data = (OvirtProxyActionData *)user_data;
 
     g_return_if_fail(data != NULL);
 
-    if (librest_error == NULL) {
-        parse_action_response(call, data->vm, data->response_parser, &action_error);
-        error = action_error;
+    if (librest_error != NULL) {
+        g_simple_async_result_set_from_error(result, librest_error);
     } else {
-        error = librest_error;
+        GError *action_error = NULL;
+        OvirtVm *vm = OVIRT_VM (
+              g_async_result_get_source_object (G_ASYNC_RESULT (result)));
+        parse_action_response(call, vm, data->response_parser, &action_error);
+        if (action_error != NULL) {
+            g_simple_async_result_take_error(result, action_error);
+        } else {
+            g_simple_async_result_set_op_res_gboolean (result, TRUE);
+        }
+        g_object_unref(G_OBJECT(vm));
     }
 
-    if (data->async_cb != NULL) {
-        data->async_cb(data->vm, proxy, error, data->user_data);
-    }
+    g_simple_async_result_complete (result);
 
-    if (action_error != NULL) {
-        g_error_free(action_error);
-    }
-    g_free(data->action);
-    g_object_unref(G_OBJECT(data->vm));
-    g_slice_free(OvirtVmActionData, data);
+    g_slice_free(OvirtProxyActionData, data);
     g_object_unref(G_OBJECT(call));
 }
 
-static gboolean
-ovirt_vm_action_async(OvirtVm *vm, OvirtProxy *proxy,
-                      const char *action,
-                      ActionResponseParser response_parser,
-                      OvirtVmActionAsyncCallback async_cb,
-                      gpointer user_data, GError **error)
+static void
+action_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
+                     RestProxyCall *call)
 {
-    RestProxyCall *call;
-    OvirtVmActionData *data;
-    const char *function;
+    rest_proxy_call_cancel (call);
+}
 
-    g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
-    g_return_val_if_fail(action != NULL, FALSE);
-    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
-    g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
+
+static void
+ovirt_vm_invoke_action_async(OvirtVm *vm,
+                             const char *action,
+                             OvirtProxy *proxy,
+                             ActionResponseParser response_parser,
+                             GCancellable *cancellable,
+                             GAsyncReadyCallback callback,
+                             gpointer user_data)
+{
+    GSimpleAsyncResult *result;
+    RestProxyCall *call;
+    OvirtProxyActionData *data;
+    const char *function;
+    GError *error = NULL;
+
+    g_return_if_fail(OVIRT_IS_VM(vm));
+    g_return_if_fail(action != NULL);
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
     function = ovirt_vm_get_action(vm, action);
-    g_return_val_if_fail(function != NULL, FALSE);
+    g_return_if_fail(function != NULL);
 
     call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
     rest_proxy_call_set_method(call, "POST");
     rest_proxy_call_set_function(call, function);
     rest_proxy_call_add_param(call, "async", "false");
-    data = g_slice_new(OvirtVmActionData);
-    data->async_cb = async_cb;
-    data->user_data = user_data;
-    data->action = g_strdup(action);
-    data->vm = g_object_ref(G_OBJECT(vm));
+
+    result = g_simple_async_result_new (G_OBJECT(vm), callback,
+                                        user_data,
+                                        ovirt_vm_invoke_action_async);
+    if (cancellable != NULL) {
+        g_signal_connect (cancellable, "cancelled",
+                          G_CALLBACK (action_cancelled_cb), call);
+    }
+
+    data = g_slice_new(OvirtProxyActionData);
     data->response_parser = response_parser;
 
     if (!rest_proxy_call_async(call, action_async_cb, G_OBJECT(proxy),
-                               data, error)) {
+                               data, &error)) {
         g_warning("Error while running %s on %p", action, vm);
-        g_free(data->action);
-        g_object_unref(G_OBJECT(data->vm));
-        g_slice_free(OvirtVmActionData, data);
+        g_simple_async_result_take_error(result, error);
+        g_simple_async_result_complete(result);
+        g_slice_free(OvirtProxyActionData, data);
         g_object_unref(G_OBJECT(call));
-        return FALSE;
     }
-    return TRUE;
 }
 
-/**
- * ovirt_vm_get_ticket_async:
- * @proxy: a #OvirtProxy
- * @vm: a #OvirtVM
- * @async_cb: (scope async): completion callback
- * @user_data: (closure): opaque data for callback
- */
 gboolean
+ovirt_vm_action_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
+{
+    g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
+    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(vm),
+                                                        ovirt_vm_invoke_action_async),
+                         FALSE);
+
+    if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
+        return FALSE;
+
+    return g_simple_async_result_get_op_res_gboolean(G_SIMPLE_ASYNC_RESULT(result));
+}
+
+void
 ovirt_vm_get_ticket_async(OvirtVm *vm, OvirtProxy *proxy,
-                          OvirtVmActionAsyncCallback async_cb,
-                          gpointer user_data, GError **error)
+                          GCancellable *cancellable,
+                          GAsyncReadyCallback callback,
+                          gpointer user_data)
 {
-    return ovirt_vm_action_async(vm, proxy, "ticket",
-                                 parse_ticket_status,
-                                 async_cb, user_data,
-                                 error);
+    ovirt_vm_invoke_action_async(vm, "ticket", proxy, parse_ticket_status,
+                                 cancellable, callback, user_data);
 }
 
-/**
- * ovirt_vm_start_async:
- * @proxy: a #OvirtProxy
- * @vm: a #OvirtVM
- * @async_cb: (scope async): completion callback
- * @user_data: (closure): opaque data for callback
- */
-gboolean
+void
 ovirt_vm_start_async(OvirtVm *vm, OvirtProxy *proxy,
-                     OvirtVmActionAsyncCallback async_cb,
-                     gpointer user_data, GError **error)
+                     GCancellable *cancellable,
+                     GAsyncReadyCallback callback,
+                     gpointer user_data)
 {
-    return ovirt_vm_action_async(vm, proxy, "start", NULL,
-                                 async_cb, user_data, error);
+    ovirt_vm_invoke_action_async(vm, "start", proxy, NULL,
+                                 cancellable, callback, user_data);
 }
 
-/**
- * ovirt_vm_stop_async:
- * @proxy: a #OvirtProxy
- * @vm: a #OvirtVM
- * @async_cb: (scope async): completion callback
- * @user_data: (closure): opaque data for callback
- */
-gboolean
+void
 ovirt_vm_stop_async(OvirtVm *vm, OvirtProxy *proxy,
-                    OvirtVmActionAsyncCallback async_cb,
-                    gpointer user_data, GError **error)
+                    GCancellable *cancellable,
+                    GAsyncReadyCallback callback,
+                    gpointer user_data)
 {
-    return ovirt_vm_action_async(vm, proxy, "stop", NULL,
-                                 async_cb, user_data, error);
+    ovirt_vm_invoke_action_async(vm, "stop", proxy, NULL,
+                                 cancellable, callback, user_data);
 }
+
 static gboolean
 ovirt_vm_action(OvirtVm *vm, OvirtProxy *proxy, const char *action,
-                ActionResponseParser response_parser, GError **error)
+                      ActionResponseParser response_parser, GError **error)
 {
     RestProxyCall *call;
     const char *function;
