@@ -40,6 +40,8 @@ nodist_libgovirt_la_HEADERS =					\
 
 nodist_libgovirt_la_SOURCES =					\
 	$(builddir)/ovirt-enum-types.c				\
+	$(builddir)/ovirt-enum-types-private.c			\
+	$(builddir)/ovirt-enum-types-private.h			\
 	$(NULL)
 
 libgovirt_la_LIBADD =						\
@@ -69,9 +71,19 @@ ovirt-enum-types.c: $(libgovirt_la_HEADERS) ovirt-enum-types.h ovirt-enum-types.
 	$(AM_V_GEN) ( $(GLIB_MKENUMS) --template $(srcdir)/ovirt-enum-types.c.template $(libgovirt_la_HEADERS:%=$(srcdir)/%) ) \
 	    > ovirt-enum-types.c
 
+ovirt-enum-types-private.h: $(noinst_HEADERS) ovirt-enum-types-private.h.template
+	$(AM_V_GEN) ( $(GLIB_MKENUMS) --template $(srcdir)/ovirt-enum-types-private.h.template $(noinst_HEADERS:%=$(srcdir)/%) ) \
+	    > ovirt-enum-types-private.h
+
+ovirt-enum-types-private.c: $(noinst_HEADERS) ovirt-enum-types-private.h ovirt-enum-types-private.c.template
+	$(AM_V_GEN) ( $(GLIB_MKENUMS) --template $(srcdir)/ovirt-enum-types-private.c.template $(noinst_HEADERS:%=$(srcdir)/%) ) \
+	    > ovirt-enum-types-private.c
+
 BUILT_SOURCES =							\
 	ovirt-enum-types.h					\
 	ovirt-enum-types.c					\
+	ovirt-enum-types-private.h				\
+	ovirt-enum-types-private.c				\
 	$(NULL)
 
 EXTRA_DIST =							\
@@ -80,6 +92,8 @@ EXTRA_DIST =							\
 	govirt.sym						\
 	ovirt-enum-types.h.template				\
 	ovirt-enum-types.c.template				\
+	ovirt-enum-types-private.h.template			\
+	ovirt-enum-types-private.c.template			\
 	$(NULL)
 
 CLEANFILES = $(BUILT_SOURCES)
@@ -98,7 +112,7 @@ INTROSPECTION_SCANNER_ARGS =					\
 INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
-introspection_sources = $(libgovirt_la_SOURCES) $(libgovirt_la_HEADERS) $(BUILT_SOURCES)
+introspection_sources = $(libgovirt_la_SOURCES) $(libgovirt_la_HEADERS) $(builddir)/ovirt-enum-types.c $(builddir)/ovirt-enum-types.h
 
 GoVirt-1.0.gir: libgovirt.la Makefile
 GoVirt_1_0_gir_INCLUDES = Gio-2.0 GObject-2.0 Rest-0.7
