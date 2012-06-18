@@ -25,6 +25,18 @@
 
 G_BEGIN_DECLS
 
+typedef enum {
+    OVIRT_VM_ACTION_SHUTDOWN,
+    OVIRT_VM_ACTION_START,
+    OVIRT_VM_ACTION_STOP,
+    OVIRT_VM_ACTION_SUSPEND,
+    OVIRT_VM_ACTION_DETACH,
+    OVIRT_VM_ACTION_EXPORT,
+    OVIRT_VM_ACTION_MOVE,
+    OVIRT_VM_ACTION_TICKET,
+    OVIRT_VM_ACTION_MIGRATE
+} OvirtVmAction;
+
 void ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url);
 
 G_END_DECLS
