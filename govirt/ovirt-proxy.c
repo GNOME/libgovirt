@@ -39,9 +39,15 @@ G_DEFINE_TYPE (OvirtProxy, ovirt_proxy, REST_TYPE_PROXY);
 
 struct _OvirtProxyPrivate {
     GHashTable *vms;
+    gchar *ca_cert_path;
 };
 
 #define OVIRT_PROXY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE((o), OVIRT_TYPE_PROXY, OvirtProxyPrivate))
+
+enum {
+    PROP_0,
+    PROP_CA_CERT
+};
 
 #define API_ENTRY_POINT "/api/"
 
@@ -643,6 +649,41 @@ gboolean ovirt_proxy_lookup_vm_async(OvirtProxy *proxy, const char *vm_name,
     return TRUE;
 }
 
+static void ovirt_proxy_get_property(GObject *object,
+                                     guint prop_id,
+                                     GValue *value,
+                                     GParamSpec *pspec)
+{
+    OvirtProxy *proxy = OVIRT_PROXY(object);
+
+    switch (prop_id) {
+    case PROP_CA_CERT:
+        g_value_set_string(value, proxy->priv->ca_cert_path);
+        break;
+
+    default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+    }
+}
+
+static void ovirt_proxy_set_property(GObject *object,
+                                     guint prop_id,
+                                     const GValue *value,
+                                     GParamSpec *pspec)
+{
+    OvirtProxy *proxy = OVIRT_PROXY(object);
+
+    switch (prop_id) {
+    case PROP_CA_CERT:
+        g_free(proxy->priv->ca_cert_path);
+        proxy->priv->ca_cert_path = g_value_dup_string(value);
+        break;
+
+    default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+    }
+}
+
 static void
 ovirt_proxy_dispose(GObject *obj)
 {
@@ -657,11 +698,35 @@ ovirt_proxy_dispose(GObject *obj)
 }
 
 static void
+ovirt_proxy_finalize(GObject *obj)
+{
+    OvirtProxy *proxy = OVIRT_PROXY(obj);
+
+    g_free(proxy->priv->ca_cert_path);
+    proxy->priv->ca_cert_path = NULL;
+
+    G_OBJECT_CLASS(ovirt_proxy_parent_class)->finalize(obj);
+}
+
+static void
 ovirt_proxy_class_init(OvirtProxyClass *klass)
 {
     GObjectClass *oclass = G_OBJECT_CLASS(klass);
 
     oclass->dispose = ovirt_proxy_dispose;
+    oclass->finalize = ovirt_proxy_finalize;
+
+    oclass->get_property = ovirt_proxy_get_property;
+    oclass->set_property = ovirt_proxy_set_property;
+
+    g_object_class_install_property(oclass,
+                                    PROP_CA_CERT,
+                                    g_param_spec_string("ca-cert",
+                                                        "ca-cert",
+                                                        "Path to the oVirt CA certificate to use when connecting to remote VM",
+                                                        NULL,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
 
     g_type_class_add_private(klass, sizeof(OvirtProxyPrivate));
 }
