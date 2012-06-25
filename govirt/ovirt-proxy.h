@@ -91,4 +91,12 @@ typedef void (*OvirtProxyGetVmsAsyncCallback)(OvirtProxy *proxy, GList *vms, con
 gboolean ovirt_proxy_get_vms_async(OvirtProxy *proxy, OvirtProxyGetVmsAsyncCallback async_cb,
                                    gpointer user_data, GError **error);
 
+void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
+                                            GCancellable *cancellable,
+                                            GAsyncReadyCallback callback,
+                                            gpointer user_data);
+const char *ovirt_proxy_fetch_ca_certificate_finish(OvirtProxy *proxy,
+                                                    GAsyncResult *result,
+                                                    GError **err);
+
 #endif
