@@ -487,27 +487,21 @@ ovirt_proxy_fetch_vms_finish(OvirtProxy *proxy,
  * ovirt_proxy_lookup_vm:
  * @proxy: a #OvirtProxy
  * @vm_name: name of the virtual machine to lookup
- * @error: a #GError or NULL
  *
  * Looks up a virtual machine whose name is @name. If it cannot be found,
- * NULL is returned.
+ * NULL is returned. This method does not initiate any network activity,
+ * the remote VM list must have been fetched with ovirt_proxy_fetch_vms()
+ * or ovirt_proxy_fetch_vms_async() before calling this function.
  *
  * Return value: (transfer full): a #OvirtVm whose name is @name or NULL
  */
-OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name,
-                               GError **error)
+OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name)
 {
     OvirtVm *vm;
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
     g_return_val_if_fail(vm_name != NULL, NULL);
 
-    if (proxy->priv->vms == NULL) {
-        gboolean success;
-        success = ovirt_proxy_fetch_vms(proxy, error);
-        if (!success)
-            return NULL;
-    }
     if (proxy->priv->vms == NULL) {
         return NULL;
     }

@@ -70,8 +70,7 @@ GQuark ovirt_proxy_error_quark(void);
 GType ovirt_proxy_get_type(void);
 
 OvirtProxy *ovirt_proxy_new(const char *uri);
-OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name,
-                               GError **error);
+OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name);
 GList *ovirt_proxy_get_vms(OvirtProxy *proxy);
 
 gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error);
