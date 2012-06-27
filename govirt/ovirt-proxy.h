@@ -82,16 +82,6 @@ void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
 GList *ovirt_proxy_fetch_vms_finish(OvirtProxy *proxy,
                                     GAsyncResult *result,
                                     GError **err);
-
-typedef void (*OvirtProxyLookupVmAsyncCallback)(OvirtProxy *proxy, OvirtVm *vm, const GError *error, gpointer user_data);
-gboolean ovirt_proxy_lookup_vm_async(OvirtProxy *proxy, const char *vm_name,
-                                     OvirtProxyLookupVmAsyncCallback async_cb,
-                                     gpointer user_data, GError **error);
-
-typedef void (*OvirtProxyGetVmsAsyncCallback)(OvirtProxy *proxy, GList *vms, const GError *error, gpointer user_data);
-gboolean ovirt_proxy_get_vms_async(OvirtProxy *proxy, OvirtProxyGetVmsAsyncCallback async_cb,
-                                   gpointer user_data, GError **error);
-
 void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
                                             GCancellable *cancellable,
                                             GAsyncReadyCallback callback,
