@@ -362,7 +362,7 @@ static GHashTable *parse_vms_xml(RestProxyCall *call)
     return vms;
 }
 
-static gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
+gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
 {
     RestProxyCall *call;
 

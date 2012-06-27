@@ -74,6 +74,7 @@ OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name,
                                GError **error);
 GList *ovirt_proxy_get_vms(OvirtProxy *proxy);
 
+gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error);
 void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
                                  GCancellable *cancellable,
                                  GAsyncReadyCallback callback,
