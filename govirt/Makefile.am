@@ -12,7 +12,7 @@ INCLUDES = \
 lib_LTLIBRARIES =						\
 	libgovirt.la
 
-libgovirt_ladir = $(includedir)/govirt-1/govirt
+libgovirt_ladir = $(includedir)/govirt-1.0/govirt
 libgovirt_la_HEADERS =						\
 	govirt.h						\
 	ovirt-proxy.h						\
@@ -62,7 +62,7 @@ libgovirt_la_CFLAGS =						\
 	$(WARNINGFLAGS_C)
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = govirt.pc
+pkgconfig_DATA = govirt-1.0.pc
 
 ovirt-enum-types.h: $(libgovirt_la_HEADERS) ovirt-enum-types.h.template
 	$(AM_V_GEN) ( $(GLIB_MKENUMS) --template $(srcdir)/ovirt-enum-types.h.template $(libgovirt_la_HEADERS:%=$(srcdir)/%) ) \
@@ -88,7 +88,7 @@ BUILT_SOURCES =							\
 	$(NULL)
 
 EXTRA_DIST =							\
-	govirt.pc.in						\
+	govirt-1.0.pc.in					\
 	govirt.sym						\
 	ovirt-enum-types.h.template				\
 	ovirt-enum-types.c.template				\

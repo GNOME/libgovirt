@@ -115,7 +115,7 @@ dnl - Makefiles, etc.
 dnl ---------------------------------------------------------------------------
 AC_CONFIG_FILES([
 Makefile
-govirt/govirt.pc
+govirt/govirt-1.0.pc
 govirt/Makefile
 ])
 AC_OUTPUT
