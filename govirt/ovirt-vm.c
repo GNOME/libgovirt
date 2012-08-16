@@ -335,7 +335,7 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
     }
 }
 
-gboolean
+static gboolean
 ovirt_vm_action_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
@@ -359,6 +359,12 @@ ovirt_vm_get_ticket_async(OvirtVm *vm, OvirtProxy *proxy,
                                  cancellable, callback, user_data);
 }
 
+gboolean
+ovirt_vm_get_ticket_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
+{
+    return ovirt_vm_action_finish(vm, result, err);
+}
+
 void
 ovirt_vm_start_async(OvirtVm *vm, OvirtProxy *proxy,
                      GCancellable *cancellable,
@@ -369,6 +375,12 @@ ovirt_vm_start_async(OvirtVm *vm, OvirtProxy *proxy,
                                  cancellable, callback, user_data);
 }
 
+gboolean
+ovirt_vm_start_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
+{
+    return ovirt_vm_action_finish(vm, result, err);
+}
+
 void
 ovirt_vm_stop_async(OvirtVm *vm, OvirtProxy *proxy,
                     GCancellable *cancellable,
@@ -377,6 +389,12 @@ ovirt_vm_stop_async(OvirtVm *vm, OvirtProxy *proxy,
 {
     ovirt_vm_invoke_action_async(vm, "stop", proxy, NULL,
                                  cancellable, callback, user_data);
+}
+
+gboolean
+ovirt_vm_stop_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
+{
+    return ovirt_vm_action_finish(vm, result, err);
 }
 
 static gboolean

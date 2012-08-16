@@ -68,20 +68,27 @@ gboolean ovirt_vm_get_ticket(OvirtVm *vm, OvirtProxy *proxy, GError **error);
 gboolean ovirt_vm_start(OvirtVm *vm, OvirtProxy *proxy, GError **error);
 gboolean ovirt_vm_stop(OvirtVm *vm, OvirtProxy *proxy, GError **error);
 
-gboolean ovirt_vm_action_finish(OvirtVm *vm, GAsyncResult *result, GError **err);
-
 void ovirt_vm_get_ticket_async(OvirtVm *vm, OvirtProxy *proxy,
                                GCancellable *cancellable,
                                GAsyncReadyCallback callback,
                                gpointer user_data);
+gboolean ovirt_vm_get_ticket_finish(OvirtVm *vm,
+                                    GAsyncResult *result,
+                                    GError **err);
 void ovirt_vm_start_async(OvirtVm *vm, OvirtProxy *proxy,
                           GCancellable *cancellable,
                           GAsyncReadyCallback callback,
                           gpointer user_data);
+gboolean ovirt_vm_start_finish(OvirtVm *vm,
+                               GAsyncResult *result,
+                               GError **err);
 void ovirt_vm_stop_async(OvirtVm *vm, OvirtProxy *proxy,
                          GCancellable *cancellable,
                          GAsyncReadyCallback callback,
                          gpointer user_data);
+gboolean ovirt_vm_stop_finish(OvirtVm *vm,
+                              GAsyncResult *result,
+                              GError **err);
 G_END_DECLS
 
 #endif /* __OVIRT_VM_H__ */
