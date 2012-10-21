@@ -43,13 +43,15 @@ struct _OvirtProxyPrivate {
     GHashTable *vms;
     gchar *ca_cert_path;
     gboolean delete_ca_cert;
+    gboolean admin_mode;
 };
 
 #define OVIRT_PROXY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE((o), OVIRT_TYPE_PROXY, OvirtProxyPrivate))
 
 enum {
     PROP_0,
-    PROP_CA_CERT
+    PROP_CA_CERT,
+    PROP_ADMIN,
 };
 
 #define API_ENTRY_POINT "/api/"
@@ -704,6 +706,9 @@ static void ovirt_proxy_get_property(GObject *object,
     case PROP_CA_CERT:
         g_value_set_string(value, proxy->priv->ca_cert_path);
         break;
+    case PROP_ADMIN:
+        g_value_set_boolean(value, proxy->priv->admin_mode);
+        break;
 
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -725,6 +730,10 @@ static void ovirt_proxy_set_property(GObject *object,
         g_free(proxy->priv->ca_cert_path);
         proxy->priv->ca_cert_path = g_value_dup_string(value);
         proxy->priv->delete_ca_cert = FALSE;
+        break;
+
+    case PROP_ADMIN:
+        proxy->priv->admin_mode = g_value_get_boolean(value);
         break;
 
     default:
@@ -778,6 +787,14 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
                                                         NULL,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(oclass,
+                                    PROP_ADMIN,
+                                    g_param_spec_boolean("admin",
+                                                         "admin",
+                                                         "Use REST API as an admin",
+                                                         FALSE,
+                                                         G_PARAM_READWRITE |
+                                                         G_PARAM_STATIC_STRINGS));
 
     g_type_class_add_private(klass, sizeof(OvirtProxyPrivate));
 }
