@@ -58,7 +58,8 @@ struct _OvirtVmClass
 
 typedef enum {
     OVIRT_VM_STATE_DOWN,
-    OVIRT_VM_STATE_UP
+    OVIRT_VM_STATE_UP,
+    OVIRT_VM_STATE_REBOOTING
 } OvirtVmState;
 
 GType ovirt_vm_get_type(void);

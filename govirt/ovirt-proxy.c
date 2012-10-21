@@ -238,6 +238,9 @@ static gboolean vm_set_state_from_xml(OvirtVm *vm, RestXmlNode *node)
             /* FIXME: check "UP" state name in the rsdl file */
             g_object_set(G_OBJECT(vm), "state", OVIRT_VM_STATE_UP, NULL);
             res = TRUE;
+        } else if (strcmp(state->content, "reboot_in_progress") == 0) {
+            g_object_set(G_OBJECT(vm), "state", OVIRT_VM_STATE_REBOOTING, NULL);
+            res = TRUE;
         } else {
             g_warning("Couldn't parse VM state: %s", state->content);
         }
