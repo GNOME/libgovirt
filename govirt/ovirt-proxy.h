@@ -81,6 +81,7 @@ void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
 GList *ovirt_proxy_fetch_vms_finish(OvirtProxy *proxy,
                                     GAsyncResult *result,
                                     GError **err);
+gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error);
 void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
                                             GCancellable *cancellable,
                                             GAsyncReadyCallback callback,

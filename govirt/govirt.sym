@@ -4,6 +4,7 @@ GOVIRT_0.0.2 {
         ovirt_proxy_get_type;
         ovirt_proxy_error_get_type;
         ovirt_proxy_new;
+        ovirt_proxy_fetch_ca_certificate;
         ovirt_proxy_fetch_ca_certificate_async;
         ovirt_proxy_fetch_ca_certificate_finish;
         ovirt_proxy_fetch_vms;

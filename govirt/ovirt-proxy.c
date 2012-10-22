@@ -548,6 +548,60 @@ error:
     return ca_file;
 }
 
+static void set_downloaded_ca_cert(OvirtProxy *proxy, GFile *local_ca_cert)
+{
+      if (proxy->priv->delete_ca_cert) {
+          g_unlink(proxy->priv->ca_cert_path);
+      }
+      g_free(proxy->priv->ca_cert_path);
+      proxy->priv->ca_cert_path = g_file_get_path(local_ca_cert);
+      proxy->priv->delete_ca_cert = TRUE;
+      g_object_notify(G_OBJECT(proxy), "ca-cert");
+}
+
+gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
+{
+    GFile *source = NULL;
+    GFile *destination = NULL;
+    GFileInputStream *src_stream = NULL;
+    GIOStream *dest_stream = NULL;
+    gboolean copy_ok = FALSE;
+
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
+    g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
+
+    source = get_ca_cert_file(proxy);
+    src_stream = g_file_read(source, NULL, error);
+    if (src_stream == NULL)
+        goto error;
+
+    destination = g_file_new_tmp("ovirt-ca-XXXXXX.crt",
+                                 (GFileIOStream**)&dest_stream,
+                                 error);
+    if (destination == NULL)
+        goto error;
+
+    copy_ok = g_output_stream_splice(g_io_stream_get_output_stream(dest_stream),
+                                     G_INPUT_STREAM(src_stream),
+                                     G_OUTPUT_STREAM_SPLICE_NONE, NULL, error);
+    if (!copy_ok)
+        goto error;
+
+    set_downloaded_ca_cert(proxy, destination);
+
+error:
+    if (source != NULL)
+        g_object_unref(source);
+    if (src_stream != NULL)
+        g_object_unref(src_stream);
+    if (destination != NULL)
+        g_object_unref(destination);
+    if (dest_stream != NULL)
+        g_object_unref(dest_stream);
+
+    return copy_ok;
+}
+
 typedef struct {
     OvirtProxy *proxy;
     GSimpleAsyncResult *result;
@@ -590,9 +644,9 @@ static void ca_file_failed_cb(FetchCaCertData *data, GError *error)
     fetch_ca_cert_data_free(data, TRUE);
 }
 
-static void ca_file_spliced_cb (GObject *source_object,
-                                GAsyncResult *res,
-                                gpointer user_data)
+static void ca_file_spliced_cb(GObject *source_object,
+                               GAsyncResult *res,
+                               gpointer user_data)
 {
     FetchCaCertData *data = (FetchCaCertData *)user_data;
     GOutputStream *stream;
@@ -606,13 +660,7 @@ static void ca_file_spliced_cb (GObject *source_object,
         return;
     } else {
       g_simple_async_result_set_op_res_gboolean(data->result, !!spliced_bytes);
-      if (data->proxy->priv->delete_ca_cert) {
-          g_unlink(data->proxy->priv->ca_cert_path);
-      }
-      g_free(data->proxy->priv->ca_cert_path);
-      data->proxy->priv->ca_cert_path = g_file_get_path(data->local_ca_cert);
-      data->proxy->priv->delete_ca_cert = TRUE;
-      g_object_notify(G_OBJECT(data->proxy), "ca-cert");
+      set_downloaded_ca_cert(data->proxy, data->local_ca_cert);
     }
 
     g_simple_async_result_complete (data->result);
