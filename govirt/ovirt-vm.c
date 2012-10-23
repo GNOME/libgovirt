@@ -307,6 +307,7 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
+    g_debug("invoking '%s' action on %p using %p", action, vm, proxy);
     function = ovirt_vm_get_action(vm, action);
     g_return_if_fail(function != NULL);
 
