@@ -247,13 +247,14 @@ ovirt_vm_get_action(OvirtVm *vm, const char *action)
 
 typedef struct {
     ActionResponseParser response_parser;
+    GSimpleAsyncResult *result;
 } OvirtProxyActionData;
 
 static void action_async_cb(RestProxyCall *call, const GError *librest_error,
                             GObject *weak_object, gpointer user_data)
 {
-    GSimpleAsyncResult *result = user_data;
     OvirtProxyActionData *data = (OvirtProxyActionData *)user_data;
+    GSimpleAsyncResult *result = data->result;
 
     g_return_if_fail(data != NULL);
 
@@ -324,6 +325,7 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
 
     data = g_slice_new(OvirtProxyActionData);
     data->response_parser = response_parser;
+    data->result = result;
 
     if (!rest_proxy_call_async(call, action_async_cb, G_OBJECT(proxy),
                                data, &error)) {
