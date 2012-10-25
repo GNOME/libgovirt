@@ -273,10 +273,9 @@ static void action_async_cb(RestProxyCall *call, const GError *librest_error,
         g_object_unref(G_OBJECT(vm));
     }
 
-    g_simple_async_result_complete (result);
-
+    g_simple_async_result_complete(result);
+    g_object_unref(result);
     g_slice_free(OvirtProxyActionData, data);
-    g_object_unref(G_OBJECT(call));
 }
 
 static void
@@ -333,9 +332,10 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
         g_warning("Error while running %s on %p", action, vm);
         g_simple_async_result_take_error(result, error);
         g_simple_async_result_complete(result);
+        g_object_unref(result);
         g_slice_free(OvirtProxyActionData, data);
-        g_object_unref(G_OBJECT(call));
     }
+    g_object_unref(G_OBJECT(call));
 }
 
 static gboolean
