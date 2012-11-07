@@ -1,7 +1,8 @@
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 SUBDIRS = 						\
-	govirt
+	govirt						\
+	examples
 
 EXTRA_DIST =						\
 	COPYING						\
