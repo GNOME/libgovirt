@@ -402,7 +402,7 @@ ovirt_vm_stop_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
 
 static gboolean
 ovirt_vm_action(OvirtVm *vm, OvirtProxy *proxy, const char *action,
-                      ActionResponseParser response_parser, GError **error)
+                ActionResponseParser response_parser, GError **error)
 {
     RestProxyCall *call;
     const char *function;
