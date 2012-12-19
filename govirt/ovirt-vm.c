@@ -421,7 +421,16 @@ ovirt_vm_action(OvirtVm *vm, OvirtProxy *proxy, const char *action,
     rest_proxy_call_add_param(call, "async", "false");
 
     if (!rest_proxy_call_sync(call, error)) {
+        GError *call_error = NULL;
         g_warning("Error while running %s on %p", action, vm);
+        /* Even in error cases we may have a response body describing
+         * the failure, try to parse that */
+        parse_action_response(call, vm, response_parser, &call_error);
+        if (call_error != NULL) {
+            g_clear_error(error);
+            g_propagate_error(error, call_error);
+        }
+
         g_object_unref(G_OBJECT(call));
         return FALSE;
     }
