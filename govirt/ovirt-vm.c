@@ -578,15 +578,29 @@ parse_action_response(RestProxyCall *call, OvirtVm *vm,
             rest_proxy_call_get_payload_length (call));
 
     if (g_strcmp0(root->name, "action") == 0) {
-        if (parse_action_status(root, error) == OVIRT_RESPONSE_COMPLETE) {
+        enum OvirtResponseStatus status;
+
+        status = parse_action_status(root, error);
+        if (status  == OVIRT_RESPONSE_COMPLETE) {
             if (response_parser) {
                 result = response_parser(root, vm, error);
             } else {
                 result = TRUE;
             }
+        } if (status == OVIRT_RESPONSE_FAILED) {
+            const char *fault_key = g_intern_string("fault");
+            GError *fault_error = NULL;
+            RestXmlNode *fault_node = NULL;
+
+            fault_node = g_hash_table_lookup(root->children, fault_key);
+            if (fault_node != NULL) {
+                parse_fault(fault_node, &fault_error);
+                if (fault_error != NULL) {
+                    g_clear_error(error);
+                    g_propagate_error(error, fault_error);
+                }
+            }
         }
-    } else if (g_strcmp0(root->name, "fault") == 0) {
-        parse_fault(root, error);
     } else {
         g_warn_if_reached();
     }
