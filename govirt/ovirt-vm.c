@@ -544,18 +544,22 @@ static enum OvirtResponseStatus parse_action_status(RestXmlNode *root,
 
 static void parse_fault(RestXmlNode *root, GError **error)
 {
-    RestXmlNode *node;
+    RestXmlNode *reason_node;
+    RestXmlNode *detail_node;
     const char *reason_key = g_intern_string("reason");
+    const char *detail_key = g_intern_string("detail");
 
     g_return_if_fail(g_strcmp0(root->name, "fault") == 0);
 
-    node = g_hash_table_lookup(root->children, reason_key);
-    if (node == NULL) {
+    reason_node = g_hash_table_lookup(root->children, reason_key);
+    if (reason_node == NULL) {
         g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, "could not find 'reason' node");
         g_return_if_reached();
     }
     g_debug("Reason: %s\n", node->content);
-    g_set_error_literal(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_FAULT, node->content);
+    detail_node = g_hash_table_lookup(root->children, detail_key);
+    g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_FAULT, "%s: %s", reason_node->content,
+                (detail_node == NULL)?"":detail_node->content);
 }
 
 static gboolean
