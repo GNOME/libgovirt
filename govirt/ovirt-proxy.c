@@ -293,19 +293,16 @@ static gboolean vm_set_actions_from_xml(OvirtVm *vm, RestXmlNode *node)
     return TRUE;
 }
 
-static OvirtVm *xml_to_vm(RestXmlNode *node)
+static gboolean xml_to_vm(OvirtVm *vm, RestXmlNode *node)
 {
-    OvirtVm *vm;
     const char *uuid;
     const char *href;
 
-
     uuid = rest_xml_node_get_attr(node, "id");
-    g_return_val_if_fail(uuid != NULL, NULL);
+    g_return_val_if_fail(uuid != NULL, FALSE);
     href = rest_xml_node_get_attr(node, "href");
-    g_return_val_if_fail(href != NULL, NULL);
+    g_return_val_if_fail(href != NULL, FALSE);
 
-    vm = ovirt_vm_new();
     g_object_set(G_OBJECT(vm), "uuid", uuid, "href", href, NULL);
 
     vm_set_name_from_xml(vm, node);
@@ -313,7 +310,7 @@ static OvirtVm *xml_to_vm(RestXmlNode *node)
     vm_set_actions_from_xml(vm, node);
     vm_set_display_from_xml(vm, node);
 
-    return vm;
+    return TRUE;
 }
 
 static GHashTable *parse_vms_xml(RestProxyCall *call)
@@ -340,14 +337,15 @@ static GHashTable *parse_vms_xml(RestProxyCall *call)
     for (node = xml_vms; node != NULL; node = node->next) {
         OvirtVm *vm;
         gchar *name;
-        vm = xml_to_vm(node);
+        vm = ovirt_vm_new();
+        if (!xml_to_vm(vm, node)) {
+            g_message("Failed to parse XML VM description");
+            g_object_unref(G_OBJECT(vm));
+            continue;
+        }
 #ifdef OVIRT_DEBUG
         dump_vm(vm);
 #endif
-        if (!OVIRT_IS_VM(vm)) {
-            g_message("Failed to parse XML VM description");
-            continue;
-        }
         g_object_get(G_OBJECT(vm), "name", &name, NULL);
         if (name == NULL) {
             g_message("VM had no name in its XML description");
