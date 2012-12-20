@@ -41,8 +41,7 @@ G_DEFINE_TYPE (OvirtProxy, ovirt_proxy, REST_TYPE_PROXY);
 
 struct _OvirtProxyPrivate {
     GHashTable *vms;
-    gchar *ca_cert_path;
-    gboolean delete_ca_cert;
+    GByteArray *ca_cert;
     gboolean admin_mode;
 };
 
@@ -546,157 +545,70 @@ error:
     return ca_file;
 }
 
-static void set_downloaded_ca_cert(OvirtProxy *proxy, GFile *local_ca_cert)
+static void set_downloaded_ca_cert(OvirtProxy *proxy,
+                                   char *ca_cert_data,
+                                   gsize ca_cert_len)
 {
-      if (proxy->priv->delete_ca_cert) {
-          g_unlink(proxy->priv->ca_cert_path);
-      }
-      g_free(proxy->priv->ca_cert_path);
-      proxy->priv->ca_cert_path = g_file_get_path(local_ca_cert);
-      proxy->priv->delete_ca_cert = TRUE;
-      g_object_notify(G_OBJECT(proxy), "ca-cert");
+    if (proxy->priv->ca_cert != NULL)
+        g_byte_array_unref(proxy->priv->ca_cert);
+    proxy->priv->ca_cert = g_byte_array_new_take((guint8 *)ca_cert_data,
+                                                 ca_cert_len);
+    g_object_notify(G_OBJECT(proxy), "ca-cert");
 }
 
 gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
 {
     GFile *source = NULL;
-    GFile *destination = NULL;
-    GFileInputStream *src_stream = NULL;
-    GIOStream *dest_stream = NULL;
-    gboolean copy_ok = FALSE;
+    char *cert_data;
+    gsize cert_length;
+    gboolean load_ok = FALSE;
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
     g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
 
     source = get_ca_cert_file(proxy);
-    src_stream = g_file_read(source, NULL, error);
-    if (src_stream == NULL)
+    load_ok = g_file_load_contents(source, NULL,
+                                   &cert_data,
+                                   &cert_length,
+                                   NULL, error);
+    if (!load_ok)
         goto error;
 
-    destination = g_file_new_tmp("ovirt-ca-XXXXXX.crt",
-                                 (GFileIOStream**)&dest_stream,
-                                 error);
-    if (destination == NULL)
-        goto error;
-
-    copy_ok = g_output_stream_splice(g_io_stream_get_output_stream(dest_stream),
-                                     G_INPUT_STREAM(src_stream),
-                                     G_OUTPUT_STREAM_SPLICE_NONE, NULL, error);
-    if (!copy_ok)
-        goto error;
-
-    set_downloaded_ca_cert(proxy, destination);
+    set_downloaded_ca_cert(proxy, cert_data, cert_length);
 
 error:
     if (source != NULL)
         g_object_unref(source);
-    if (src_stream != NULL)
-        g_object_unref(src_stream);
-    if (destination != NULL)
-        g_object_unref(destination);
-    if (dest_stream != NULL)
-        g_object_unref(dest_stream);
 
-    return copy_ok;
+    return load_ok;
 }
 
-typedef struct {
-    OvirtProxy *proxy;
-    GSimpleAsyncResult *result;
-    GCancellable *cancellable;
-    GFile *local_ca_cert;
-    GFileIOStream *iostream; //stream to write to local_ca_cert
-} FetchCaCertData;
-
-static void fetch_ca_cert_data_free(FetchCaCertData *data, gboolean delete_temp)
+static void ca_file_loaded_cb(GObject *source_object,
+                              GAsyncResult *res,
+                              gpointer user_data)
 {
-    g_return_if_fail(data != NULL);
-
-    if (data->proxy != NULL) {
-        g_object_unref(data->proxy);
-    }
-    if (data->result != NULL) {
-        g_object_unref(data->result);
-    }
-    if (data->cancellable != NULL) {
-        g_object_unref(data->cancellable);
-    }
-    if (data->local_ca_cert != NULL) {
-        if (delete_temp) {
-            g_file_delete(data->local_ca_cert, NULL, NULL);
-        }
-        g_object_unref(data->local_ca_cert);
-    }
-    if (data->iostream != NULL) {
-        g_object_unref(data->iostream);
-    }
-    g_slice_free(FetchCaCertData, data);
-}
-
-static void ca_file_failed_cb(FetchCaCertData *data, GError *error)
-{
-    g_return_if_fail(error != NULL);
-
-    g_simple_async_result_take_error(data->result, error);
-    g_simple_async_result_complete (data->result);
-    fetch_ca_cert_data_free(data, TRUE);
-}
-
-static void ca_file_spliced_cb(GObject *source_object,
-                               GAsyncResult *res,
-                               gpointer user_data)
-{
-    FetchCaCertData *data = (FetchCaCertData *)user_data;
-    GOutputStream *stream;
+    GSimpleAsyncResult *fetch_result;
+    GObject *proxy;
     GError *error = NULL;
-    gssize spliced_bytes;
+    char *cert_data;
+    gsize cert_length;
 
-    stream = G_OUTPUT_STREAM(source_object);
-    spliced_bytes = g_output_stream_splice_finish(stream, res, &error);
+    fetch_result = G_SIMPLE_ASYNC_RESULT(user_data);
+    g_file_load_contents_finish(G_FILE(source_object), res,
+                                &cert_data, &cert_length,
+                                NULL, &error);
     if (error != NULL) {
-        ca_file_failed_cb(data, error);
-        return;
-    } else {
-      g_simple_async_result_set_op_res_gboolean(data->result, !!spliced_bytes);
-      set_downloaded_ca_cert(data->proxy, data->local_ca_cert);
-    }
-
-    g_simple_async_result_complete (data->result);
-
-    fetch_ca_cert_data_free(data, FALSE);
-}
-
-static void ca_file_opened_cb (GObject *source_object,
-                               GAsyncResult *res,
-                               gpointer user_data)
-{
-    FetchCaCertData *data;
-    GFileInputStream *source;
-    GOutputStream *out_stream;
-    GError *error = NULL;
-
-    data = (FetchCaCertData *)user_data;
-    source = g_file_read_finish(G_FILE(source_object), res, &error);
-    if (error != NULL) {
-        ca_file_failed_cb(data, error);
+        g_simple_async_result_take_error(fetch_result, error);
+        g_simple_async_result_complete (fetch_result);
         return;
     }
 
-    data->local_ca_cert = g_file_new_tmp("ovirt-ca-XXXXXX.crt",
-                                         &data->iostream, &error);
-    if (error != NULL) {
-        ca_file_failed_cb(data, error);
-        return;
-    }
+    proxy = g_async_result_get_source_object(G_ASYNC_RESULT(fetch_result));
 
-    out_stream = g_io_stream_get_output_stream(G_IO_STREAM(data->iostream));
-
-    g_output_stream_splice_async(out_stream, G_INPUT_STREAM(source),
-                                 G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE
-                                 | G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
-                                 G_PRIORITY_DEFAULT, data->cancellable,
-                                 ca_file_spliced_cb, data);
-    g_object_unref(G_OBJECT(source));
+    set_downloaded_ca_cert(OVIRT_PROXY(proxy), cert_data, cert_length);
+    g_object_unref(proxy);
+    g_simple_async_result_set_op_res_gboolean(fetch_result, TRUE);
+    g_simple_async_result_complete (fetch_result);
 }
 
 void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
@@ -705,7 +617,7 @@ void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
                                             gpointer user_data)
 {
     GFile *ca_file;
-    FetchCaCertData *data;
+    GSimpleAsyncResult *result;
 
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
@@ -713,22 +625,20 @@ void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
     ca_file = get_ca_cert_file(proxy);
     g_return_if_fail(ca_file != NULL);
 
-    data = g_slice_new0(FetchCaCertData);
-    data->result = g_simple_async_result_new (G_OBJECT(proxy), callback,
-                                              user_data,
-                                              ovirt_proxy_fetch_ca_certificate_async);
-    g_simple_async_result_set_check_cancellable(data->result, cancellable);
-    data->proxy = g_object_ref(proxy);
-    if (cancellable != NULL) {
-        data->cancellable = g_object_ref(cancellable);
-    }
+    result = g_simple_async_result_new(G_OBJECT(proxy), callback,
+                                       user_data,
+                                       ovirt_proxy_fetch_ca_certificate_async);
 
-    g_file_read_async(ca_file, G_PRIORITY_DEFAULT, cancellable,
-                      ca_file_opened_cb, data);
+    g_file_load_contents_async(ca_file, cancellable, ca_file_loaded_cb, result);
     g_object_unref(ca_file);
 }
 
-const char *ovirt_proxy_fetch_ca_certificate_finish(OvirtProxy *proxy,
+/**
+ * ovirt_proxy_fetch_ca_certificate_finish:
+ *
+ * Return value: (transfer full):
+ */
+GByteArray *ovirt_proxy_fetch_ca_certificate_finish(OvirtProxy *proxy,
                                                     GAsyncResult *result,
                                                     GError **err)
 {
@@ -741,7 +651,10 @@ const char *ovirt_proxy_fetch_ca_certificate_finish(OvirtProxy *proxy,
     if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
         return NULL;
 
-    return proxy->priv->ca_cert_path;
+    if (proxy->priv->ca_cert == NULL)
+        return NULL;
+
+    return g_byte_array_ref(proxy->priv->ca_cert);
 }
 
 static void ovirt_proxy_get_property(GObject *object,
@@ -753,7 +666,7 @@ static void ovirt_proxy_get_property(GObject *object,
 
     switch (prop_id) {
     case PROP_CA_CERT:
-        g_value_set_string(value, proxy->priv->ca_cert_path);
+        g_value_set_boxed(value, proxy->priv->ca_cert);
         break;
     case PROP_ADMIN:
         g_value_set_boolean(value, proxy->priv->admin_mode);
@@ -773,12 +686,9 @@ static void ovirt_proxy_set_property(GObject *object,
 
     switch (prop_id) {
     case PROP_CA_CERT:
-        if (proxy->priv->delete_ca_cert) {
-            g_unlink(proxy->priv->ca_cert_path);
-        }
-        g_free(proxy->priv->ca_cert_path);
-        proxy->priv->ca_cert_path = g_value_dup_string(value);
-        proxy->priv->delete_ca_cert = FALSE;
+        if (proxy->priv->ca_cert != NULL)
+            g_byte_array_unref(proxy->priv->ca_cert);
+        proxy->priv->ca_cert = g_value_dup_boxed(value);
         break;
 
     case PROP_ADMIN:
@@ -808,11 +718,9 @@ ovirt_proxy_finalize(GObject *obj)
 {
     OvirtProxy *proxy = OVIRT_PROXY(obj);
 
-    if (proxy->priv->delete_ca_cert) {
-        g_unlink(proxy->priv->ca_cert_path);
-    }
-    g_free(proxy->priv->ca_cert_path);
-    proxy->priv->ca_cert_path = NULL;
+    if (proxy->priv->ca_cert != NULL)
+        g_byte_array_unref(proxy->priv->ca_cert);
+    proxy->priv->ca_cert = NULL;
 
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->finalize(obj);
 }
@@ -830,10 +738,10 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
 
     g_object_class_install_property(oclass,
                                     PROP_CA_CERT,
-                                    g_param_spec_string("ca-cert",
-                                                        "ca-cert",
-                                                        "Path to the oVirt CA certificate to use when connecting to remote VM",
-                                                        NULL,
+                                    g_param_spec_boxed("ca-cert",
+                                                       "ca-cert",
+                                                       "Virt CA certificate to use when connecting to remote VM",
+                                                        G_TYPE_BYTE_ARRAY,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
     g_object_class_install_property(oclass,

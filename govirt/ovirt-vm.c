@@ -556,7 +556,7 @@ static void parse_fault(RestXmlNode *root, GError **error)
         g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, "could not find 'reason' node");
         g_return_if_reached();
     }
-    g_debug("Reason: %s\n", node->content);
+    g_debug("Reason: %s\n", root->content);
     detail_node = g_hash_table_lookup(root->children, detail_key);
     g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_FAULT, "%s: %s", reason_node->content,
                 (detail_node == NULL)?"":detail_node->content);

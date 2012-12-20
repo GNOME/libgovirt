@@ -86,7 +86,7 @@ void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
                                             GCancellable *cancellable,
                                             GAsyncReadyCallback callback,
                                             gpointer user_data);
-const char *ovirt_proxy_fetch_ca_certificate_finish(OvirtProxy *proxy,
+GByteArray *ovirt_proxy_fetch_ca_certificate_finish(OvirtProxy *proxy,
                                                     GAsyncResult *result,
                                                     GError **err);
 
