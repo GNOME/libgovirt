@@ -386,6 +386,12 @@ gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
     return TRUE;
 }
 
+typedef struct {
+    GSimpleAsyncResult *result;
+    GCancellable *cancellable;
+    gulong cancellable_cb_id;
+} OvirtProxyFetchVmData;
+
 static void
 fetch_vms_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
                         RestProxyCall *call)
@@ -397,7 +403,8 @@ static void
 fetch_vms_async_cb(RestProxyCall *call, const GError *error,
                    G_GNUC_UNUSED GObject *weak_object, gpointer user_data)
 {
-  GSimpleAsyncResult *result = user_data;
+  OvirtProxyFetchVmData *data = user_data;
+  GSimpleAsyncResult *result = data->result;
 
   if (error != NULL) {
       g_simple_async_result_set_from_error(result, error);
@@ -416,8 +423,12 @@ fetch_vms_async_cb(RestProxyCall *call, const GError *error,
   }
 
   g_simple_async_result_complete (result);
-
   g_object_unref (result);
+
+  if (data->cancellable != NULL) {
+      g_cancellable_disconnect(data->cancellable, data->cancellable_cb_id);
+  }
+  g_slice_free(OvirtProxyFetchVmData, data);
 }
 
 /**
@@ -434,6 +445,7 @@ void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
     GSimpleAsyncResult *result;
     RestProxyCall *call;
     GError *error;
+    OvirtProxyFetchVmData *data;
 
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
@@ -444,18 +456,23 @@ void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
 
     call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
     rest_proxy_call_set_function(call, "vms");
+
+    data = g_slice_new(OvirtProxyFetchVmData);
+    data->result = result;
     if (cancellable != NULL) {
-        g_signal_connect (cancellable, "cancelled",
-                          G_CALLBACK (fetch_vms_cancelled_cb), call);
+        data->cancellable_cb_id = g_cancellable_connect (cancellable,
+                                                         G_CALLBACK (fetch_vms_cancelled_cb),
+                                                         call, NULL);
     }
 
     if (!rest_proxy_call_async(call, fetch_vms_async_cb, NULL,
-                               result, &error)) {
+                               data, &error)) {
         g_warning("Error while getting VM list");
         g_simple_async_result_set_from_error(result, error);
         g_simple_async_result_complete(result);
         g_object_unref(G_OBJECT(result));
         g_object_unref(G_OBJECT(call));
+        g_slice_free(OvirtProxyFetchVmData, data);
     }
 }
 

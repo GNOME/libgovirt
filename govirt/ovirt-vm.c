@@ -248,6 +248,8 @@ ovirt_vm_get_action(OvirtVm *vm, const char *action)
 typedef struct {
     ActionResponseParser response_parser;
     GSimpleAsyncResult *result;
+    GCancellable *cancellable;
+    gulong cancellable_cb_id;
 } OvirtProxyActionData;
 
 static void action_async_cb(RestProxyCall *call, const GError *librest_error,
@@ -273,6 +275,9 @@ static void action_async_cb(RestProxyCall *call, const GError *librest_error,
         g_object_unref(G_OBJECT(vm));
     }
 
+    if (data->cancellable != NULL) {
+        g_cancellable_disconnect(data->cancellable, data->cancellable_cb_id);
+    }
     g_simple_async_result_complete(result);
     g_object_unref(result);
     g_slice_free(OvirtProxyActionData, data);
@@ -318,18 +323,24 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
     result = g_simple_async_result_new (G_OBJECT(vm), callback,
                                         user_data,
                                         ovirt_vm_invoke_action_async);
-    if (cancellable != NULL) {
-        g_signal_connect (cancellable, "cancelled",
-                          G_CALLBACK (action_cancelled_cb), call);
-    }
 
     data = g_slice_new(OvirtProxyActionData);
     data->response_parser = response_parser;
     data->result = result;
 
+    if (cancellable != NULL) {
+        data->cancellable = cancellable;
+        data->cancellable_cb_id = g_cancellable_connect (cancellable,
+                                                         G_CALLBACK (action_cancelled_cb),
+                                                         call, NULL);
+    }
+
     if (!rest_proxy_call_async(call, action_async_cb, G_OBJECT(proxy),
                                data, &error)) {
         g_warning("Error while running %s on %p", action, vm);
+        if (cancellable != NULL) {
+            g_cancellable_disconnect(cancellable, data->cancellable_cb_id);
+        }
         g_simple_async_result_take_error(result, error);
         g_simple_async_result_complete(result);
         g_object_unref(result);
