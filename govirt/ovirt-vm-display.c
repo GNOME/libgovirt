@@ -36,6 +36,7 @@ struct _OvirtVmDisplayPrivate {
     guint monitor_count;
     char *ticket;
     guint expiry;
+    char *host_subject;
 };
 
 G_DEFINE_TYPE(OvirtVmDisplay, ovirt_vm_display, G_TYPE_OBJECT);
@@ -48,7 +49,8 @@ enum {
     PROP_SECURE_PORT,
     PROP_MONITOR_COUNT,
     PROP_TICKET,
-    PROP_EXPIRY
+    PROP_EXPIRY,
+    PROP_HOST_SUBJECT
 };
 
 static void ovirt_vm_display_get_property(GObject *object,
@@ -79,6 +81,9 @@ static void ovirt_vm_display_get_property(GObject *object,
         break;
     case PROP_EXPIRY:
         g_value_set_uint(value, display->priv->expiry);
+        break;
+    case PROP_HOST_SUBJECT:
+        g_value_set_string(value, display->priv->host_subject);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -116,6 +121,10 @@ static void ovirt_vm_display_set_property(GObject *object,
     case PROP_EXPIRY:
         display->priv->expiry = g_value_get_uint(value);
         break;
+    case PROP_HOST_SUBJECT:
+        g_free(display->priv->host_subject);
+        display->priv->host_subject = g_value_dup_string(value);
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -127,6 +136,7 @@ static void ovirt_vm_display_finalize(GObject *object)
 
     g_free(display->priv->address);
     g_free(display->priv->ticket);
+    g_free(display->priv->host_subject);
 
     G_OBJECT_CLASS(ovirt_vm_display_parent_class)->finalize(object);
 }
@@ -202,6 +212,14 @@ static void ovirt_vm_display_class_init(OvirtVmDisplayClass *klass)
                                                       0,
                                                       G_PARAM_READWRITE |
                                                       G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_HOST_SUBJECT,
+                                    g_param_spec_string("host-subject",
+                                                        "Host Subject",
+                                                        "Host subject of the VM certificate",
+                                                        NULL,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
 }
 
 static void ovirt_vm_display_init(G_GNUC_UNUSED OvirtVmDisplay *display)
