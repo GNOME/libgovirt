@@ -23,7 +23,11 @@
 #ifndef __OVIRT_VM_PRIVATE_H__
 #define __OVIRT_VM_PRIVATE_H__
 
+#include <rest/rest-xml-node.h>
+
 G_BEGIN_DECLS
+
+#define OVIRT_API_BASE_DIR "/api/"
 
 typedef enum {
     OVIRT_VM_ACTION_SHUTDOWN,
@@ -38,6 +42,7 @@ typedef enum {
 } OvirtVmAction;
 
 void ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url);
+gboolean ovirt_vm_refresh_from_xml(OvirtVm *vm, RestXmlNode *node);
 
 G_END_DECLS
 

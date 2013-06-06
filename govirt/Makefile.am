@@ -33,6 +33,7 @@ libgovirt_la_SOURCES =						\
 	ovirt-rest-call.c					\
 	ovirt-vm.c						\
 	ovirt-vm-display.c					\
+	ovirt-vm-xml.c						\
 	$(NULL)
 
 nodist_libgovirt_la_HEADERS =					\
