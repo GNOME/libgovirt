@@ -54,6 +54,8 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
     const char *secure_port_key = g_intern_string("secure_port");
     const char *monitors_key = g_intern_string("monitors");
     const char *certificate_key = g_intern_string("certificate");
+    const char *smartcard_key = g_intern_string("smartcard_enabled");
+    const char *allow_override_key = g_intern_string("allow_override");
 
     if (root == NULL) {
         return FALSE;
@@ -96,6 +98,26 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
     if (node != NULL) {
         g_object_set(G_OBJECT(display),
                      "secure-port", strtoul(node->content, NULL, 0),
+                     NULL);
+    }
+
+    node = g_hash_table_lookup(root->children, smartcard_key);
+    if (node != NULL) {
+        gboolean smartcard;
+
+        smartcard = (g_strcmp0(node->content, "true") == 0);
+        g_object_set(G_OBJECT(display),
+                     "smartcard", smartcard,
+                     NULL);
+    }
+
+    node = g_hash_table_lookup(root->children, allow_override_key);
+    if (node != NULL) {
+        gboolean allow_override;
+
+        allow_override = (g_strcmp0(node->content, "true") == 0);
+        g_object_set(G_OBJECT(display),
+                     "allow-override", allow_override,
                      NULL);
     }
 

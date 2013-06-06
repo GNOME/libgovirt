@@ -37,6 +37,8 @@ struct _OvirtVmDisplayPrivate {
     char *ticket;
     guint expiry;
     char *host_subject;
+    gboolean smartcard;
+    gboolean allow_override;
 };
 
 G_DEFINE_TYPE(OvirtVmDisplay, ovirt_vm_display, G_TYPE_OBJECT);
@@ -50,7 +52,9 @@ enum {
     PROP_MONITOR_COUNT,
     PROP_TICKET,
     PROP_EXPIRY,
-    PROP_HOST_SUBJECT
+    PROP_HOST_SUBJECT,
+    PROP_SMARTCARD,
+    PROP_ALLOW_OVERRIDE,
 };
 
 static void ovirt_vm_display_get_property(GObject *object,
@@ -84,6 +88,12 @@ static void ovirt_vm_display_get_property(GObject *object,
         break;
     case PROP_HOST_SUBJECT:
         g_value_set_string(value, display->priv->host_subject);
+        break;
+    case PROP_SMARTCARD:
+        g_value_set_boolean(value, display->priv->smartcard);
+        break;
+    case PROP_ALLOW_OVERRIDE:
+        g_value_set_boolean(value, display->priv->allow_override);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -124,6 +134,12 @@ static void ovirt_vm_display_set_property(GObject *object,
     case PROP_HOST_SUBJECT:
         g_free(display->priv->host_subject);
         display->priv->host_subject = g_value_dup_string(value);
+        break;
+    case PROP_SMARTCARD:
+        display->priv->smartcard = g_value_get_boolean(value);
+        break;
+    case PROP_ALLOW_OVERRIDE:
+        display->priv->allow_override = g_value_get_boolean(value);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -218,6 +234,22 @@ static void ovirt_vm_display_class_init(OvirtVmDisplayClass *klass)
                                                         "Host Subject",
                                                         "Host subject of the VM certificate",
                                                         NULL,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_SMARTCARD,
+                                    g_param_spec_boolean("smartcard",
+                                                        "Smartcard",
+                                                        "Indicates whether smartcard support is enabled",
+                                                        FALSE,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_ALLOW_OVERRIDE,
+                                    g_param_spec_boolean("allow-override",
+                                                        "Allow override",
+                                                        "Allow to override display connection",
+                                                        FALSE,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
 }
