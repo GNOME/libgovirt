@@ -283,6 +283,7 @@ void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
 
     call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
     rest_proxy_call_set_function(call, "vms");
+    rest_proxy_call_add_header(call, "All-Content", "true");
 
     data = g_slice_new(OvirtProxyFetchVmData);
     data->result = result;

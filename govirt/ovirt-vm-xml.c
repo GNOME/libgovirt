@@ -53,6 +53,7 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
     const char *port_key = g_intern_string("port");
     const char *secure_port_key = g_intern_string("secure_port");
     const char *monitors_key = g_intern_string("monitors");
+    const char *certificate_key = g_intern_string("certificate");
 
     if (root == NULL) {
         return FALSE;
@@ -96,6 +97,17 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
         g_object_set(G_OBJECT(display),
                      "secure-port", strtoul(node->content, NULL, 0),
                      NULL);
+    }
+
+    node = g_hash_table_lookup(root->children, certificate_key);
+    if (node != NULL) {
+        const char *subject_key = g_intern_string("subject");
+        node = g_hash_table_lookup(node->children, subject_key);
+        if (node != NULL) {
+            g_object_set(G_OBJECT(display),
+                         "host-subject", node->content,
+                         NULL);
+        }
     }
 
     /* FIXME: this overrides the ticket/expiry which may
