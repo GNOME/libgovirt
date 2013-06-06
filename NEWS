@@ -1,0 +1,10 @@
+0.1.0 - June 7, 2013
+====================
+
+Changes since 0.0.3:
+
+- Add OvirtVmDisplay::host_subject property, this is required in some cases
+  to connect to a VM which is using SPICE
+- Add OvirtVmDisplay::smartcard and OvirtVmDisplay::allow-override
+  properties
+- Implement ovirt_vm_refresh_async()

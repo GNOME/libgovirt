@@ -3,8 +3,8 @@
 AC_PREREQ(2.63)
 
 m4_define([govirt_major_version], [0])
-m4_define([govirt_minor_version], [0])
-m4_define([govirt_micro_version], [3])
+m4_define([govirt_minor_version], [1])
+m4_define([govirt_micro_version], [0])
 m4_define([govirt_version],
           [govirt_major_version.govirt_minor_version.govirt_micro_version])
 
