@@ -90,6 +90,14 @@ void ovirt_vm_stop_async(OvirtVm *vm, OvirtProxy *proxy,
 gboolean ovirt_vm_stop_finish(OvirtVm *vm,
                               GAsyncResult *result,
                               GError **err);
+
+void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
+                            GCancellable *cancellable,
+                            GAsyncReadyCallback callback,
+                            gpointer user_data);
+gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
+                                 GAsyncResult *result,
+                                 GError **err);
 G_END_DECLS
 
 #endif /* __OVIRT_VM_H__ */

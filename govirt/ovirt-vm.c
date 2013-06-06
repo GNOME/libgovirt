@@ -621,3 +621,133 @@ parse_action_response(RestProxyCall *call, OvirtVm *vm,
 
     return result;
 }
+
+typedef void (*OvirtRestGetCallback)(RestProxyCall *call, GTask *result,
+                                     gpointer user_data);
+
+typedef struct {
+    OvirtRestGetCallback callback;
+    gulong cancellable_cb_id;
+} OvirtRestGetData;
+
+static void ovirt_rest_get_data_free(OvirtRestGetData *data)
+{
+    g_slice_free(OvirtRestGetData, data);
+}
+
+static void get_async_cb(RestProxyCall *call, const GError *librest_error,
+                          GObject *weak_object, gpointer user_data)
+{
+    GTask *task = G_TASK(user_data);
+    OvirtRestGetData *data;
+
+    g_return_if_fail(G_IS_TASK(user_data));
+    data = g_task_get_task_data(task);
+    g_warn_if_fail(data->callback != NULL);
+    if (librest_error != NULL) {
+        g_task_return_error(task, g_error_copy(librest_error));
+    } else {
+        data->callback(call, task, NULL);
+    }
+
+    if (g_task_get_cancellable(task) != NULL) {
+        g_cancellable_disconnect(g_task_get_cancellable(task),
+                                 data->cancellable_cb_id);
+        data->cancellable_cb_id = 0;
+    }
+    g_object_unref(task);
+}
+
+static void ovirt_rest_invoke_get_async(OvirtProxy *proxy,
+                                        const char *function,
+                                        GTask *task,
+                                        OvirtRestGetCallback callback)
+{
+    RestProxyCall *call;
+    GError *error = NULL;
+    OvirtRestGetData *data;
+    GCancellable *cancellable;
+
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail(function != NULL);
+    g_return_if_fail(G_IS_TASK(task));
+
+    g_debug("invoking '%s' function using %p", function, proxy);
+
+    call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
+    function = ovirt_rest_strip_api_base_dir(function);
+    rest_proxy_call_set_function(call, function);
+    rest_proxy_call_add_param(call, "async", "false");
+
+    data = g_slice_new(OvirtRestGetData);
+    data->callback = callback;
+    cancellable = g_task_get_cancellable(task);
+    if (cancellable != NULL) {
+        data->cancellable_cb_id = g_cancellable_connect(cancellable,
+                                                        G_CALLBACK (action_cancelled_cb),
+                                                        call, NULL);
+    }
+    g_task_set_task_data(task, data, (GDestroyNotify)ovirt_rest_get_data_free);
+
+    if (!rest_proxy_call_async(call, get_async_cb, G_OBJECT(proxy),
+                               task, &error)) {
+        g_warning("Error while running %s on %p", function, proxy);
+        if (cancellable != NULL) {
+            g_cancellable_disconnect(cancellable, data->cancellable_cb_id);
+            data->cancellable_cb_id = 0;
+        }
+        g_task_return_error(task, error);
+        g_object_unref(task);
+    }
+    g_object_unref(G_OBJECT(call));
+}
+
+static void ovirt_vm_refresh_async_cb(RestProxyCall *call, GTask *task,
+                                      gpointer user_data)
+{
+    OvirtVm *vm;
+    RestXmlParser *parser;
+    RestXmlNode *root;
+    gboolean refreshed;
+
+    g_return_if_fail(REST_IS_PROXY_CALL(call));
+    g_return_if_fail(G_IS_TASK(task));
+
+    parser = rest_xml_parser_new ();
+    root = rest_xml_parser_parse_from_data (parser,
+            rest_proxy_call_get_payload (call),
+            rest_proxy_call_get_payload_length (call));
+
+    vm = OVIRT_VM(g_task_get_source_object(task));
+    refreshed = ovirt_vm_refresh_from_xml(vm, root);
+
+    g_task_return_boolean(task, refreshed);
+
+    rest_xml_node_unref(root);
+    g_object_unref(G_OBJECT(parser));
+}
+
+void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
+                            GCancellable *cancellable,
+                            GAsyncReadyCallback callback,
+                            gpointer user_data)
+{
+    GTask *task;
+
+    g_return_if_fail(OVIRT_IS_VM(vm));
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
+
+    task = g_task_new(vm, cancellable, callback, user_data);
+
+    ovirt_rest_invoke_get_async(proxy, vm->priv->href, task, ovirt_vm_refresh_async_cb);
+}
+
+gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
+                                 GAsyncResult *result,
+                                 GError **err)
+{
+    g_return_val_if_fail(g_task_is_valid(result, vm), FALSE);
+
+    return g_task_propagate_boolean(G_TASK (result), err);
+}
