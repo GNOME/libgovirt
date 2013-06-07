@@ -40,6 +40,16 @@ static gboolean parse_action_response(RestProxyCall *call, OvirtVm *vm,
 static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm,
                                     GError **error);
 
+typedef void (*OvirtRestInvokeCallback)(RestProxyCall *call, GTask *result,
+                                        gpointer user_data);
+static void ovirt_rest_invoke_async(OvirtProxy *proxy,
+                                    const char *method,
+                                    const char *function,
+                                    GTask *task,
+                                    OvirtRestInvokeCallback callback,
+                                    gpointer user_data,
+                                    GDestroyNotify destroy_func);
+
 #define OVIRT_VM_GET_PRIVATE(obj)                         \
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_VM, OvirtVmPrivate))
 
@@ -245,44 +255,6 @@ ovirt_vm_get_action(OvirtVm *vm, const char *action)
     return g_hash_table_lookup(vm->priv->actions, action);
 }
 
-typedef struct {
-    ActionResponseParser response_parser;
-    GSimpleAsyncResult *result;
-    GCancellable *cancellable;
-    gulong cancellable_cb_id;
-} OvirtProxyActionData;
-
-static void action_async_cb(RestProxyCall *call, const GError *librest_error,
-                            GObject *weak_object, gpointer user_data)
-{
-    OvirtProxyActionData *data = (OvirtProxyActionData *)user_data;
-    GSimpleAsyncResult *result = data->result;
-
-    g_return_if_fail(data != NULL);
-
-    if (librest_error != NULL) {
-        g_simple_async_result_set_from_error(result, librest_error);
-    } else {
-        GError *action_error = NULL;
-        OvirtVm *vm = OVIRT_VM (
-              g_async_result_get_source_object (G_ASYNC_RESULT (result)));
-        parse_action_response(call, vm, data->response_parser, &action_error);
-        if (action_error != NULL) {
-            g_simple_async_result_take_error(result, action_error);
-        } else {
-            g_simple_async_result_set_op_res_gboolean (result, TRUE);
-        }
-        g_object_unref(G_OBJECT(vm));
-    }
-
-    if (data->cancellable != NULL) {
-        g_cancellable_disconnect(data->cancellable, data->cancellable_cb_id);
-    }
-    g_simple_async_result_complete(result);
-    g_object_unref(result);
-    g_slice_free(OvirtProxyActionData, data);
-}
-
 static void
 action_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
                      RestProxyCall *call)
@@ -290,6 +262,23 @@ action_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
     rest_proxy_call_cancel (call);
 }
 
+static void ovirt_vm_invoke_action_async_cb(RestProxyCall *call, GTask *task,
+                                            gpointer user_data)
+{
+    OvirtVm *vm;
+    GError *action_error = NULL;
+
+    g_return_if_fail(REST_IS_PROXY_CALL(call));
+    g_return_if_fail(G_IS_TASK(task));
+
+    vm = OVIRT_VM(g_task_get_source_object(task));
+    parse_action_response(call, vm, (ActionResponseParser)user_data, &action_error);
+    if (action_error != NULL) {
+        g_task_return_error(task, action_error);
+    } else {
+        g_task_return_boolean(task, TRUE);
+    }
+}
 
 static void
 ovirt_vm_invoke_action_async(OvirtVm *vm,
@@ -300,11 +289,8 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
                              GAsyncReadyCallback callback,
                              gpointer user_data)
 {
-    GSimpleAsyncResult *result;
-    RestProxyCall *call;
-    OvirtProxyActionData *data;
+    GTask *task;
     const char *function;
-    GError *error = NULL;
 
     g_return_if_fail(OVIRT_IS_VM(vm));
     g_return_if_fail(action != NULL);
@@ -315,52 +301,20 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
     function = ovirt_vm_get_action(vm, action);
     g_return_if_fail(function != NULL);
 
-    call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
-    rest_proxy_call_set_method(call, "POST");
-    rest_proxy_call_set_function(call, function);
-    rest_proxy_call_add_param(call, "async", "false");
+    task = g_task_new(vm, cancellable, callback, user_data);
 
-    result = g_simple_async_result_new (G_OBJECT(vm), callback,
-                                        user_data,
-                                        ovirt_vm_invoke_action_async);
-
-    data = g_slice_new(OvirtProxyActionData);
-    data->response_parser = response_parser;
-    data->result = result;
-
-    if (cancellable != NULL) {
-        data->cancellable = cancellable;
-        data->cancellable_cb_id = g_cancellable_connect (cancellable,
-                                                         G_CALLBACK (action_cancelled_cb),
-                                                         call, NULL);
-    }
-
-    if (!rest_proxy_call_async(call, action_async_cb, G_OBJECT(proxy),
-                               data, &error)) {
-        g_warning("Error while running %s on %p", action, vm);
-        if (cancellable != NULL) {
-            g_cancellable_disconnect(cancellable, data->cancellable_cb_id);
-        }
-        g_simple_async_result_take_error(result, error);
-        g_simple_async_result_complete(result);
-        g_object_unref(result);
-        g_slice_free(OvirtProxyActionData, data);
-    }
-    g_object_unref(G_OBJECT(call));
+    ovirt_rest_invoke_async(proxy, "POST", function,
+                            task, ovirt_vm_invoke_action_async_cb,
+                            response_parser, NULL);
 }
 
 static gboolean
 ovirt_vm_action_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(vm),
-                                                        ovirt_vm_invoke_action_async),
-                         FALSE);
+    g_return_val_if_fail(g_task_is_valid(result, vm), FALSE);
 
-    if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
-        return FALSE;
-
-    return g_simple_async_result_get_op_res_gboolean(G_SIMPLE_ASYNC_RESULT(result));
+    return g_task_propagate_boolean(G_TASK (result), err);
 }
 
 void
