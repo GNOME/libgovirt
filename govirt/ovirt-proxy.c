@@ -199,6 +199,7 @@ gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
 
     call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
     rest_proxy_call_set_function(call, "vms");
+    rest_proxy_call_add_header(call, "All-Content", "true");
 
     if (!rest_proxy_call_sync(call, error)) {
         g_warning("Error while getting VM list");
