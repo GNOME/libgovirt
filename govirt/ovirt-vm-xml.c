@@ -169,21 +169,6 @@ static gboolean vm_set_state_from_xml(OvirtVm *vm, RestXmlNode *node)
     return FALSE;
 }
 
-G_GNUC_INTERNAL const char *ovirt_rest_strip_api_base_dir(const char *path)
-{
-    if (g_str_has_prefix(path, OVIRT_API_BASE_DIR)) {
-        path += strlen(OVIRT_API_BASE_DIR);
-    } else {
-        /* action href should always be prefixed by /api/ */
-        /* it would be easier to remove /api/ from the RestProxy base
-         * URL but unfortunately I couldn't get this to work
-         */
-        g_warn_if_reached();
-    }
-
-    return path;
-}
-
 static gboolean vm_set_actions_from_xml(OvirtVm *vm, RestXmlNode *node)
 {
     RestXmlNode *link;
@@ -209,7 +194,6 @@ static gboolean vm_set_actions_from_xml(OvirtVm *vm, RestXmlNode *node)
 
         link_name = rest_xml_node_get_attr(link, "rel");
         href = rest_xml_node_get_attr(link, "href");
-        href = ovirt_rest_strip_api_base_dir(href);
 
         if ((link_name != NULL) && (href != NULL)) {
             ovirt_vm_add_action(vm, link_name, href);
