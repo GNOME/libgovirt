@@ -43,6 +43,7 @@ typedef enum {
 
 void ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url);
 gboolean ovirt_vm_refresh_from_xml(OvirtVm *vm, RestXmlNode *node);
+const char *ovirt_rest_strip_api_base_dir(const char *path);
 
 G_END_DECLS
 
