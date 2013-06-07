@@ -628,10 +628,15 @@ typedef void (*OvirtRestInvokeCallback)(RestProxyCall *call, GTask *result,
 typedef struct {
     OvirtRestInvokeCallback callback;
     gulong cancellable_cb_id;
+    gpointer user_data;
+    GDestroyNotify destroy_func;
 } OvirtRestInvokeData;
 
 static void ovirt_rest_invoke_data_free(OvirtRestInvokeData *data)
 {
+    if ((data->user_data != NULL) && (data->destroy_func != NULL)) {
+        data->destroy_func(data->user_data);
+    }
     g_slice_free(OvirtRestInvokeData, data);
 }
 
@@ -647,7 +652,7 @@ static void invoke_async_cb(RestProxyCall *call, const GError *librest_error,
     if (librest_error != NULL) {
         g_task_return_error(task, g_error_copy(librest_error));
     } else {
-        data->callback(call, task, NULL);
+        data->callback(call, task, data->user_data);
     }
 
     if (g_task_get_cancellable(task) != NULL) {
@@ -662,7 +667,9 @@ static void ovirt_rest_invoke_async(OvirtProxy *proxy,
                                     const char *method,
                                     const char *function,
                                     GTask *task,
-                                    OvirtRestInvokeCallback callback)
+                                    OvirtRestInvokeCallback callback,
+                                    gpointer user_data,
+                                    GDestroyNotify destroy_func)
 {
     RestProxyCall *call;
     GError *error = NULL;
@@ -685,6 +692,8 @@ static void ovirt_rest_invoke_async(OvirtProxy *proxy,
 
     data = g_slice_new0(OvirtRestInvokeData);
     data->callback = callback;
+    data->user_data = user_data;
+    data->destroy_func = destroy_func;
     cancellable = g_task_get_cancellable(task);
     if (cancellable != NULL) {
         data->cancellable_cb_id = g_cancellable_connect(cancellable,
@@ -745,7 +754,8 @@ void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
     task = g_task_new(vm, cancellable, callback, user_data);
 
     ovirt_rest_invoke_async(proxy, "GET", vm->priv->href,
-                            task, ovirt_vm_refresh_async_cb);
+                            task, ovirt_vm_refresh_async_cb,
+                            NULL, NULL);
 }
 
 gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
