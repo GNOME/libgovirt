@@ -413,6 +413,11 @@ gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
     g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
 
     source = get_ca_cert_file(proxy);
+    if (source == NULL) {
+        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_BAD_URI, "could not extract ca cert filename from URI");
+        goto error;
+    }
+
     load_ok = g_file_load_contents(source, NULL,
                                    &cert_data,
                                    &cert_length,

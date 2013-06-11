@@ -61,7 +61,8 @@ struct _OvirtProxyClass {
 typedef enum {
   OVIRT_PROXY_PARSING_FAILED,
   OVIRT_PROXY_ACTION_FAILED,
-  OVIRT_PROXY_FAULT
+  OVIRT_PROXY_FAULT,
+  OVIRT_PROXY_BAD_URI,
 } OvirtProxyError;
 
 GQuark ovirt_proxy_error_quark(void);
