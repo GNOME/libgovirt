@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     guint secure_port;
     OvirtVmDisplayType type;
     gchar *ticket = NULL;
-    gchar *ca_cert = NULL;
+    GByteArray *ca_cert = NULL;
 
     proxy = ovirt_proxy_new (REST_URI);
     if (proxy == NULL)
@@ -71,13 +71,13 @@ int main(int argc, char **argv)
     g_print("\tVM IP address: %s", host);
     g_print("\tPort: %d", port);
     g_print("\tSecure port: %d", secure_port);
-    g_print("\tCA certificate: %s", ca_cert);
+    g_print("\tCA certificate: %p", ca_cert);
     g_print("\tTicket: %s", ticket);
 
 error:
     g_free(ticket);
-    g_free(ca_cert);
-
+    if (ca_cert != NULL)
+        g_byte_array_unref(ca_cert);
     if (error != NULL)
         g_error_free(error);
     if (display != NULL)
