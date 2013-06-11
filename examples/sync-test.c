@@ -1,7 +1,6 @@
-#include <govirt/govirt.h>
+#include <stdlib.h>
 
-const char *REST_URI;
-const char *VM_NAME;
+#include <govirt/govirt.h>
 
 int main(int argc, char **argv)
 {
@@ -17,7 +16,13 @@ int main(int argc, char **argv)
     gchar *ticket = NULL;
     GByteArray *ca_cert = NULL;
 
-    proxy = ovirt_proxy_new (REST_URI);
+
+    if (argc != 3) {
+        g_print("Usage: %s URI VM-NAME\n", argv[0]);
+        exit(1);
+    }
+
+    proxy = ovirt_proxy_new (argv[1]);
     if (proxy == NULL)
         goto error;
 
@@ -33,23 +38,23 @@ int main(int argc, char **argv)
 
     ovirt_proxy_fetch_vms(proxy, &error);
     if (error != NULL) {
-        g_debug("failed to lookup %s: %s", VM_NAME, error->message);
+        g_debug("failed to lookup %s: %s", argv[2], error->message);
         goto error;
     }
 
-    vm = ovirt_proxy_lookup_vm(proxy, VM_NAME);
+    vm = ovirt_proxy_lookup_vm(proxy, argv[2]);
     g_return_val_if_fail(vm != NULL, -1);
     g_object_get(G_OBJECT(vm), "state", &state, NULL);
     if (state != OVIRT_VM_STATE_UP) {
         ovirt_vm_start(vm, proxy, &error);
         if (error != NULL) {
-            g_debug("failed to start %s: %s", VM_NAME, error->message);
+            g_debug("failed to start %s: %s", argv[2], error->message);
             goto error;
         }
     }
 
     if (!ovirt_vm_get_ticket(vm, proxy, &error)) {
-        g_debug("failed to get ticket for %s: %s", VM_NAME, error->message);
+        g_debug("failed to get ticket for %s: %s", argv[2], error->message);
         goto error;
     }
 
@@ -65,7 +70,7 @@ int main(int argc, char **argv)
                  "secure-port", &secure_port,
                  "ticket", &ticket,
                  NULL);
-    g_print("Connection info for %s:\n", VM_NAME);
+    g_print("Connection info for %s:\n", argv[2]);
     g_print("\tConnection type: %s\n",
             (type == OVIRT_VM_DISPLAY_SPICE?"spice":"vnc"));
     g_print("\tVM IP address: %s", host);
