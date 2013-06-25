@@ -29,6 +29,10 @@
 
 G_BEGIN_DECLS
 
+RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
+                                            const char *href,
+                                            GError **error);
+
 typedef gboolean (*OvirtProxyCallAsyncCb)(OvirtProxy *proxy,
                                           RestProxyCall *call,
                                           gpointer user_data,

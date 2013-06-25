@@ -25,6 +25,7 @@
 
 #include "ovirt-error.h"
 #include "ovirt-proxy.h"
+#include "ovirt-proxy-private.h"
 #include "ovirt-rest-call.h"
 #include "ovirt-vm.h"
 #include "ovirt-vm-display.h"
@@ -135,15 +136,12 @@ static void dump_vm(OvirtVm *vm)
 }
 #endif
 
-static GHashTable *parse_vms_xml(RestProxyCall *call)
+static GHashTable *parse_vms_xml(RestXmlNode *root)
 {
-    RestXmlNode *root;
     RestXmlNode *xml_vms;
     RestXmlNode *node;
     GHashTable *vms;
     const char *vm_key = g_intern_string("vm");
-
-    root = ovirt_rest_xml_node_from_call(call);
 
     vms = g_hash_table_new_full(g_str_hash, g_str_equal,
                                 g_free, (GDestroyNotify)g_object_unref);
@@ -171,6 +169,17 @@ static GHashTable *parse_vms_xml(RestProxyCall *call)
         }
         g_hash_table_insert(vms, name, vm);
     }
+
+    return vms;
+}
+
+static GHashTable *parse_vms(RestProxyCall *call)
+{
+    RestXmlNode *root;
+    GHashTable *vms;
+
+    root = ovirt_rest_xml_node_from_call(call);
+    vms = parse_vms_xml(root);
     rest_xml_node_unref(root);
 
     return vms;
@@ -178,25 +187,44 @@ static GHashTable *parse_vms_xml(RestProxyCall *call)
 
 gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
 {
-    RestProxyCall *call;
+    RestXmlNode *vms_node;
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
 
+    vms_node = ovirt_proxy_get_collection_xml(proxy, "vms", error);
+    if (vms_node == NULL)
+        return FALSE;
+
+    proxy->priv->vms = parse_vms_xml(vms_node);
+
+    rest_xml_node_unref(vms_node);
+
+    return TRUE;
+}
+
+RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
+                                            const char *href,
+                                            GError **error)
+{
+    RestProxyCall *call;
+    RestXmlNode *root;
+
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
+
     call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
-    rest_proxy_call_set_function(call, "vms");
+    rest_proxy_call_set_function(call, href);
     rest_proxy_call_add_header(call, "All-Content", "true");
 
     if (!rest_proxy_call_sync(call, error)) {
         g_warning("Error while getting VM list");
         g_object_unref(G_OBJECT(call));
-        return FALSE;
+        return NULL;
     }
 
-    proxy->priv->vms = parse_vms_xml(call);
-
+    root = ovirt_rest_xml_node_from_call(call);
     g_object_unref(G_OBJECT(call));
 
-    return TRUE;
+    return root;
 }
 
 typedef struct {
@@ -339,7 +367,7 @@ static gboolean fetch_vms_async_cb(OvirtProxy* proxy,
       if (proxy->priv->vms != NULL) {
           g_hash_table_unref(proxy->priv->vms);
       }
-      proxy->priv->vms = parse_vms_xml(call);
+      proxy->priv->vms = parse_vms(call);
 
       return TRUE;
 }
