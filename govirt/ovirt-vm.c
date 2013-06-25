@@ -1,7 +1,7 @@
 /*
  * ovirt-vm.c: oVirt virtual machine
  *
- * Copyright (C) 2012 Red Hat, Inc.
+ * Copyright (C) 2012, 2013 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -60,6 +60,7 @@ struct _OvirtVmPrivate {
     char *name;
     OvirtVmState state;
     GHashTable *actions;
+    GHashTable *sub_collections;
     OvirtVmDisplay *display;
 } ;
 G_DEFINE_TYPE(OvirtVm, ovirt_vm, G_TYPE_OBJECT);
@@ -154,6 +155,10 @@ static void ovirt_vm_dispose(GObject *object)
     if (vm->priv->actions != NULL) {
         g_hash_table_unref(vm->priv->actions);
         vm->priv->actions = NULL;
+    }
+    if (vm->priv->sub_collections != NULL) {
+        g_hash_table_unref(vm->priv->sub_collections);
+        vm->priv->sub_collections = NULL;
     }
     g_clear_object(&vm->priv->display);
 
@@ -254,6 +259,24 @@ ovirt_vm_get_action(OvirtVm *vm, const char *action)
     g_return_val_if_fail(vm->priv->actions != NULL, NULL);
 
     return g_hash_table_lookup(vm->priv->actions, action);
+}
+
+G_GNUC_INTERNAL void
+ovirt_vm_add_sub_collection(OvirtVm *vm,
+                            const char *sub_collection,
+                            const char *url)
+{
+    g_return_if_fail(OVIRT_IS_VM(vm));
+
+    if (vm->priv->sub_collections == NULL) {
+        vm->priv->sub_collections = g_hash_table_new_full(g_str_hash,
+                                                          g_str_equal,
+                                                          g_free,
+                                                          g_free);
+    }
+    g_hash_table_insert(vm->priv->sub_collections,
+                        g_strdup(sub_collection),
+                        g_strdup(url));
 }
 
 static void

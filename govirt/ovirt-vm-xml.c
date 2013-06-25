@@ -203,6 +203,35 @@ static gboolean vm_set_actions_from_xml(OvirtVm *vm, RestXmlNode *node)
     return TRUE;
 }
 
+static gboolean vm_set_sub_collections_from_xml(OvirtVm *vm, RestXmlNode *node)
+{
+    RestXmlNode *link;
+    const char *link_key = g_intern_string("link");
+
+    link = g_hash_table_lookup(node->children, link_key);
+    if (link == NULL)
+        return FALSE;
+
+    for (; link != NULL; link = link->next) {
+        const char *link_name;
+        const char *href;
+
+        g_warn_if_fail(link != NULL);
+        g_warn_if_fail(link->name != NULL);
+        g_warn_if_fail(strcmp(link->name, "link") == 0);
+
+        link_name = rest_xml_node_get_attr(link, "rel");
+        href = rest_xml_node_get_attr(link, "href");
+
+        if ((link_name != NULL) && (href != NULL)) {
+            ovirt_vm_add_sub_collection(vm, link_name, href);
+        }
+    }
+
+    return TRUE;
+}
+
+
 G_GNUC_INTERNAL gboolean ovirt_vm_refresh_from_xml(OvirtVm *vm, RestXmlNode *node)
 {
     const char *uuid;
@@ -218,6 +247,7 @@ G_GNUC_INTERNAL gboolean ovirt_vm_refresh_from_xml(OvirtVm *vm, RestXmlNode *nod
     vm_set_name_from_xml(vm, node);
     vm_set_state_from_xml(vm, node);
     vm_set_actions_from_xml(vm, node);
+    vm_set_sub_collections_from_xml(vm, node);
     vm_set_display_from_xml(vm, node);
 
     return TRUE;
