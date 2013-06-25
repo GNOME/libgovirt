@@ -46,6 +46,8 @@ GOVIRT_0.1.0 {
 GOVIRT_0.1.1 {
         ovirt_error_quark;
         ovirt_error_get_type;
+
+        ovirt_resource_get_type;
 } GOVIRT_0.1.0;
 
 # .... define new API here using predicted next version number ....

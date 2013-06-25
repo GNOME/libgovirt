@@ -25,6 +25,7 @@
 #include <govirt/ovirt-enum-types.h>
 #include <govirt/ovirt-error.h>
 #include <govirt/ovirt-proxy.h>
+#include <govirt/ovirt-resource.h>
 #include <govirt/ovirt-rest-call-error.h>
 #include <govirt/ovirt-vm.h>
 #include <govirt/ovirt-vm-display.h>

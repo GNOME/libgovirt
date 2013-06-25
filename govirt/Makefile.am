@@ -17,6 +17,7 @@ libgovirt_la_HEADERS =						\
 	govirt.h						\
 	ovirt-error.h						\
 	ovirt-proxy.h						\
+	ovirt-resource.h					\
 	ovirt-rest-call-error.h					\
 	ovirt-types.h						\
 	ovirt-vm.h						\
@@ -35,6 +36,7 @@ libgovirt_la_SOURCES =						\
 	glib-compat.c						\
 	ovirt-error.c						\
 	ovirt-proxy.c						\
+	ovirt-resource.c					\
 	ovirt-rest-call.c					\
 	ovirt-utils.c						\
 	ovirt-vm.c						\
