@@ -22,6 +22,7 @@
 #ifndef __OVIRT_PRIVATE_H__
 #define __OVIRT_PRIVATE_H__
 
+#include <govirt/ovirt-collection-private.h>
 #include <govirt/ovirt-enum-types-private.h>
 #include <govirt/ovirt-proxy-private.h>
 #include <govirt/ovirt-resource-private.h>
