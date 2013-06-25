@@ -42,9 +42,6 @@ typedef enum {
     OVIRT_VM_ACTION_MIGRATE
 } OvirtVmAction;
 
-void ovirt_vm_add_sub_collection(OvirtVm *vm,
-                                 const char *sub_collection,
-                                 const char *url);
 gboolean ovirt_vm_refresh_from_xml(OvirtVm *vm, RestXmlNode *node);
 OvirtVm *ovirt_vm_new_from_xml(RestXmlNode *node, GError **error);
 

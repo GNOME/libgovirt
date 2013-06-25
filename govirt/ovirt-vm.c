@@ -50,7 +50,6 @@ struct _OvirtVmPrivate {
     char *href;
     char *name;
     OvirtVmState state;
-    GHashTable *sub_collections;
     OvirtVmDisplay *display;
 } ;
 G_DEFINE_TYPE(OvirtVm, ovirt_vm, OVIRT_TYPE_RESOURCE);
@@ -118,10 +117,6 @@ static void ovirt_vm_dispose(GObject *object)
 {
     OvirtVm *vm = OVIRT_VM(object);
 
-    if (vm->priv->sub_collections != NULL) {
-        g_hash_table_unref(vm->priv->sub_collections);
-        vm->priv->sub_collections = NULL;
-    }
     g_clear_object(&vm->priv->display);
 
     G_OBJECT_CLASS(ovirt_vm_parent_class)->dispose(object);
@@ -201,24 +196,6 @@ OvirtVm *ovirt_vm_new_from_xml(RestXmlNode *node, GError **error)
 OvirtVm *ovirt_vm_new(void)
 {
     return OVIRT_VM(g_initable_new(OVIRT_TYPE_VM, NULL, NULL, NULL));
-}
-
-G_GNUC_INTERNAL void
-ovirt_vm_add_sub_collection(OvirtVm *vm,
-                            const char *sub_collection,
-                            const char *url)
-{
-    g_return_if_fail(OVIRT_IS_VM(vm));
-
-    if (vm->priv->sub_collections == NULL) {
-        vm->priv->sub_collections = g_hash_table_new_full(g_str_hash,
-                                                          g_str_equal,
-                                                          g_free,
-                                                          g_free);
-    }
-    g_hash_table_insert(vm->priv->sub_collections,
-                        g_strdup(sub_collection),
-                        g_strdup(url));
 }
 
 typedef struct {

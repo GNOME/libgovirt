@@ -40,6 +40,7 @@ struct _OvirtResourcePrivate {
     char *description;
 
     GHashTable *actions;
+    GHashTable *sub_collections;
 
     RestXmlNode *xml;
 };
@@ -134,6 +135,10 @@ static void ovirt_resource_dispose(GObject *object)
     if (resource->priv->actions != NULL) {
         g_hash_table_unref(resource->priv->actions);
         resource->priv->actions = NULL;
+    }
+    if (resource->priv->sub_collections != NULL) {
+        g_hash_table_unref(resource->priv->sub_collections);
+        resource->priv->sub_collections = NULL;
     }
     if (resource->priv->xml != NULL) {
         g_boxed_free(REST_TYPE_XML_NODE, resource->priv->xml);
@@ -244,6 +249,10 @@ static void ovirt_resource_init(OvirtResource *resource)
     resource->priv = OVIRT_RESOURCE_GET_PRIVATE(resource);
     resource->priv->actions = g_hash_table_new_full(g_str_hash, g_str_equal,
                                                     g_free, g_free);
+    resource->priv->sub_collections = g_hash_table_new_full(g_str_hash,
+                                                            g_str_equal,
+                                                            g_free,
+                                                            g_free);
 }
 
 static void
@@ -267,6 +276,20 @@ ovirt_resource_get_action(OvirtResource *resource, const char *action)
     g_return_val_if_fail(resource->priv->actions != NULL, NULL);
 
     return g_hash_table_lookup(resource->priv->actions, action);
+}
+
+static void
+ovirt_resource_add_sub_collection(OvirtResource *resource,
+                                  const char *sub_collection,
+                                  const char *url)
+{
+    g_return_if_fail(OVIRT_IS_RESOURCE(resource));
+    g_return_if_fail(sub_collection != NULL);
+    g_return_if_fail(url != NULL);
+
+    g_hash_table_insert(resource->priv->sub_collections,
+                        g_strdup(sub_collection),
+                        g_strdup(url));
 }
 
 static gboolean
@@ -298,6 +321,36 @@ ovirt_resource_set_actions_from_xml(OvirtResource *resource, RestXmlNode *node)
 
         if ((link_name != NULL) && (href != NULL)) {
             ovirt_resource_add_action(resource, link_name, href);
+        }
+    }
+
+    return TRUE;
+}
+
+static gboolean
+ovirt_resource_set_sub_collections_from_xml(OvirtResource *resource,
+                                            RestXmlNode *node)
+{
+    RestXmlNode *link;
+    const char *link_key = g_intern_string("link");
+
+    link = g_hash_table_lookup(node->children, link_key);
+    if (link == NULL)
+        return FALSE;
+
+    for (; link != NULL; link = link->next) {
+        const char *link_name;
+        const char *href;
+
+        g_warn_if_fail(link != NULL);
+        g_warn_if_fail(link->name != NULL);
+        g_warn_if_fail(strcmp(link->name, "link") == 0);
+
+        link_name = rest_xml_node_get_attr(link, "rel");
+        href = rest_xml_node_get_attr(link, "href");
+
+        if ((link_name != NULL) && (href != NULL)) {
+            ovirt_resource_add_sub_collection(resource, link_name, href);
         }
     }
 
@@ -365,6 +418,7 @@ static gboolean ovirt_resource_init_from_xml_real(OvirtResource *resource,
     ovirt_resource_set_name_from_xml(resource, node);
     ovirt_resource_set_description_from_xml(resource, node);
     ovirt_resource_set_actions_from_xml(resource, node);
+    ovirt_resource_set_sub_collections_from_xml(resource, node);
 
     return TRUE;
 }
