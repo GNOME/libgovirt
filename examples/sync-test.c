@@ -2,6 +2,20 @@
 
 #include <govirt/govirt.h>
 
+static gboolean
+authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
+                G_GNUC_UNUSED gboolean retrying, gpointer user_data)
+{
+    if (retrying)
+        return FALSE;
+
+    g_object_set(G_OBJECT(proxy),
+                 "username", g_getenv("LIBGOVIRT_TEST_USERNAME"),
+                 "password", g_getenv("LIBGOVIRT_TEST_PASSWORD"),
+                 NULL);
+    return TRUE;
+}
+
 int main(int argc, char **argv)
 {
     OvirtProxy *proxy = NULL;
@@ -26,8 +40,8 @@ int main(int argc, char **argv)
     if (proxy == NULL)
         goto error;
 
-    /*g_signal_connect(G_OBJECT(proxy), "authenticate",
-                     G_CALLBACK(authenticate_cb), app);*/
+    g_signal_connect(G_OBJECT(proxy), "authenticate",
+                     G_CALLBACK(authenticate_cb), NULL);
 
     ovirt_proxy_fetch_ca_certificate(proxy, &error);
     if (error != NULL) {
