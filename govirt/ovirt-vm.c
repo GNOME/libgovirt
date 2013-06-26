@@ -41,16 +41,6 @@ static gboolean parse_action_response(RestProxyCall *call, OvirtVm *vm,
 static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm,
                                     GError **error);
 
-typedef void (*OvirtRestInvokeCallback)(RestProxyCall *call, GTask *result,
-                                        gpointer user_data);
-static void ovirt_rest_invoke_async(OvirtProxy *proxy,
-                                    const char *method,
-                                    const char *function,
-                                    GTask *task,
-                                    OvirtRestInvokeCallback callback,
-                                    gpointer user_data,
-                                    GDestroyNotify destroy_func);
-
 #define OVIRT_VM_GET_PRIVATE(obj)                         \
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_VM, OvirtVmPrivate))
 
@@ -279,29 +269,33 @@ ovirt_vm_add_sub_collection(OvirtVm *vm,
                         g_strdup(url));
 }
 
-static void
-action_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
-                     RestProxyCall *call)
-{
-    rest_proxy_call_cancel (call);
-}
-
-static void ovirt_vm_invoke_action_async_cb(RestProxyCall *call, GTask *task,
-                                            gpointer user_data)
-{
+typedef struct {
     OvirtVm *vm;
+    ActionResponseParser parser;
+} OvirtVmInvokeActionData;
+
+static gboolean ovirt_vm_invoke_action_async_cb(OvirtProxy *proxy, RestProxyCall *call,
+                                                gpointer user_data, GError **error)
+{
+    OvirtVmInvokeActionData *data;
     GError *action_error = NULL;
 
-    g_return_if_fail(REST_IS_PROXY_CALL(call));
-    g_return_if_fail(G_IS_TASK(task));
+    g_return_val_if_fail(REST_IS_PROXY_CALL(call), FALSE);
+    data = (OvirtVmInvokeActionData *)user_data;
 
-    vm = OVIRT_VM(g_task_get_source_object(task));
-    parse_action_response(call, vm, (ActionResponseParser)user_data, &action_error);
+    parse_action_response(call, data->vm, data->parser, &action_error);
     if (action_error != NULL) {
-        g_task_return_error(task, action_error);
-    } else {
-        g_task_return_boolean(task, TRUE);
+        g_propagate_error(error, action_error);
+        return  FALSE;
     }
+
+    return TRUE;
+}
+
+static void
+ovirt_vm_invoke_action_data_free(OvirtVmInvokeActionData *data)
+{
+    g_slice_free(OvirtVmInvokeActionData, data);
 }
 
 static void
@@ -313,8 +307,9 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
                              GAsyncReadyCallback callback,
                              gpointer user_data)
 {
-    GTask *task;
+    GSimpleAsyncResult *result;
     const char *function;
+    OvirtVmInvokeActionData *data;
 
     g_return_if_fail(OVIRT_IS_VM(vm));
     g_return_if_fail(action != NULL);
@@ -325,35 +320,27 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
     function = ovirt_vm_get_action(vm, action);
     g_return_if_fail(function != NULL);
 
-    task = g_task_new(vm, cancellable, callback, user_data);
+    result = g_simple_async_result_new(G_OBJECT(vm), callback,
+                                       user_data,
+                                       ovirt_vm_invoke_action_async);
+    data = g_slice_new(OvirtVmInvokeActionData);
+    data->vm = vm;
+    data->parser = response_parser;
 
-    ovirt_rest_invoke_async(proxy, "POST", function,
-                            task, ovirt_vm_invoke_action_async_cb,
-                            response_parser, NULL);
-}
-
-static const char *ovirt_rest_strip_api_base_dir(const char *path)
-{
-    if (g_str_has_prefix(path, OVIRT_API_BASE_DIR)) {
-        path += strlen(OVIRT_API_BASE_DIR);
-    } else {
-        /* action href should always be prefixed by /api/ */
-        /* it would be easier to remove /api/ from the RestProxy base
-         * URL but unfortunately I couldn't get this to work
-         */
-        g_warn_if_reached();
-    }
-
-    return path;
+    ovirt_rest_call_async(proxy, "POST", function, result, cancellable,
+                          ovirt_vm_invoke_action_async_cb, data,
+                          (GDestroyNotify)ovirt_vm_invoke_action_data_free);
 }
 
 static gboolean
 ovirt_vm_action_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
-    g_return_val_if_fail(g_task_is_valid(result, vm), FALSE);
+    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(vm),
+                                                        ovirt_vm_invoke_action_async),
+                         FALSE);
 
-    return g_task_propagate_boolean(G_TASK (result), err);
+    return ovirt_rest_call_finish(result, err);
 }
 
 void
@@ -402,6 +389,21 @@ gboolean
 ovirt_vm_stop_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
 {
     return ovirt_vm_action_finish(vm, result, err);
+}
+
+static const char *ovirt_rest_strip_api_base_dir(const char *path)
+{
+    if (g_str_has_prefix(path, OVIRT_API_BASE_DIR)) {
+        path += strlen(OVIRT_API_BASE_DIR);
+    } else {
+        /* action href should always be prefixed by /api/ */
+        /* it would be easier to remove /api/ from the RestProxy base
+         * URL but unfortunately I couldn't get this to work
+         */
+        g_warn_if_reached();
+    }
+
+    return path;
 }
 
 static gboolean
@@ -620,6 +622,13 @@ typedef struct {
     GDestroyNotify destroy_func;
 } OvirtRestInvokeData;
 
+static void
+action_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
+                     RestProxyCall *call)
+{
+    rest_proxy_call_cancel (call);
+}
+
 static void ovirt_rest_invoke_data_free(OvirtRestInvokeData *data)
 {
     if ((data->user_data != NULL) && (data->destroy_func != NULL)) {
@@ -703,24 +712,23 @@ static void ovirt_rest_invoke_async(OvirtProxy *proxy,
     g_object_unref(G_OBJECT(call));
 }
 
-static void ovirt_vm_refresh_async_cb(RestProxyCall *call, GTask *task,
-                                      gpointer user_data)
+static gboolean ovirt_vm_refresh_async_cb(OvirtProxy *proxy, RestProxyCall *call,
+                                          gpointer user_data, GError **error)
 {
     OvirtVm *vm;
     RestXmlNode *root;
     gboolean refreshed;
 
-    g_return_if_fail(REST_IS_PROXY_CALL(call));
-    g_return_if_fail(G_IS_TASK(task));
+    g_return_val_if_fail(REST_IS_PROXY_CALL(call), FALSE);
+    g_return_val_if_fail(OVIRT_IS_VM(user_data), FALSE);
 
     root = ovirt_rest_xml_node_from_call(call);
-
-    vm = OVIRT_VM(g_task_get_source_object(task));
+    vm = OVIRT_VM(user_data);
     refreshed = ovirt_vm_refresh_from_xml(vm, root);
 
-    g_task_return_boolean(task, refreshed);
-
     rest_xml_node_unref(root);
+
+    return refreshed;
 }
 
 void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
@@ -728,24 +736,27 @@ void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
                             GAsyncReadyCallback callback,
                             gpointer user_data)
 {
-    GTask *task;
+    GSimpleAsyncResult *result;
 
     g_return_if_fail(OVIRT_IS_VM(vm));
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
-    task = g_task_new(vm, cancellable, callback, user_data);
-
-    ovirt_rest_invoke_async(proxy, "GET", vm->priv->href,
-                            task, ovirt_vm_refresh_async_cb,
-                            NULL, NULL);
+    result = g_simple_async_result_new(G_OBJECT(vm), callback,
+                                       user_data,
+                                       ovirt_vm_refresh_async);
+    ovirt_rest_call_async(proxy, "GET", vm->priv->href, result, cancellable,
+                          ovirt_vm_refresh_async_cb, vm, NULL);
 }
 
 gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
                                  GAsyncResult *result,
                                  GError **err)
 {
-    g_return_val_if_fail(g_task_is_valid(result, vm), FALSE);
+    g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
+    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(vm),
+                                                        ovirt_vm_invoke_action_async),
+                         FALSE);
 
-    return g_task_propagate_boolean(G_TASK (result), err);
+    return ovirt_rest_call_finish(result, err);
 }
