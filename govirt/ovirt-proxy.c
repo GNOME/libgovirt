@@ -27,7 +27,7 @@
 #include "ovirt-proxy.h"
 #include "ovirt-vm.h"
 #include "ovirt-vm-display.h"
-#include "ovirt-vm-private.h"
+#include "govirt-private.h"
 
 #include <string.h>
 #include <glib/gstdio.h>
@@ -141,18 +141,13 @@ static void dump_vm(OvirtVm *vm)
 
 static GHashTable *parse_vms_xml(RestProxyCall *call)
 {
-    RestXmlParser *parser;
     RestXmlNode *root;
     RestXmlNode *xml_vms;
     RestXmlNode *node;
     GHashTable *vms;
     const char *vm_key = g_intern_string("vm");
 
-    parser = rest_xml_parser_new ();
-
-    root = rest_xml_parser_parse_from_data (parser,
-            rest_proxy_call_get_payload (call),
-            rest_proxy_call_get_payload_length (call));
+    root = ovirt_rest_xml_node_from_call(call);
 
     vms = g_hash_table_new_full(g_str_hash, g_str_equal,
                                 g_free, (GDestroyNotify)g_object_unref);
@@ -186,7 +181,6 @@ static GHashTable *parse_vms_xml(RestProxyCall *call)
         g_hash_table_insert(vms, name, vm);
     }
     rest_xml_node_unref(root);
-    g_object_unref(G_OBJECT(parser));
 
     return vms;
 }

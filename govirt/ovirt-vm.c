@@ -27,7 +27,7 @@
 #include "ovirt-rest-call.h"
 #include "ovirt-vm.h"
 #include "ovirt-vm-display.h"
-#include "ovirt-vm-private.h"
+#include "govirt-private.h"
 
 #include <rest/rest-xml-node.h>
 #include <rest/rest-xml-parser.h>
@@ -571,16 +571,11 @@ static gboolean
 parse_action_response(RestProxyCall *call, OvirtVm *vm,
                       ActionResponseParser response_parser, GError **error)
 {
-    RestXmlParser *parser;
     RestXmlNode *root;
     gboolean result;
 
     result = FALSE;
-    parser = rest_xml_parser_new ();
-
-    root = rest_xml_parser_parse_from_data (parser,
-            rest_proxy_call_get_payload (call),
-            rest_proxy_call_get_payload_length (call));
+    root = ovirt_rest_xml_node_from_call(call);
 
     if (g_strcmp0(root->name, "action") == 0) {
         enum OvirtResponseStatus status;
@@ -611,7 +606,6 @@ parse_action_response(RestProxyCall *call, OvirtVm *vm,
     }
 
     rest_xml_node_unref(root);
-    g_object_unref(G_OBJECT(parser));
 
     return result;
 }
@@ -713,17 +707,13 @@ static void ovirt_vm_refresh_async_cb(RestProxyCall *call, GTask *task,
                                       gpointer user_data)
 {
     OvirtVm *vm;
-    RestXmlParser *parser;
     RestXmlNode *root;
     gboolean refreshed;
 
     g_return_if_fail(REST_IS_PROXY_CALL(call));
     g_return_if_fail(G_IS_TASK(task));
 
-    parser = rest_xml_parser_new ();
-    root = rest_xml_parser_parse_from_data (parser,
-            rest_proxy_call_get_payload (call),
-            rest_proxy_call_get_payload_length (call));
+    root = ovirt_rest_xml_node_from_call(call);
 
     vm = OVIRT_VM(g_task_get_source_object(task));
     refreshed = ovirt_vm_refresh_from_xml(vm, root);
@@ -731,7 +721,6 @@ static void ovirt_vm_refresh_async_cb(RestProxyCall *call, GTask *task,
     g_task_return_boolean(task, refreshed);
 
     rest_xml_node_unref(root);
-    g_object_unref(G_OBJECT(parser));
 }
 
 void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,

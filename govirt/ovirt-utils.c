@@ -1,7 +1,7 @@
 /*
- * govirt-private.h: main private header
+ * ovirt-utils.c
  *
- * Copyright (C) 2012 Red Hat, Inc.
+ * Copyright (C) 2011, 2013 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,12 +19,27 @@
  *
  * Author: Christophe Fergeau <cfergeau@redhat.com>
  */
-#ifndef __OVIRT_PRIVATE_H__
-#define __OVIRT_PRIVATE_H__
 
-#include <govirt/ovirt-enum-types-private.h>
-#include <govirt/ovirt-rest-call.h>
-#include <govirt/ovirt-utils.h>
-#include <govirt/ovirt-vm-private.h>
+#include <config.h>
 
-#endif /* __OVIRT_PRIVATE_H__ */
+#include <rest/rest-xml-parser.h>
+
+#include "ovirt-utils.h"
+
+RestXmlNode *
+ovirt_rest_xml_node_from_call(RestProxyCall *call)
+{
+    RestXmlParser *parser;
+    RestXmlNode *node;
+
+    parser = rest_xml_parser_new ();
+
+    node = rest_xml_parser_parse_from_data (parser,
+            rest_proxy_call_get_payload (call),
+            rest_proxy_call_get_payload_length (call));
+
+    g_object_unref(G_OBJECT(parser));
+
+    return node;
+}
+

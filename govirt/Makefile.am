@@ -25,12 +25,14 @@ libgovirt_la_HEADERS =						\
 noinst_HEADERS =						\
 	govirt-private.h					\
 	ovirt-rest-call.h					\
+	ovirt-utils.h						\
 	ovirt-vm-private.h					\
 	$(NULL)
 
 libgovirt_la_SOURCES =						\
 	ovirt-proxy.c						\
 	ovirt-rest-call.c					\
+	ovirt-utils.c						\
 	ovirt-vm.c						\
 	ovirt-vm-display.c					\
 	ovirt-vm-xml.c						\
