@@ -173,18 +173,6 @@ static GHashTable *parse_vms_xml(RestXmlNode *root)
     return vms;
 }
 
-static GHashTable *parse_vms(RestProxyCall *call)
-{
-    RestXmlNode *root;
-    GHashTable *vms;
-
-    root = ovirt_rest_xml_node_from_call(call);
-    vms = parse_vms_xml(root);
-    rest_xml_node_unref(root);
-
-    return vms;
-}
-
 gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
 {
     RestXmlNode *vms_node;
@@ -359,15 +347,80 @@ gboolean ovirt_rest_call_finish(GAsyncResult *result, GError **err)
     return g_simple_async_result_get_op_res_gboolean(simple);
 }
 
+typedef struct {
+    OvirtProxyGetCollectionAsyncCb parser;
+    gpointer user_data;
+    GDestroyNotify destroy_user_data;
+} OvirtProxyGetCollectionAsyncData;
+
+static void
+ovirt_proxy_get_collection_async_data_destroy(OvirtProxyGetCollectionAsyncData *data)
+{
+    if (data->destroy_user_data != NULL) {
+        data->destroy_user_data(data->user_data);
+    }
+    g_slice_free(OvirtProxyGetCollectionAsyncData, data);
+}
+
+static gboolean get_collection_xml_async_cb(OvirtProxy* proxy,
+                                            RestProxyCall *call,
+                                            gpointer user_data,
+                                            GError **error)
+{
+    RestXmlNode *root;
+    OvirtProxyGetCollectionAsyncData *data;
+    gboolean parsed = FALSE;
+
+    data = (OvirtProxyGetCollectionAsyncData *)user_data;
+
+    root = ovirt_rest_xml_node_from_call(call);
+
+    /* Do the parsing */
+    g_warn_if_fail(data->parser != NULL);
+    if (data->parser != NULL) {
+        parsed = data->parser(proxy, root, data->user_data, error);
+    }
+
+    rest_xml_node_unref(root);
+
+    return parsed;
+}
+
+/**
+ * ovirt_proxy_get_collection_xml_async:
+ * @proxy: a #OvirtProxy
+ * @callback: (scope async): completion callback
+ * @user_data: (closure): opaque data for callback
+ */
+void ovirt_proxy_get_collection_xml_async(OvirtProxy *proxy,
+                                          const char *href,
+                                          GSimpleAsyncResult *result,
+                                          GCancellable *cancellable,
+                                          OvirtProxyGetCollectionAsyncCb callback,
+                                          gpointer user_data,
+                                          GDestroyNotify destroy_func)
+{
+    OvirtProxyGetCollectionAsyncData *data;
+
+    data = g_slice_new0(OvirtProxyGetCollectionAsyncData);
+    data->parser = callback;
+    data->user_data = user_data;
+    data->destroy_user_data = destroy_func;
+
+    ovirt_rest_call_async(proxy, "GET", href, result, cancellable,
+                          get_collection_xml_async_cb, data,
+                          (GDestroyNotify)ovirt_proxy_get_collection_async_data_destroy);
+}
+
 static gboolean fetch_vms_async_cb(OvirtProxy* proxy,
-                                   RestProxyCall *call,
+                                   RestXmlNode *root_node,
                                    gpointer user_data,
                                    GError **error)
 {
       if (proxy->priv->vms != NULL) {
           g_hash_table_unref(proxy->priv->vms);
       }
-      proxy->priv->vms = parse_vms(call);
+      proxy->priv->vms = parse_vms_xml(root_node);
 
       return TRUE;
 }
@@ -391,8 +444,8 @@ void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
     result = g_simple_async_result_new (G_OBJECT(proxy), callback,
                                         user_data,
                                         ovirt_proxy_fetch_vms_async);
-    ovirt_rest_call_async(proxy, "GET", "vms", result, cancellable,
-                          fetch_vms_async_cb, NULL, NULL);
+    ovirt_proxy_get_collection_xml_async(proxy, "vms", result, cancellable,
+                                         fetch_vms_async_cb, NULL, NULL);
 }
 
 /**

@@ -32,6 +32,17 @@ G_BEGIN_DECLS
 RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
                                             const char *href,
                                             GError **error);
+typedef gboolean (*OvirtProxyGetCollectionAsyncCb)(OvirtProxy* proxy,
+                                                   RestXmlNode *root_node,
+                                                   gpointer user_data,
+                                                   GError **error);
+void ovirt_proxy_get_collection_xml_async(OvirtProxy *proxy,
+                                          const char *href,
+                                          GSimpleAsyncResult *result,
+                                          GCancellable *cancellable,
+                                          OvirtProxyGetCollectionAsyncCb callback,
+                                          gpointer user_data,
+                                          GDestroyNotify destroy_func);
 
 typedef gboolean (*OvirtProxyCallAsyncCb)(OvirtProxy *proxy,
                                           RestProxyCall *call,
