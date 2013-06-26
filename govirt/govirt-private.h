@@ -23,6 +23,7 @@
 #define __OVIRT_PRIVATE_H__
 
 #include <govirt/ovirt-enum-types-private.h>
+#include <govirt/ovirt-proxy-private.h>
 #include <govirt/ovirt-rest-call.h>
 #include <govirt/ovirt-utils.h>
 #include <govirt/ovirt-vm-private.h>

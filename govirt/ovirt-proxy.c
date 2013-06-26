@@ -209,6 +209,138 @@ gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
 }
 
 typedef struct {
+    OvirtProxy *proxy;
+    GSimpleAsyncResult *result;
+    GCancellable *cancellable;
+    gulong cancellable_cb_id;
+    OvirtProxyCallAsyncCb call_async_cb;
+    gpointer call_user_data;
+    GDestroyNotify destroy_call_data;
+} OvirtProxyCallAsyncData;
+
+static void ovirt_proxy_call_async_data_free(OvirtProxyCallAsyncData *data)
+{
+        if (data->destroy_call_data != NULL) {
+            data->destroy_call_data(data->call_user_data);
+        }
+        if (data->proxy != NULL) {
+            g_object_unref(G_OBJECT(data->proxy));
+        }
+        if (data->result != NULL) {
+            g_object_unref(G_OBJECT(data->result));
+        }
+        if ((data->cancellable != NULL) && (data->cancellable_cb_id != 0)) {
+            g_cancellable_disconnect(data->cancellable, data->cancellable_cb_id);
+        }
+        g_slice_free(OvirtProxyCallAsyncData, data);
+}
+
+static void
+call_async_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
+                         RestProxyCall *call)
+{
+    rest_proxy_call_cancel(call);
+}
+
+
+static void
+call_async_cb(RestProxyCall *call, const GError *error,
+              G_GNUC_UNUSED GObject *weak_object,
+              gpointer user_data)
+{
+    OvirtProxyCallAsyncData *data = user_data;
+    GSimpleAsyncResult *result = data->result;
+
+    if (error != NULL) {
+        g_simple_async_result_set_from_error(result, error);
+    } else {
+        GError *call_error = NULL;
+        gboolean callback_result = FALSE;
+
+        if (data->call_async_cb != NULL) {
+            callback_result = data->call_async_cb(data->proxy, call,
+                                                  data->call_user_data,
+                                                  &call_error);
+            if (call_error != NULL) {
+                g_simple_async_result_set_from_error(result, call_error);
+            }
+        }
+
+        g_simple_async_result_set_op_res_gboolean(result, callback_result);
+    }
+
+    g_simple_async_result_complete (result);
+    ovirt_proxy_call_async_data_free(data);
+}
+
+static const char *ovirt_rest_strip_api_base_dir(const char *path)
+{
+    if (g_str_has_prefix(path, OVIRT_API_BASE_DIR)) {
+        g_debug("stripping %s from %s", OVIRT_API_BASE_DIR, path);
+        path += strlen(OVIRT_API_BASE_DIR);
+    }
+
+    return path;
+}
+
+void ovirt_rest_call_async(OvirtProxy *proxy,
+                           const char *method,
+                           const char *href,
+                           GSimpleAsyncResult *result,
+                           GCancellable *cancellable,
+                           OvirtProxyCallAsyncCb callback,
+                           gpointer user_data,
+                           GDestroyNotify destroy_func)
+{
+    RestProxyCall *call;
+    GError *error;
+    OvirtProxyCallAsyncData *data;
+
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
+
+    call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
+    if (method != NULL) {
+        rest_proxy_call_set_method(call, method);
+    }
+    href = ovirt_rest_strip_api_base_dir(href);
+    rest_proxy_call_set_function(call, href);
+    /* FIXME: to set or not to set ?? */
+    rest_proxy_call_add_header(call, "All-Content", "true");
+
+    data = g_slice_new0(OvirtProxyCallAsyncData);
+    data->proxy = g_object_ref(proxy);
+    data->result = result;
+    data->call_async_cb = callback;
+    data->call_user_data = user_data;
+    data->destroy_call_data = destroy_func;
+    if (cancellable != NULL) {
+        data->cancellable_cb_id = g_cancellable_connect(cancellable,
+                                                        G_CALLBACK (call_async_cancelled_cb),
+                                                        call, NULL);
+    }
+
+    if (!rest_proxy_call_async(call, call_async_cb, NULL, data, &error)) {
+        g_warning("Error while getting collection XML");
+        g_simple_async_result_set_from_error(result, error);
+        g_simple_async_result_complete(result);
+        g_object_unref(G_OBJECT(call));
+        ovirt_proxy_call_async_data_free(data);
+    }
+}
+
+gboolean ovirt_rest_call_finish(GAsyncResult *result, GError **err)
+{
+    GSimpleAsyncResult *simple;
+
+    simple = G_SIMPLE_ASYNC_RESULT(result);
+    if (g_simple_async_result_propagate_error(simple, err))
+        return FALSE;
+
+    return g_simple_async_result_get_op_res_gboolean(simple);
+}
+
+typedef struct {
     GSimpleAsyncResult *result;
     GCancellable *cancellable;
     gulong cancellable_cb_id;
