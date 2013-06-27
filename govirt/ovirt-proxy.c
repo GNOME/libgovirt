@@ -454,6 +454,7 @@ static GFile *get_ca_cert_file(OvirtProxy *proxy)
     base_uri[strlen(base_uri) - suffix_len] = '\0';
 
     ca_uri = g_build_filename(base_uri, CA_CERT_FILENAME, NULL);
+    g_debug("CA certificate URI: %s", ca_uri);
     ca_file = g_file_new_for_uri(ca_uri);
 
 error:
