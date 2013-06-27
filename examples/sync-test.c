@@ -87,11 +87,11 @@ int main(int argc, char **argv)
     g_print("Connection info for %s:\n", argv[2]);
     g_print("\tConnection type: %s\n",
             (type == OVIRT_VM_DISPLAY_SPICE?"spice":"vnc"));
-    g_print("\tVM IP address: %s", host);
-    g_print("\tPort: %d", port);
-    g_print("\tSecure port: %d", secure_port);
-    g_print("\tCA certificate: %p", ca_cert);
-    g_print("\tTicket: %s", ticket);
+    g_print("\tVM IP address: %s\n", host);
+    g_print("\tPort: %d\n", port);
+    g_print("\tSecure port: %d\n", secure_port);
+    g_print("\tCA certificate: %p\n", ca_cert);
+    g_print("\tTicket: %s\n", ticket);
 
 error:
     g_free(ticket);
