@@ -21,7 +21,11 @@
  */
 
 #include <config.h>
+
+#include <string.h>
+
 #include "ovirt-collection.h"
+#include "ovirt-error.h"
 #include "govirt-private.h"
 
 #define OVIRT_COLLECTION_GET_PRIVATE(obj)                         \
@@ -86,4 +90,71 @@ void ovirt_collection_set_resources(OvirtCollection *collection, GHashTable *res
     } else {
         collection->priv->resources = NULL;
     }
+}
+static OvirtResource *ovirt_collection_new_resource_from_xml(GType resource_type,
+                                                             RestXmlNode *node,
+                                                             GError **error)
+{
+    return OVIRT_RESOURCE(g_initable_new(resource_type, NULL, error,
+                                         "xml-node", node , NULL));
+}
+
+OvirtCollection *ovirt_collection_new_from_xml(RestXmlNode *root_node,
+                                               GType collection_type,
+                                               const char *collection_name,
+                                               GType resource_type,
+                                               const char *resource_name,
+                                               GError **error)
+{
+    OvirtCollection *self;
+    RestXmlNode *resources_node;
+    RestXmlNode *node;
+    GHashTable *resources;
+    const char *resource_key = g_intern_string(resource_name);
+
+    if (strcmp(root_node->name, collection_name) != 0) {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                    "Got '%s' node, expected '%s'", root_node->name, collection_name);
+        return NULL;
+    }
+
+    resources = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                      g_free, (GDestroyNotify)g_object_unref);
+    resources_node = g_hash_table_lookup(root_node->children, resource_key);
+    for (node = resources_node; node != NULL; node = node->next) {
+        OvirtResource *resource;
+        gchar *name;
+
+        resource = ovirt_collection_new_resource_from_xml(resource_type, node, error);
+        if (resource == NULL) {
+            if ((error != NULL) && (*error != NULL)) {
+                g_message("Failed to parse '%s' node: %s",
+                          resource_name, (*error)->message);
+            } else {
+                g_message("Failed to parse '%s' node", resource_name);
+            }
+            g_clear_error(error);
+            continue;
+        }
+        g_object_get(G_OBJECT(resource), "name", &name, NULL);
+        if (name == NULL) {
+            g_message("'%s' resource had no name in its XML description",
+                      resource_name);
+            g_object_unref(G_OBJECT(resource));
+            continue;
+        }
+        if (g_hash_table_lookup(resources, name) != NULL) {
+            g_message("'%s' resource with the same name ('%s') already exists",
+                      resource_name, name);
+            g_object_unref(resources);
+            continue;
+        }
+        g_hash_table_insert(resources, name, resource);
+    }
+
+    self = OVIRT_COLLECTION(g_object_new(collection_type, NULL));
+    ovirt_collection_set_resources(OVIRT_COLLECTION(self), resources);
+    g_hash_table_unref(resources);
+
+    return self;
 }

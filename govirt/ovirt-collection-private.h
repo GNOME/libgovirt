@@ -31,6 +31,12 @@
 G_BEGIN_DECLS
 
 void ovirt_collection_set_resources(OvirtCollection *collection, GHashTable *resources);
+OvirtCollection *ovirt_collection_new_from_xml(RestXmlNode *root_node,
+                                               GType collection_type,
+                                               const char *collection_name,
+                                               GType resource_type,
+                                               const char *resource_name,
+                                               GError **error);
 
 G_END_DECLS
 
