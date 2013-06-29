@@ -24,6 +24,7 @@
 
 #include <rest/rest-xml-node.h>
 
+#include "ovirt-error.h"
 #include "ovirt-resource.h"
 
 #define OVIRT_RESOURCE_GET_PRIVATE(obj)                         \
@@ -38,7 +39,12 @@ struct _OvirtResourcePrivate {
     RestXmlNode *xml;
 };
 
-G_DEFINE_TYPE(OvirtResource, ovirt_resource, G_TYPE_OBJECT);
+static void ovirt_resource_initable_iface_init(GInitableIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE(OvirtResource, ovirt_resource, G_TYPE_OBJECT,
+                        G_IMPLEMENT_INTERFACE(G_TYPE_INITABLE,
+                                              ovirt_resource_initable_iface_init));
+
 
 enum {
     PROP_0,
@@ -132,6 +138,35 @@ static void ovirt_resource_finalize(GObject *object)
     g_free(resource->priv->name);
 
     G_OBJECT_CLASS(ovirt_resource_parent_class)->finalize(object);
+}
+
+static gboolean ovirt_resource_initable_init(GInitable *initable,
+                                             GCancellable *cancellable,
+                                             GError  **error)
+{
+    OvirtResource *resource;
+
+    g_return_val_if_fail (OVIRT_IS_RESOURCE(initable), FALSE);
+
+
+    if (cancellable != NULL) {
+        g_set_error_literal (error, OVIRT_ERROR, OVIRT_ERROR_NOT_SUPPORTED,
+                             "Cancellable initialization not supported");
+        return FALSE;
+    }
+
+    resource = OVIRT_RESOURCE(initable);
+
+    if (resource->priv->xml == NULL) {
+        return TRUE;
+    }
+
+    return TRUE;
+}
+
+static void ovirt_resource_initable_iface_init(GInitableIface *iface)
+{
+      iface->init = ovirt_resource_initable_init;
 }
 
 static void ovirt_resource_class_init(OvirtResourceClass *klass)
