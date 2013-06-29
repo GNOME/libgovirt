@@ -16,6 +16,7 @@ libgovirt_ladir = $(includedir)/govirt-1.0/govirt
 libgovirt_la_HEADERS =						\
 	govirt.h						\
 	ovirt-api.h						\
+	ovirt-cdrom.h						\
 	ovirt-collection.h					\
 	ovirt-error.h						\
 	ovirt-proxy.h						\
@@ -43,6 +44,7 @@ noinst_HEADERS =						\
 libgovirt_la_SOURCES =						\
 	glib-compat.c						\
 	ovirt-api.c						\
+	ovirt-cdrom.c						\
 	ovirt-collection.c					\
 	ovirt-error.c						\
 	ovirt-proxy.c						\

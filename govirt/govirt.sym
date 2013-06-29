@@ -55,6 +55,8 @@ GOVIRT_0.2.1 {
         ovirt_api_get_vms;
         ovirt_api_get_storage_domains;
 
+        ovirt_cdrom_get_type;
+
         ovirt_collection_fetch;
         ovirt_collection_fetch_async;
         ovirt_collection_fetch_finish;

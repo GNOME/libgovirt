@@ -1,7 +1,7 @@
 /*
- * govirt.h: main header
+ * ovirt-cdrom.c: oVirt cdrom handling
  *
- * Copyright (C) 2012 Red Hat, Inc.
+ * Copyright (C) 2013 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,19 +19,25 @@
  *
  * Author: Christophe Fergeau <cfergeau@redhat.com>
  */
-#ifndef __OVIRT_H__
-#define __OVIRT_H__
 
-#include <govirt/ovirt-enum-types.h>
-#include <govirt/ovirt-api.h>
-#include <govirt/ovirt-cdrom.h>
-#include <govirt/ovirt-collection.h>
-#include <govirt/ovirt-error.h>
-#include <govirt/ovirt-proxy.h>
-#include <govirt/ovirt-resource.h>
-#include <govirt/ovirt-rest-call-error.h>
-#include <govirt/ovirt-storage-domain.h>
-#include <govirt/ovirt-vm.h>
-#include <govirt/ovirt-vm-display.h>
+#include <config.h>
+#include "ovirt-cdrom.h"
 
-#endif /* __OVIRT_H__ */
+#define OVIRT_CDROM_GET_PRIVATE(obj)                         \
+        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_CDROM, OvirtCdromPrivate))
+
+struct _OvirtCdromPrivate {
+    gboolean unused;
+};
+
+G_DEFINE_TYPE(OvirtCdrom, ovirt_cdrom, OVIRT_TYPE_RESOURCE);
+
+static void ovirt_cdrom_class_init(OvirtCdromClass *klass)
+{
+    g_type_class_add_private(klass, sizeof(OvirtCdromPrivate));
+}
+
+static void ovirt_cdrom_init(OvirtCdrom *cdrom)
+{
+    cdrom->priv = OVIRT_CDROM_GET_PRIVATE(cdrom);
+}
