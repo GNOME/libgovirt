@@ -23,6 +23,7 @@ libgovirt_la_HEADERS =						\
 	$(NULL)
 
 noinst_HEADERS =						\
+	glib-compat.h						\
 	govirt-private.h					\
 	ovirt-rest-call.h					\
 	ovirt-utils.h						\
@@ -30,6 +31,7 @@ noinst_HEADERS =						\
 	$(NULL)
 
 libgovirt_la_SOURCES =						\
+	glib-compat.c						\
 	ovirt-proxy.c						\
 	ovirt-rest-call.c					\
 	ovirt-utils.c						\

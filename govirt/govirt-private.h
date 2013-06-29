@@ -27,5 +27,6 @@
 #include <govirt/ovirt-rest-call.h>
 #include <govirt/ovirt-utils.h>
 #include <govirt/ovirt-vm-private.h>
+#include <govirt/glib-compat.h>
 
 #endif /* __OVIRT_PRIVATE_H__ */

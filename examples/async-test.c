@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include <govirt/govirt.h>
+#include "govirt/glib-compat.h"
 
 static GMainLoop *main_loop;
 
@@ -172,6 +173,7 @@ static gboolean start(gpointer user_data)
 
 int main(int argc, char **argv)
 {
+    g_type_init();
 
     if (argc != 3) {
         g_print("Usage: %s URI VM-NAME\n", argv[0]);

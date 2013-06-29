@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include <govirt/govirt.h>
+#include "govirt/glib-compat.h"
 
 static gboolean
 authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
@@ -30,6 +31,7 @@ int main(int argc, char **argv)
     gchar *ticket = NULL;
     GByteArray *ca_cert = NULL;
 
+    g_type_init();
 
     if (argc != 3) {
         g_print("Usage: %s URI VM-NAME\n", argv[0]);
