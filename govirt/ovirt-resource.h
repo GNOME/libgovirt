@@ -25,6 +25,7 @@
 #include <gio/gio.h>
 #include <glib-object.h>
 #include <govirt/ovirt-types.h>
+#include <rest/rest-xml-node.h>
 
 G_BEGIN_DECLS
 
@@ -51,6 +52,10 @@ struct _OvirtResource
 struct _OvirtResourceClass
 {
     GObjectClass parent_class;
+
+    gboolean (*init_from_xml)(OvirtResource *resource,
+                              RestXmlNode *node,
+                              GError **error);
 
     gpointer padding[20];
 };

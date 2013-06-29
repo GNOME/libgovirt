@@ -42,6 +42,9 @@ struct _OvirtResourcePrivate {
 };
 
 static void ovirt_resource_initable_iface_init(GInitableIface *iface);
+static gboolean ovirt_resource_init_from_xml_real(OvirtResource *resource,
+                                                  RestXmlNode *node,
+                                                  GError **error);
 static gboolean ovirt_resource_init_from_xml(OvirtResource *resource,
                                              RestXmlNode *node,
                                              GError **error);
@@ -180,6 +183,7 @@ static void ovirt_resource_class_init(OvirtResourceClass *klass)
 
     g_type_class_add_private(klass, sizeof(OvirtResourcePrivate));
 
+    klass->init_from_xml = ovirt_resource_init_from_xml_real;
     object_class->dispose = ovirt_resource_dispose;
     object_class->finalize = ovirt_resource_finalize;
     object_class->get_property = ovirt_resource_get_property;
@@ -266,9 +270,9 @@ ovirt_resource_set_description_from_xml(OvirtResource *resource,
     return FALSE;
 }
 
-static gboolean ovirt_resource_init_from_xml(OvirtResource *resource,
-                                             RestXmlNode *node,
-                                             GError **error)
+static gboolean ovirt_resource_init_from_xml_real(OvirtResource *resource,
+                                                  RestXmlNode *node,
+                                                  GError **error)
 {
     const char *guid;
     const char *href;
@@ -295,4 +299,18 @@ static gboolean ovirt_resource_init_from_xml(OvirtResource *resource,
     ovirt_resource_set_description_from_xml(resource, node);
 
     return TRUE;
+}
+
+static gboolean ovirt_resource_init_from_xml(OvirtResource *resource,
+                                             RestXmlNode *node,
+                                             GError **error)
+{
+    OvirtResourceClass *klass;
+
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
+
+    klass = OVIRT_RESOURCE_GET_CLASS(resource);
+    g_return_val_if_fail(klass->init_from_xml != NULL, FALSE);
+
+    return klass->init_from_xml(resource, node, error);
 }
