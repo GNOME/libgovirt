@@ -21,6 +21,9 @@
  */
 
 #include <config.h>
+
+#include <rest/rest-xml-node.h>
+
 #include "ovirt-resource.h"
 
 #define OVIRT_RESOURCE_GET_PRIVATE(obj)                         \
@@ -31,6 +34,8 @@ struct _OvirtResourcePrivate {
     char *href;
     char *name;
     char *description;
+
+    RestXmlNode *xml;
 };
 
 G_DEFINE_TYPE(OvirtResource, ovirt_resource, G_TYPE_OBJECT);
@@ -41,6 +46,7 @@ enum {
     PROP_GUID,
     PROP_HREF,
     PROP_NAME,
+    PROP_XML_NODE,
 };
 
 static void ovirt_resource_get_property(GObject *object,
@@ -91,9 +97,29 @@ static void ovirt_resource_set_property(GObject *object,
     case PROP_DESCRIPTION:
         g_free(resource->priv->description);
         resource->priv->description = g_value_dup_string(value);
+        break;
+    case PROP_XML_NODE: {
+        if (resource->priv->xml != NULL) {
+            g_boxed_free(REST_TYPE_XML_NODE, resource->priv->xml);
+        }
+        resource->priv->xml = g_value_dup_boxed(value);
+        break;
+    }
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
+}
+
+static void ovirt_resource_dispose(GObject *object)
+{
+    OvirtResource *resource = OVIRT_RESOURCE(object);
+
+    if (resource->priv->xml != NULL) {
+        g_boxed_free(REST_TYPE_XML_NODE, resource->priv->xml);
+        resource->priv->xml = NULL;
+    }
+
+    G_OBJECT_CLASS(ovirt_resource_parent_class)->dispose(object);
 }
 
 static void ovirt_resource_finalize(GObject *object)
@@ -114,6 +140,7 @@ static void ovirt_resource_class_init(OvirtResourceClass *klass)
 
     g_type_class_add_private(klass, sizeof(OvirtResourcePrivate));
 
+    object_class->dispose = ovirt_resource_dispose;
     object_class->finalize = ovirt_resource_finalize;
     object_class->get_property = ovirt_resource_get_property;
     object_class->set_property = ovirt_resource_set_property;
@@ -150,6 +177,15 @@ static void ovirt_resource_class_init(OvirtResourceClass *klass)
                                                         NULL,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_XML_NODE,
+                                    g_param_spec_boxed("xml-node",
+                                                       "Librest XML Node",
+                                                       "XML data to fill this resource with",
+                                                       REST_TYPE_XML_NODE,
+                                                       G_PARAM_WRITABLE |
+                                                       G_PARAM_CONSTRUCT_ONLY |
+                                                       G_PARAM_STATIC_STRINGS));
 }
 
 static void ovirt_resource_init(OvirtResource *resource)
