@@ -28,20 +28,6 @@
 #include "ovirt-vm-display.h"
 #include "ovirt-vm-private.h"
 
-static gboolean vm_set_name_from_xml(OvirtVm *vm, RestXmlNode *node)
-{
-    RestXmlNode *name_node;
-
-    name_node = rest_xml_node_find(node, "name");
-    if (name_node != NULL) {
-        g_return_val_if_fail(name_node->content != NULL, FALSE);
-        g_object_set(G_OBJECT(vm), "name", name_node->content, NULL);
-        return TRUE;
-    }
-
-    return FALSE;
-}
-
 static gboolean vm_set_display_from_xml(OvirtVm *vm,
                                         RestXmlNode *root)
 {
@@ -234,17 +220,6 @@ static gboolean vm_set_sub_collections_from_xml(OvirtVm *vm, RestXmlNode *node)
 
 G_GNUC_INTERNAL gboolean ovirt_vm_refresh_from_xml(OvirtVm *vm, RestXmlNode *node)
 {
-    const char *uuid;
-    const char *href;
-
-    uuid = rest_xml_node_get_attr(node, "id");
-    g_return_val_if_fail(uuid != NULL, FALSE);
-    href = rest_xml_node_get_attr(node, "href");
-    g_return_val_if_fail(href != NULL, FALSE);
-
-    g_object_set(G_OBJECT(vm), "uuid", uuid, "href", href, NULL);
-
-    vm_set_name_from_xml(vm, node);
     vm_set_state_from_xml(vm, node);
     vm_set_actions_from_xml(vm, node);
     vm_set_sub_collections_from_xml(vm, node);
@@ -252,4 +227,3 @@ G_GNUC_INTERNAL gboolean ovirt_vm_refresh_from_xml(OvirtVm *vm, RestXmlNode *nod
 
     return TRUE;
 }
-

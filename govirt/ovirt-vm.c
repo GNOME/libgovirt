@@ -54,7 +54,7 @@ struct _OvirtVmPrivate {
     GHashTable *sub_collections;
     OvirtVmDisplay *display;
 } ;
-G_DEFINE_TYPE(OvirtVm, ovirt_vm, G_TYPE_OBJECT);
+G_DEFINE_TYPE(OvirtVm, ovirt_vm, OVIRT_TYPE_RESOURCE);
 
 enum OvirtResponseStatus {
     OVIRT_RESPONSE_UNKNOWN,
@@ -70,9 +70,6 @@ ActionResponseParser response_parsers[] = {
 
 enum {
     PROP_0,
-    PROP_UUID,
-    PROP_HREF,
-    PROP_NAME,
     PROP_STATE,
     PROP_DISPLAY
 };
@@ -85,15 +82,6 @@ static void ovirt_vm_get_property(GObject *object,
     OvirtVm *vm = OVIRT_VM(object);
 
     switch (prop_id) {
-    case PROP_UUID:
-        g_value_set_string(value, vm->priv->uuid);
-        break;
-    case PROP_HREF:
-        g_value_set_string(value, vm->priv->href);
-        break;
-    case PROP_NAME:
-        g_value_set_string(value, vm->priv->name);
-        break;
     case PROP_STATE:
         g_value_set_enum(value, vm->priv->state);
         break;
@@ -113,18 +101,6 @@ static void ovirt_vm_set_property(GObject *object,
     OvirtVm *vm = OVIRT_VM(object);
 
     switch (prop_id) {
-    case PROP_UUID:
-        g_free(vm->priv->uuid);
-        vm->priv->uuid = g_value_dup_string(value);
-        break;
-    case PROP_HREF:
-        g_free(vm->priv->href);
-        vm->priv->href = g_value_dup_string(value);
-        break;
-    case PROP_NAME:
-        g_free(vm->priv->name);
-        vm->priv->name = g_value_dup_string(value);
-        break;
     case PROP_STATE:
         vm->priv->state = g_value_get_enum(value);
         break;
@@ -167,41 +143,36 @@ static void ovirt_vm_finalize(GObject *object)
     G_OBJECT_CLASS(ovirt_vm_parent_class)->finalize(object);
 }
 
+
+static gboolean ovirt_vm_init_from_xml(OvirtResource *resource,
+                                       RestXmlNode *node,
+                                       GError **error)
+{
+    gboolean parsed_ok;
+    OvirtResourceClass *parent_class;
+
+    parsed_ok = ovirt_vm_refresh_from_xml(OVIRT_VM(resource), node);
+    if (!parsed_ok) {
+        return FALSE;
+    }
+    parent_class = OVIRT_RESOURCE_CLASS(ovirt_vm_parent_class);
+
+    return parent_class->init_from_xml(resource, node, error);
+}
+
 static void ovirt_vm_class_init(OvirtVmClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
+    OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
 
     g_type_class_add_private(klass, sizeof(OvirtVmPrivate));
 
+    resource_class->init_from_xml = ovirt_vm_init_from_xml;
     object_class->dispose = ovirt_vm_dispose;
     object_class->finalize = ovirt_vm_finalize;
     object_class->get_property = ovirt_vm_get_property;
     object_class->set_property = ovirt_vm_set_property;
 
-    g_object_class_install_property(object_class,
-                                    PROP_UUID,
-                                    g_param_spec_string("uuid",
-                                                        "UUID",
-                                                        "Virtual Machine UUID",
-                                                        NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
-    g_object_class_install_property(object_class,
-                                    PROP_HREF,
-                                    g_param_spec_string("href",
-                                                        "Href",
-                                                        "Virtual Machine Href",
-                                                        NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
-    g_object_class_install_property(object_class,
-                                    PROP_NAME,
-                                    g_param_spec_string("name",
-                                                        "Name",
-                                                        "Virtual Machine Name",
-                                                        NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
     g_object_class_install_property(object_class,
                                     PROP_STATE,
                                     g_param_spec_enum("state",
@@ -226,9 +197,15 @@ static void ovirt_vm_init(G_GNUC_UNUSED OvirtVm *vm)
     vm->priv = OVIRT_VM_GET_PRIVATE(vm);
 }
 
+OvirtVm *ovirt_vm_new_from_xml(RestXmlNode *node, GError **error)
+{
+    return OVIRT_VM(g_initable_new(OVIRT_TYPE_VM, NULL, error,
+                                   "xml-node", node, NULL));
+}
+
 OvirtVm *ovirt_vm_new(void)
 {
-    return OVIRT_VM(g_object_new(OVIRT_TYPE_VM, NULL));
+    return OVIRT_VM(g_initable_new(OVIRT_TYPE_VM, NULL, NULL, NULL));
 }
 
 G_GNUC_INTERNAL void

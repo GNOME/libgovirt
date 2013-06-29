@@ -154,12 +154,7 @@ static GHashTable *parse_vms_xml(RestProxyCall *call)
     for (node = xml_vms; node != NULL; node = node->next) {
         OvirtVm *vm;
         gchar *name;
-        vm = ovirt_vm_new();
-        if (!ovirt_vm_refresh_from_xml(vm, node)) {
-            g_message("Failed to parse XML VM description");
-            g_object_unref(G_OBJECT(vm));
-            continue;
-        }
+        vm = ovirt_vm_new_from_xml(node, NULL);
 #ifdef OVIRT_DEBUG
         dump_vm(vm);
 #endif

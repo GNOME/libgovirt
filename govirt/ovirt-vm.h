@@ -24,6 +24,7 @@
 
 #include <gio/gio.h>
 #include <glib-object.h>
+#include <govirt/ovirt-resource.h>
 #include <govirt/ovirt-types.h>
 
 G_BEGIN_DECLS
@@ -41,7 +42,7 @@ typedef struct _OvirtVmClass OvirtVmClass;
 
 struct _OvirtVm
 {
-    GObject parent;
+    OvirtResource parent;
 
     OvirtVmPrivate *priv;
 
@@ -50,7 +51,7 @@ struct _OvirtVm
 
 struct _OvirtVmClass
 {
-    GObjectClass parent_class;
+    OvirtResourceClass parent_class;
 
     gpointer padding[20];
 };
