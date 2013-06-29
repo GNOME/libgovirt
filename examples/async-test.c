@@ -48,6 +48,22 @@ authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
 }
 
 
+static void cdroms_fetched_cb(GObject *source_object,
+                              GAsyncResult *result,
+                              gpointer user_data)
+{
+    OvirtCollection *cdroms = OVIRT_COLLECTION(source_object);
+    GError *error = NULL;
+
+    ovirt_collection_fetch_finish(cdroms, result, &error);
+    if (error != NULL) {
+        g_debug("failed to fetch cdroms collection: %s", error->message);
+        g_main_loop_quit(main_loop);
+        return;
+    }
+    g_main_loop_quit(main_loop);
+}
+
 static void got_ticket_cb(GObject *source_object,
                           GAsyncResult *result,
                           gpointer user_data)
@@ -60,6 +76,8 @@ static void got_ticket_cb(GObject *source_object,
     guint secure_port;
     OvirtVmDisplayType type;
     gchar *ticket = NULL;
+    OvirtCollection *cdroms;
+    AsyncData *data = (AsyncData *)user_data;
 
     g_debug("Got ticket");
     vm = OVIRT_VM(source_object);
@@ -92,7 +110,10 @@ static void got_ticket_cb(GObject *source_object,
     g_print("\tSecure port: %d\n", secure_port);
     g_print("\tTicket: %s\n", ticket);
 
-    g_main_loop_quit(main_loop);
+    cdroms = ovirt_vm_get_cdroms(vm);
+    g_assert(cdroms != NULL);
+    ovirt_collection_fetch_async(cdroms, data->proxy, NULL,
+                                 cdroms_fetched_cb, NULL);
 }
 
 static void vm_started_cb(GObject *source_object,
