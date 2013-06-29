@@ -22,6 +22,8 @@
 
 #include <config.h>
 
+#include <string.h>
+
 #include <rest/rest-xml-node.h>
 
 #include "ovirt-error.h"
@@ -40,6 +42,9 @@ struct _OvirtResourcePrivate {
 };
 
 static void ovirt_resource_initable_iface_init(GInitableIface *iface);
+static gboolean ovirt_resource_init_from_xml(OvirtResource *resource,
+                                             RestXmlNode *node,
+                                             GError **error);
 
 G_DEFINE_TYPE_WITH_CODE(OvirtResource, ovirt_resource, G_TYPE_OBJECT,
                         G_IMPLEMENT_INTERFACE(G_TYPE_INITABLE,
@@ -161,7 +166,7 @@ static gboolean ovirt_resource_initable_init(GInitable *initable,
         return TRUE;
     }
 
-    return TRUE;
+    return ovirt_resource_init_from_xml(resource, resource->priv->xml, error);
 }
 
 static void ovirt_resource_initable_iface_init(GInitableIface *iface)
@@ -226,4 +231,68 @@ static void ovirt_resource_class_init(OvirtResourceClass *klass)
 static void ovirt_resource_init(OvirtResource *resource)
 {
     resource->priv = OVIRT_RESOURCE_GET_PRIVATE(resource);
+}
+
+static gboolean
+ovirt_resource_set_name_from_xml(OvirtResource *resource, RestXmlNode *node)
+{
+    RestXmlNode *name_node;
+
+    name_node = rest_xml_node_find(node, "name");
+    if (name_node != NULL) {
+        g_return_val_if_fail(name_node->content != NULL, FALSE);
+        g_object_set(G_OBJECT(resource), "name", name_node->content, NULL);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+static gboolean
+ovirt_resource_set_description_from_xml(OvirtResource *resource,
+                                        RestXmlNode *node)
+{
+    RestXmlNode *desc_node;
+
+    desc_node = rest_xml_node_find(node, "description");
+    if (desc_node != NULL) {
+        g_return_val_if_fail(desc_node->content != NULL, FALSE);
+        g_object_set(G_OBJECT(resource),
+                     "description", desc_node->content,
+                     NULL);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+static gboolean ovirt_resource_init_from_xml(OvirtResource *resource,
+                                             RestXmlNode *node,
+                                             GError **error)
+{
+    const char *guid;
+    const char *href;
+
+    g_return_val_if_fail(resource->priv->xml != NULL, FALSE);
+
+    guid = rest_xml_node_get_attr(node, "id");
+    if (guid == NULL) {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                    "missing mandatory 'id' attribute");
+        return FALSE;
+    }
+
+    href = rest_xml_node_get_attr(node, "href");
+    if (href == NULL) {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                    "missing mandatory 'href' attribute");
+        return FALSE;
+    }
+
+    g_object_set(G_OBJECT(resource), "guid", guid, "href", href, NULL);
+
+    ovirt_resource_set_name_from_xml(resource, node);
+    ovirt_resource_set_description_from_xml(resource, node);
+
+    return TRUE;
 }
