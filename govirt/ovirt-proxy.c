@@ -136,41 +136,29 @@ static void dump_vm(OvirtVm *vm)
 }
 #endif
 
-static GHashTable *parse_vms_xml(RestXmlNode *root)
+static gboolean
+ovirt_proxy_parse_vms_xml(OvirtProxy *proxy, RestXmlNode *root, GError **error)
 {
-    RestXmlNode *xml_vms;
-    RestXmlNode *node;
-    GHashTable *vms;
-    const char *vm_key = g_intern_string("vm");
+    OvirtCollection *collection;
+    GHashTable *resources;
 
-    vms = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                g_free, (GDestroyNotify)g_object_unref);
-#ifdef OVIRT_DEBUG
-    g_hash_table_foreach(root->children, dump_key, NULL);
-#endif
-    xml_vms = g_hash_table_lookup(root->children, vm_key);
-    for (node = xml_vms; node != NULL; node = node->next) {
-        OvirtVm *vm;
-        gchar *name;
-        vm = ovirt_vm_new_from_xml(node, NULL);
-#ifdef OVIRT_DEBUG
-        dump_vm(vm);
-#endif
-        g_object_get(G_OBJECT(vm), "name", &name, NULL);
-        if (name == NULL) {
-            g_message("VM had no name in its XML description");
-            g_object_unref(vm);
-            continue;
-        }
-        if (g_hash_table_lookup(vms, name) != NULL) {
-            g_message("VM with the same name ('%s') already exists", name);
-            g_object_unref(vm);
-            continue;
-        }
-        g_hash_table_insert(vms, name, vm);
+    collection = ovirt_collection_new_from_xml(root, OVIRT_TYPE_COLLECTION, "vms",
+                                               OVIRT_TYPE_VM, "vm", error);
+    if (collection == NULL) {
+        return FALSE;
     }
 
-    return vms;
+    resources = ovirt_collection_get_resources(collection);
+
+    if (proxy->priv->vms != NULL) {
+        g_hash_table_unref(proxy->priv->vms);
+        proxy->priv->vms = NULL;
+    }
+    if (resources != NULL) {
+        proxy->priv->vms = g_hash_table_ref(resources);
+    }
+
+    return TRUE;
 }
 
 gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
@@ -183,7 +171,7 @@ gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
     if (vms_node == NULL)
         return FALSE;
 
-    proxy->priv->vms = parse_vms_xml(vms_node);
+    ovirt_proxy_parse_vms_xml(proxy, vms_node, error);
 
     rest_xml_node_unref(vms_node);
 
@@ -417,12 +405,7 @@ static gboolean fetch_vms_async_cb(OvirtProxy* proxy,
                                    gpointer user_data,
                                    GError **error)
 {
-      if (proxy->priv->vms != NULL) {
-          g_hash_table_unref(proxy->priv->vms);
-      }
-      proxy->priv->vms = parse_vms_xml(root_node);
-
-      return TRUE;
+    return ovirt_proxy_parse_vms_xml(proxy, root_node, error);
 }
 
 /**
