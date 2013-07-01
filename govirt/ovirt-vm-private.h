@@ -42,7 +42,6 @@ typedef enum {
     OVIRT_VM_ACTION_MIGRATE
 } OvirtVmAction;
 
-void ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url);
 void ovirt_vm_add_sub_collection(OvirtVm *vm,
                                  const char *sub_collection,
                                  const char *url);

@@ -25,6 +25,8 @@
 #include <rest/rest-proxy-call.h>
 #include <rest/rest-xml-node.h>
 
+#include "ovirt-proxy.h"
+
 G_BEGIN_DECLS
 
 typedef gboolean (*OvirtProxyCallAsyncCb)(OvirtProxy *proxy,

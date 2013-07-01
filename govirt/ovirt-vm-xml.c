@@ -155,40 +155,6 @@ static gboolean vm_set_state_from_xml(OvirtVm *vm, RestXmlNode *node)
     return FALSE;
 }
 
-static gboolean vm_set_actions_from_xml(OvirtVm *vm, RestXmlNode *node)
-{
-    RestXmlNode *link;
-    RestXmlNode *rest_actions;
-    const char *link_key = g_intern_string("link");
-
-    rest_actions = rest_xml_node_find(node, "actions");
-    if (rest_actions == NULL) {
-        return FALSE;
-    }
-
-    link = g_hash_table_lookup(rest_actions->children, link_key);
-    if (link == NULL)
-        return FALSE;
-
-    for (; link != NULL; link = link->next) {
-        const char *link_name;
-        const char *href;
-
-        g_warn_if_fail(link != NULL);
-        g_warn_if_fail(link->name != NULL);
-        g_warn_if_fail(strcmp(link->name, "link") == 0);
-
-        link_name = rest_xml_node_get_attr(link, "rel");
-        href = rest_xml_node_get_attr(link, "href");
-
-        if ((link_name != NULL) && (href != NULL)) {
-            ovirt_vm_add_action(vm, link_name, href);
-        }
-    }
-
-    return TRUE;
-}
-
 static gboolean vm_set_sub_collections_from_xml(OvirtVm *vm, RestXmlNode *node)
 {
     RestXmlNode *link;
@@ -221,7 +187,6 @@ static gboolean vm_set_sub_collections_from_xml(OvirtVm *vm, RestXmlNode *node)
 G_GNUC_INTERNAL gboolean ovirt_vm_refresh_from_xml(OvirtVm *vm, RestXmlNode *node)
 {
     vm_set_state_from_xml(vm, node);
-    vm_set_actions_from_xml(vm, node);
     vm_set_sub_collections_from_xml(vm, node);
     vm_set_display_from_xml(vm, node);
 

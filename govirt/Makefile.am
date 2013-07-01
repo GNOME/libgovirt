@@ -27,6 +27,8 @@ libgovirt_la_HEADERS =						\
 noinst_HEADERS =						\
 	glib-compat.h						\
 	govirt-private.h					\
+	ovirt-proxy-private.h					\
+	ovirt-resource-private.h				\
 	ovirt-rest-call.h					\
 	ovirt-utils.h						\
 	ovirt-vm-private.h					\

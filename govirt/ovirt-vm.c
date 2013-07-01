@@ -50,7 +50,6 @@ struct _OvirtVmPrivate {
     char *href;
     char *name;
     OvirtVmState state;
-    GHashTable *actions;
     GHashTable *sub_collections;
     OvirtVmDisplay *display;
 } ;
@@ -119,10 +118,6 @@ static void ovirt_vm_dispose(GObject *object)
 {
     OvirtVm *vm = OVIRT_VM(object);
 
-    if (vm->priv->actions != NULL) {
-        g_hash_table_unref(vm->priv->actions);
-        vm->priv->actions = NULL;
-    }
     if (vm->priv->sub_collections != NULL) {
         g_hash_table_unref(vm->priv->sub_collections);
         vm->priv->sub_collections = NULL;
@@ -209,27 +204,6 @@ OvirtVm *ovirt_vm_new(void)
 }
 
 G_GNUC_INTERNAL void
-ovirt_vm_add_action(OvirtVm *vm, const char *action, const char *url)
-{
-    g_return_if_fail(OVIRT_IS_VM(vm));
-
-    if (vm->priv->actions == NULL) {
-        vm->priv->actions = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                                  g_free, g_free);
-    }
-    g_hash_table_insert(vm->priv->actions, g_strdup(action), g_strdup(url));
-}
-
-static const char *
-ovirt_vm_get_action(OvirtVm *vm, const char *action)
-{
-    g_return_val_if_fail(OVIRT_IS_VM(vm), NULL);
-    g_return_val_if_fail(vm->priv->actions != NULL, NULL);
-
-    return g_hash_table_lookup(vm->priv->actions, action);
-}
-
-G_GNUC_INTERNAL void
 ovirt_vm_add_sub_collection(OvirtVm *vm,
                             const char *sub_collection,
                             const char *url)
@@ -295,7 +269,7 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
     g_debug("invoking '%s' action on %p using %p", action, vm, proxy);
-    function = ovirt_vm_get_action(vm, action);
+    function = ovirt_resource_get_action(OVIRT_RESOURCE(vm), action);
     g_return_if_fail(function != NULL);
 
     result = g_simple_async_result_new(G_OBJECT(vm), callback,
@@ -396,7 +370,7 @@ ovirt_vm_action(OvirtVm *vm, OvirtProxy *proxy, const char *action,
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
     g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
 
-    function = ovirt_vm_get_action(vm, action);
+    function = ovirt_resource_get_action(OVIRT_RESOURCE(vm), action);
     function = ovirt_rest_strip_api_base_dir(function);
     g_return_val_if_fail(function != NULL, FALSE);
 
