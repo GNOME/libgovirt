@@ -292,6 +292,17 @@ ovirt_resource_add_sub_collection(OvirtResource *resource,
                         g_strdup(url));
 }
 
+const char *
+ovirt_resource_get_sub_collection(OvirtResource *resource,
+                                  const char *sub_collection)
+{
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), NULL);
+    g_return_val_if_fail(resource->priv->sub_collections != NULL, NULL);
+
+    return g_hash_table_lookup(resource->priv->sub_collections,
+                               sub_collection);
+}
+
 static gboolean
 ovirt_resource_set_actions_from_xml(OvirtResource *resource, RestXmlNode *node)
 {

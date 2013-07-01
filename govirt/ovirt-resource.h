@@ -62,6 +62,9 @@ struct _OvirtResourceClass
 
 GType ovirt_resource_get_type(void);
 
+const char *ovirt_resource_get_sub_collection(OvirtResource *resource,
+                                              const char *sub_collection);
+
 G_END_DECLS
 
 #endif /* __OVIRT_RESOURCE_H__ */
