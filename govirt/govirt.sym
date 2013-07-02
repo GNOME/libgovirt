@@ -1,8 +1,13 @@
-GOVIRT_0.0.2 {
+GOVIRT_0.2.0 {
   global:
-        ovirt_proxy_error_quark;
+        ovirt_collection_get_type;
+        ovirt_collection_get_resources;
+        ovirt_collection_new_from_xml;
+
+        ovirt_error_quark;
+        ovirt_error_get_type;
+
         ovirt_proxy_get_type;
-        ovirt_proxy_error_get_type;
         ovirt_proxy_new;
         ovirt_proxy_fetch_ca_certificate;
         ovirt_proxy_fetch_ca_certificate_async;
@@ -12,8 +17,16 @@ GOVIRT_0.0.2 {
         ovirt_proxy_fetch_vms_finish;
         ovirt_proxy_get_vms;
         ovirt_proxy_lookup_vm;
+
+        ovirt_resource_get_type;
+        ovirt_resource_get_sub_collection;
+
         ovirt_rest_call_error_quark;
         ovirt_rest_call_error_get_type;
+
+        ovirt_vm_display_get_type;
+        ovirt_vm_display_type_get_type;
+        ovirt_vm_display_new;
 
         ovirt_vm_get_type;
         ovirt_vm_state_get_type;
@@ -23,6 +36,8 @@ GOVIRT_0.0.2 {
         ovirt_vm_get_ticket;
         ovirt_vm_get_ticket_async;
         ovirt_vm_get_ticket_finish;
+        ovirt_vm_refresh_async;
+        ovirt_vm_refresh_finish;
         ovirt_vm_start;
         ovirt_vm_start_async;
         ovirt_vm_start_finish;
@@ -30,27 +45,8 @@ GOVIRT_0.0.2 {
         ovirt_vm_stop_async;
         ovirt_vm_stop_finish;
 
-        ovirt_vm_display_get_type;
-        ovirt_vm_display_type_get_type;
-        ovirt_vm_display_new;
-
   local:
         *;
 };
-
-GOVIRT_0.1.0 {
-        ovirt_vm_refresh_async;
-        ovirt_vm_refresh_finish;
-} GOVIRT_0.0.2;
-
-GOVIRT_0.1.1 {
-        ovirt_collection_get_type;
-
-        ovirt_error_quark;
-        ovirt_error_get_type;
-
-        ovirt_resource_get_type;
-        ovirt_resource_get_sub_collection;
-} GOVIRT_0.1.0;
 
 # .... define new API here using predicted next version number ....
