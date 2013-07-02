@@ -306,7 +306,7 @@ ovirt_resource_get_sub_collection(OvirtResource *resource,
 static gboolean
 ovirt_resource_set_actions_from_xml(OvirtResource *resource, RestXmlNode *node)
 {
-    RestXmlNode *link;
+    RestXmlNode *link_node;
     RestXmlNode *rest_actions;
     const char *link_key = g_intern_string("link");
 
@@ -315,20 +315,20 @@ ovirt_resource_set_actions_from_xml(OvirtResource *resource, RestXmlNode *node)
         return FALSE;
     }
 
-    link = g_hash_table_lookup(rest_actions->children, link_key);
-    if (link == NULL)
+    link_node = g_hash_table_lookup(rest_actions->children, link_key);
+    if (link_node == NULL)
         return FALSE;
 
-    for (; link != NULL; link = link->next) {
+    for (; link_node != NULL; link_node = link_node->next) {
         const char *link_name;
         const char *href;
 
-        g_warn_if_fail(link != NULL);
-        g_warn_if_fail(link->name != NULL);
-        g_warn_if_fail(strcmp(link->name, "link") == 0);
+        g_warn_if_fail(link_node != NULL);
+        g_warn_if_fail(link_node->name != NULL);
+        g_warn_if_fail(strcmp(link_node->name, "link") == 0);
 
-        link_name = rest_xml_node_get_attr(link, "rel");
-        href = rest_xml_node_get_attr(link, "href");
+        link_name = rest_xml_node_get_attr(link_node, "rel");
+        href = rest_xml_node_get_attr(link_node, "href");
 
         if ((link_name != NULL) && (href != NULL)) {
             ovirt_resource_add_action(resource, link_name, href);
