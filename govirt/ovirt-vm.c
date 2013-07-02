@@ -23,6 +23,7 @@
 #include <config.h>
 
 #include "ovirt-enum-types.h"
+#include "ovirt-error.h"
 #include "ovirt-proxy.h"
 #include "ovirt-rest-call.h"
 #include "ovirt-vm.h"
@@ -480,12 +481,12 @@ static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm, GError **err
 
     root = g_hash_table_lookup(root->children, ticket_key);
     if (root == NULL) {
-        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, "could not find 'ticket' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'ticket' node");
         g_return_val_if_reached(FALSE);
     }
     node = g_hash_table_lookup(root->children, value_key);
     if (node == NULL) {
-        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, "could not find 'value' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'value' node");
         g_return_val_if_reached(FALSE);
     }
 
@@ -497,7 +498,7 @@ static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm, GError **err
 
     node = g_hash_table_lookup(root->children, expiry_key);
     if (node == NULL) {
-        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, "could not find 'expiry' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'expiry' node");
         g_object_unref(G_OBJECT(display));
         g_return_val_if_reached(FALSE);
     }
@@ -523,29 +524,29 @@ static enum OvirtResponseStatus parse_action_status(RestXmlNode *root,
 
     node = g_hash_table_lookup(root->children, status_key);
     if (node == NULL) {
-        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, "could not find 'status' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'status' node");
         g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
     }
     node = g_hash_table_lookup(node->children, state_key);
     if (node == NULL) {
-        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, "could not find 'state' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'state' node");
         g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
     }
     g_debug("State: %s\n", node->content);
     if (g_strcmp0(node->content, "complete") == 0) {
         return OVIRT_RESPONSE_COMPLETE;
     } else if (g_strcmp0(node->content, "pending") == 0) {
-        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_ACTION_FAILED, "action is pending");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action is pending");
         return OVIRT_RESPONSE_PENDING;
     } else if (g_strcmp0(node->content, "in_progress") == 0) {
-        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_ACTION_FAILED, "action is in progress");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action is in progress");
         return OVIRT_RESPONSE_IN_PROGRESS;
     } else if (g_strcmp0(node->content, "failed") == 0) {
-        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_ACTION_FAILED, "action has failed");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action has failed");
         return OVIRT_RESPONSE_FAILED;
     }
 
-    g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, "unknown action failure");
+    g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "unknown action failure");
     g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
 }
 
@@ -560,12 +561,12 @@ static void parse_fault(RestXmlNode *root, GError **error)
 
     reason_node = g_hash_table_lookup(root->children, reason_key);
     if (reason_node == NULL) {
-        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_PARSING_FAILED, "could not find 'reason' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'reason' node");
         g_return_if_reached();
     }
     g_debug("Reason: %s\n", root->content);
     detail_node = g_hash_table_lookup(root->children, detail_key);
-    g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_FAULT, "%s: %s", reason_node->content,
+    g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_FAILED, "%s: %s", reason_node->content,
                 (detail_node == NULL)?"":detail_node->content);
 }
 

@@ -23,8 +23,9 @@
 #undef OVIRT_DEBUG
 #include <config.h>
 
-#include "ovirt-rest-call.h"
+#include "ovirt-error.h"
 #include "ovirt-proxy.h"
+#include "ovirt-rest-call.h"
 #include "ovirt-vm.h"
 #include "ovirt-vm-display.h"
 #include "govirt-private.h"
@@ -52,11 +53,6 @@ enum {
 };
 
 #define CA_CERT_FILENAME "ca.crt"
-
-GQuark ovirt_proxy_error_quark(void)
-{
-      return g_quark_from_static_string ("ovirt-proxy-error-quark");
-}
 
 #ifdef OVIRT_DEBUG
 static void dump_display(OvirtVmDisplay *display)
@@ -486,7 +482,7 @@ gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
 
     source = get_ca_cert_file(proxy);
     if (source == NULL) {
-        g_set_error(error, OVIRT_PROXY_ERROR, OVIRT_PROXY_BAD_URI, "could not extract ca cert filename from URI");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_BAD_URI, "could not extract ca cert filename from URI");
         goto error;
     }
 

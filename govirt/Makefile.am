@@ -15,6 +15,7 @@ lib_LTLIBRARIES =						\
 libgovirt_ladir = $(includedir)/govirt-1.0/govirt
 libgovirt_la_HEADERS =						\
 	govirt.h						\
+	ovirt-error.h						\
 	ovirt-proxy.h						\
 	ovirt-rest-call-error.h					\
 	ovirt-types.h						\
@@ -32,6 +33,7 @@ noinst_HEADERS =						\
 
 libgovirt_la_SOURCES =						\
 	glib-compat.c						\
+	ovirt-error.c						\
 	ovirt-proxy.c						\
 	ovirt-rest-call.c					\
 	ovirt-utils.c						\

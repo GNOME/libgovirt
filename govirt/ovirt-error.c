@@ -1,7 +1,7 @@
 /*
- * govirt.h: main header
+ * ovirt-error.c
  *
- * Copyright (C) 2012 Red Hat, Inc.
+ * Copyright (C) 2013 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,14 +19,9 @@
  *
  * Author: Christophe Fergeau <cfergeau@redhat.com>
  */
-#ifndef __OVIRT_H__
-#define __OVIRT_H__
-
-#include <govirt/ovirt-enum-types.h>
 #include <govirt/ovirt-error.h>
-#include <govirt/ovirt-proxy.h>
-#include <govirt/ovirt-rest-call-error.h>
-#include <govirt/ovirt-vm.h>
-#include <govirt/ovirt-vm-display.h>
 
-#endif /* __OVIRT_H__ */
+GQuark ovirt_error_quark(void)
+{
+      return g_quark_from_static_string ("ovirt-error-quark");
+}

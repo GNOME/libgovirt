@@ -1,7 +1,7 @@
 /*
- * govirt.h: main header
+ * ovirt-error.h: govirt error handling
  *
- * Copyright (C) 2012 Red Hat, Inc.
+ * Copyright (C) 2013 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,14 +19,22 @@
  *
  * Author: Christophe Fergeau <cfergeau@redhat.com>
  */
-#ifndef __OVIRT_H__
-#define __OVIRT_H__
+#ifndef __OVIRT_ERROR_H__
+#define __OVIRT_ERROR_H__
 
-#include <govirt/ovirt-enum-types.h>
-#include <govirt/ovirt-error.h>
-#include <govirt/ovirt-proxy.h>
-#include <govirt/ovirt-rest-call-error.h>
-#include <govirt/ovirt-vm.h>
-#include <govirt/ovirt-vm-display.h>
+#include <glib.h>
 
-#endif /* __OVIRT_H__ */
+G_BEGIN_DECLS
+
+typedef enum {
+    OVIRT_ERROR_FAILED,
+    OVIRT_ERROR_PARSING_FAILED,
+    OVIRT_ERROR_NOT_SUPPORTED,
+    OVIRT_ERROR_ACTION_FAILED,
+    OVIRT_ERROR_BAD_URI,
+} OvirtError;
+
+GQuark ovirt_error_quark(void);
+#define OVIRT_ERROR ovirt_error_quark()
+
+#endif
