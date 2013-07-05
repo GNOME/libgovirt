@@ -12,7 +12,6 @@ EXTRA_DIST =						\
 	README						\
 	NEWS						\
 	autogen.sh					\
-	config.h					\
 	libgovirt.doap
 
 MAINTAINERCLEANFILES =					\
