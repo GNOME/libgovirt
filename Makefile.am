@@ -12,7 +12,8 @@ EXTRA_DIST =						\
 	README						\
 	NEWS						\
 	autogen.sh					\
-	config.h
+	config.h					\
+	libgovirt.doap
 
 MAINTAINERCLEANFILES =					\
 	ChangeLog					\
