@@ -1,3 +1,15 @@
+0.2.0 - July 5, 2013
+====================
+
+Changes since 0.1.0:
+
+- Break ABI :(
+- Switch back to using GSimpleAsyncResult (from GTask) to gain
+  compatibility with older glib versions
+- Refactor internals to make it much easier to add support for more
+  REST collections
+- Parse more VM states from the OvirtVm resource
+
 0.1.0 - June 7, 2013
 ====================
 
