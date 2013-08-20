@@ -43,3 +43,81 @@ ovirt_rest_xml_node_from_call(RestProxyCall *call)
     return node;
 }
 
+G_GNUC_INTERNAL const char *
+ovirt_rest_xml_node_get_content(RestXmlNode *node, ...)
+{
+    va_list args;
+
+    g_return_val_if_fail(node != NULL, NULL);
+
+    va_start(args, node);
+
+    while (TRUE) {
+        const char *node_name;
+        node_name = va_arg(args, const char *);
+        if (node_name == NULL)
+            break;
+        node = rest_xml_node_find(node, node_name);
+        if (node == NULL) {
+            g_debug("could not find XML node '%s'", node_name);
+            return NULL;
+        }
+    }
+
+    va_end(args);
+
+    g_warn_if_fail(node != NULL);
+
+    return node->content;
+}
+
+
+/* These 2 functions come from
+ * libvirt-glib/libvirt-gconfig/libvirt-gconfig-helpers.c
+ * Copyright (C) 2010, 2011 Red Hat, Inc.
+ * LGPLv2.1+ licensed */
+G_GNUC_INTERNAL const char *
+ovirt_utils_genum_get_nick (GType enum_type, gint value)
+{
+    GEnumClass *enum_class;
+    GEnumValue *enum_value;
+
+    g_return_val_if_fail (G_TYPE_IS_ENUM (enum_type), NULL);
+
+    enum_class = g_type_class_ref(enum_type);
+    enum_value = g_enum_get_value(enum_class, value);
+    g_type_class_unref(enum_class);
+
+    if (enum_value != NULL)
+        return enum_value->value_nick;
+
+    g_return_val_if_reached(NULL);
+}
+
+G_GNUC_INTERNAL int
+ovirt_utils_genum_get_value (GType enum_type, const char *nick,
+                             gint default_value)
+{
+    GEnumClass *enum_class;
+    GEnumValue *enum_value;
+
+    g_return_val_if_fail(G_TYPE_IS_ENUM(enum_type), default_value);
+    g_return_val_if_fail(nick != NULL, default_value);
+
+    enum_class = g_type_class_ref(enum_type);
+    enum_value = g_enum_get_value_by_nick(enum_class, nick);
+    g_type_class_unref(enum_class);
+
+    if (enum_value != NULL)
+        return enum_value->value;
+
+    g_return_val_if_reached(default_value);
+}
+
+G_GNUC_INTERNAL gboolean
+ovirt_utils_boolean_from_string(const char *value)
+{
+    g_return_val_if_fail(value != NULL, FALSE);
+
+    return (g_strcmp0(value, "true") == 0);
+}
