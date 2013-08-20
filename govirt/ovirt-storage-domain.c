@@ -261,58 +261,74 @@ OvirtStorageDomain *ovirt_storage_domain_new(void)
     return OVIRT_STORAGE_DOMAIN(domain);
 }
 
+typedef struct {
+    const char *xml_node;
+    GType type;
+    const char *prop_name;
+} OvirtXmlElement;
+
+static gboolean
+ovirt_resource_parse_xml(OvirtResource *resource,
+                         RestXmlNode *node,
+                         OvirtXmlElement *elements)
+{
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
+    g_return_val_if_fail(elements != NULL, FALSE);
+
+    for (;elements->xml_node != NULL; elements++) {
+        const char *value_str;
+        GValue value = { 0, };
+
+        value_str = ovirt_rest_xml_node_get_content(node, elements->xml_node, NULL);
+        if (value_str == NULL) {
+            g_warning("could not find node %s", elements->xml_node);
+            continue;
+        }
+        g_value_init(&value, elements->type);
+
+        if (G_TYPE_IS_ENUM(elements->type)) {
+            int enum_value;
+            enum_value = ovirt_utils_genum_get_value(elements->type,
+                                                     value_str, 0);
+            g_value_set_enum(&value, enum_value);
+        } else if (elements->type == G_TYPE_BOOLEAN) {
+            gboolean bool_value;
+
+            bool_value = ovirt_utils_boolean_from_string(value_str);
+            g_value_set_boolean(&value, bool_value);
+        } else if (elements->type == G_TYPE_UINT64) {
+            guint64 int64_value;
+
+            int64_value = g_ascii_strtoull(value_str, NULL, 0);
+            g_value_set_uint64(&value, int64_value);
+        } else if (g_type_is_a(elements->type, OVIRT_TYPE_RESOURCE)) {
+            GObject *resource_value;
+
+            resource_value = g_initable_new(elements->type, NULL, NULL,
+                                            "xml-node", node, NULL);
+            g_value_set_object(&value, resource_value);
+        }
+        g_object_set_property(G_OBJECT(resource), elements->prop_name, &value);
+        g_value_unset(&value);
+    }
+
+    return TRUE;
+}
+
 static gboolean
 ovirt_storage_domain_refresh_from_xml(OvirtStorageDomain *domain,
                                       RestXmlNode *node)
 {
-    const char *available;
-    const char *committed;
-    const char *master;
-    const char *state;
-    const char *type;
-    const char *used;
-    const char *version;
+    OvirtXmlElement storage_domain_elements[] = {
+        { "type",                   OVIRT_TYPE_STORAGE_DOMAIN_TYPE,         "type" },
+        { "master",                 G_TYPE_BOOLEAN,                         "master" },
+        { "available",              G_TYPE_UINT64,                          "available" },
+        { "used",                   G_TYPE_UINT64,                          "used" },
+        { "committed",              G_TYPE_UINT64,                          "committed" },
+        { "storage_format",         OVIRT_TYPE_STORAGE_DOMAIN_FORMAT_VERSION, "version" },
+        { "storage_domain_state",   OVIRT_TYPE_STORAGE_DOMAIN_STATE,        "state" },
+        { NULL,                     G_TYPE_INVALID,                         NULL }
+    };
 
-    type = ovirt_rest_xml_node_get_content(node, "type", NULL);
-    if (type != NULL) {
-        domain->priv->state = ovirt_utils_genum_get_value(OVIRT_TYPE_STORAGE_DOMAIN_TYPE,
-                                                          type,
-                                                          OVIRT_STORAGE_DOMAIN_TYPE_DATA);
-    }
-
-    master = ovirt_rest_xml_node_get_content(node, "master", NULL);
-    if (master != NULL) {
-        domain->priv->is_master = ovirt_utils_boolean_from_string(master);
-    }
-
-    available = ovirt_rest_xml_node_get_content(node, "available", NULL);
-    if (available != NULL) {
-        domain->priv->available = g_ascii_strtoull(available, NULL, 0);
-    }
-
-    used = ovirt_rest_xml_node_get_content(node, "used", NULL);
-    if (used != NULL) {
-        domain->priv->used = g_ascii_strtoull(used, NULL, 0);
-    }
-
-    committed = ovirt_rest_xml_node_get_content(node, "committed", NULL);
-    if (committed != NULL) {
-        domain->priv->committed = g_ascii_strtoull(committed, NULL, 0);
-    }
-
-    version = ovirt_rest_xml_node_get_content(node, "storage_format", NULL);
-    if (version != NULL) {
-        domain->priv->version = ovirt_utils_genum_get_value(OVIRT_TYPE_STORAGE_DOMAIN_FORMAT_VERSION,
-                                                           version,
-                                                           OVIRT_STORAGE_DOMAIN_FORMAT_VERSION_V1);
-    }
-
-    state = ovirt_rest_xml_node_get_content(node, "storage_domain_state", NULL);
-    if (state != NULL)  {
-        domain->priv->state = ovirt_utils_genum_get_value(OVIRT_TYPE_STORAGE_DOMAIN_STATE,
-                                                          state,
-                                                          OVIRT_STORAGE_DOMAIN_STATE_UNKNOWN);
-    }
-
-    return TRUE;
+    return ovirt_resource_parse_xml(OVIRT_RESOURCE(domain), node, storage_domain_elements);
 }
