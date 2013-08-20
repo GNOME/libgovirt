@@ -35,6 +35,7 @@ noinst_HEADERS =						\
 	ovirt-proxy-private.h					\
 	ovirt-resource-private.h				\
 	ovirt-rest-call.h					\
+	ovirt-storage-domain-private.h				\
 	ovirt-utils.h						\
 	ovirt-vm-private.h					\
 	$(NULL)

@@ -80,6 +80,8 @@ struct _OvirtStorageDomainClass
 
 GType ovirt_storage_domain_get_type(void);
 
+OvirtStorageDomain *ovirt_storage_domain_new(void);
+
 G_END_DECLS
 
 #endif /* __OVIRT_STORAGE_DOMAIN_H__ */

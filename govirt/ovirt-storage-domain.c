@@ -23,6 +23,7 @@
 #include <config.h>
 #include "ovirt-enum-types.h"
 #include "ovirt-storage-domain.h"
+#include "govirt-private.h"
 
 #define OVIRT_STORAGE_DOMAIN_GET_PRIVATE(obj)                         \
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_STORAGE_DOMAIN, OvirtStorageDomainPrivate))
@@ -49,6 +50,10 @@ enum {
     PROP_VERSION,
     PROP_STATE
 };
+
+static gboolean
+ovirt_storage_domain_refresh_from_xml(OvirtStorageDomain *domain,
+                                      RestXmlNode *node);
 
 static void ovirt_storage_domain_get_property(GObject *object,
                                               guint prop_id,
@@ -120,13 +125,33 @@ static void ovirt_storage_domain_set_property(GObject *object,
     }
 }
 
+static gboolean ovirt_storage_domain_init_from_xml(OvirtResource *resource,
+                                                   RestXmlNode *node,
+                                                   GError **error)
+{
+    gboolean parsed_ok;
+    OvirtResourceClass *parent_class;
+    OvirtStorageDomain *domain;
+
+    domain = OVIRT_STORAGE_DOMAIN(resource);
+    parsed_ok = ovirt_storage_domain_refresh_from_xml(domain, node);
+    if (!parsed_ok) {
+        return FALSE;
+    }
+    parent_class = OVIRT_RESOURCE_CLASS(ovirt_storage_domain_parent_class);
+
+    return parent_class->init_from_xml(resource, node, error);
+}
+
 static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
+    OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
     GParamSpec *param_spec;
 
     g_type_class_add_private(klass, sizeof(OvirtStorageDomainPrivate));
 
+    resource_class->init_from_xml = ovirt_storage_domain_init_from_xml;
     object_class->get_property = ovirt_storage_domain_get_property;
     object_class->set_property = ovirt_storage_domain_set_property;
 
@@ -213,4 +238,81 @@ static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
 static void ovirt_storage_domain_init(OvirtStorageDomain *domain)
 {
     domain->priv = OVIRT_STORAGE_DOMAIN_GET_PRIVATE(domain);
+}
+
+G_GNUC_INTERNAL
+OvirtStorageDomain *ovirt_storage_domain_new_from_xml(RestXmlNode *node,
+                                                      GError **error)
+{
+    GObject *domain;
+
+    domain = g_initable_new(OVIRT_TYPE_STORAGE_DOMAIN, NULL, error,
+                            "xml-node", node, NULL);
+
+    return OVIRT_STORAGE_DOMAIN(domain);
+}
+
+OvirtStorageDomain *ovirt_storage_domain_new(void)
+{
+    GObject *domain;
+
+    domain = g_initable_new(OVIRT_TYPE_STORAGE_DOMAIN, NULL, NULL, NULL);
+
+    return OVIRT_STORAGE_DOMAIN(domain);
+}
+
+static gboolean
+ovirt_storage_domain_refresh_from_xml(OvirtStorageDomain *domain,
+                                      RestXmlNode *node)
+{
+    const char *available;
+    const char *committed;
+    const char *master;
+    const char *state;
+    const char *type;
+    const char *used;
+    const char *version;
+
+    type = ovirt_rest_xml_node_get_content(node, "type", NULL);
+    if (type != NULL) {
+        domain->priv->state = ovirt_utils_genum_get_value(OVIRT_TYPE_STORAGE_DOMAIN_TYPE,
+                                                          type,
+                                                          OVIRT_STORAGE_DOMAIN_TYPE_DATA);
+    }
+
+    master = ovirt_rest_xml_node_get_content(node, "master", NULL);
+    if (master != NULL) {
+        domain->priv->is_master = ovirt_utils_boolean_from_string(master);
+    }
+
+    available = ovirt_rest_xml_node_get_content(node, "available", NULL);
+    if (available != NULL) {
+        domain->priv->available = g_ascii_strtoull(available, NULL, 0);
+    }
+
+    used = ovirt_rest_xml_node_get_content(node, "used", NULL);
+    if (used != NULL) {
+        domain->priv->used = g_ascii_strtoull(used, NULL, 0);
+    }
+
+    committed = ovirt_rest_xml_node_get_content(node, "committed", NULL);
+    if (committed != NULL) {
+        domain->priv->committed = g_ascii_strtoull(committed, NULL, 0);
+    }
+
+    version = ovirt_rest_xml_node_get_content(node, "storage_format", NULL);
+    if (version != NULL) {
+        domain->priv->version = ovirt_utils_genum_get_value(OVIRT_TYPE_STORAGE_DOMAIN_FORMAT_VERSION,
+                                                           version,
+                                                           OVIRT_STORAGE_DOMAIN_FORMAT_VERSION_V1);
+    }
+
+    state = ovirt_rest_xml_node_get_content(node, "storage_domain_state", NULL);
+    if (state != NULL)  {
+        domain->priv->state = ovirt_utils_genum_get_value(OVIRT_TYPE_STORAGE_DOMAIN_STATE,
+                                                          state,
+                                                          OVIRT_STORAGE_DOMAIN_STATE_UNKNOWN);
+    }
+
+    return TRUE;
 }

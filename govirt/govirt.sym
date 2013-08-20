@@ -67,6 +67,7 @@ GOVIRT_0.2.1 {
         ovirt_storage_domain_state_get_type;
         ovirt_storage_domain_format_version_get_type;
         ovirt_storage_domain_type_get_type;
+        ovirt_storage_domain_new;
 } GOVIRT_0.2.0;
 
 
