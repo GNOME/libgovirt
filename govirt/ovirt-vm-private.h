@@ -47,4 +47,4 @@ OvirtVm *ovirt_vm_new_from_xml(RestXmlNode *node, GError **error);
 
 G_END_DECLS
 
-#endif /* __OVIRT_VM_H__ */
+#endif /* __OVIRT_VM_PRIVATE_H__ */
