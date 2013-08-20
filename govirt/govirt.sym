@@ -62,6 +62,11 @@ GOVIRT_0.2.1 {
         ovirt_proxy_fetch_api;
         ovirt_proxy_fetch_api_async;
         ovirt_proxy_fetch_api_finish;
+
+        ovirt_storage_domain_get_type;
+        ovirt_storage_domain_state_get_type;
+        ovirt_storage_domain_format_version_get_type;
+        ovirt_storage_domain_type_get_type;
 } GOVIRT_0.2.0;
 
 

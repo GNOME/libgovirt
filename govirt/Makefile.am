@@ -21,6 +21,7 @@ libgovirt_la_HEADERS =						\
 	ovirt-proxy.h						\
 	ovirt-resource.h					\
 	ovirt-rest-call-error.h					\
+	ovirt-storage-domain.h					\
 	ovirt-types.h						\
 	ovirt-vm.h						\
 	ovirt-vm-display.h					\
@@ -47,6 +48,7 @@ libgovirt_la_SOURCES =						\
 	ovirt-proxy-deprecated.c				\
 	ovirt-resource.c					\
 	ovirt-rest-call.c					\
+	ovirt-storage-domain.c					\
 	ovirt-utils.c						\
 	ovirt-vm.c						\
 	ovirt-vm-display.c					\
