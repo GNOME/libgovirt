@@ -178,6 +178,16 @@ gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
     return TRUE;
 }
 
+static const char *ovirt_rest_strip_api_base_dir(const char *path)
+{
+    if (g_str_has_prefix(path, OVIRT_API_BASE_DIR)) {
+        g_debug("stripping %s from %s", OVIRT_API_BASE_DIR, path);
+        path += strlen(OVIRT_API_BASE_DIR);
+    }
+
+    return path;
+}
+
 RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
                                             const char *href,
                                             GError **error)
@@ -188,6 +198,7 @@ RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
 
     call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
+    href = ovirt_rest_strip_api_base_dir(href);
     rest_proxy_call_set_function(call, href);
     rest_proxy_call_add_header(call, "All-Content", "true");
 
@@ -266,16 +277,6 @@ call_async_cb(RestProxyCall *call, const GError *error,
 
     g_simple_async_result_complete (result);
     ovirt_proxy_call_async_data_free(data);
-}
-
-static const char *ovirt_rest_strip_api_base_dir(const char *path)
-{
-    if (g_str_has_prefix(path, OVIRT_API_BASE_DIR)) {
-        g_debug("stripping %s from %s", OVIRT_API_BASE_DIR, path);
-        path += strlen(OVIRT_API_BASE_DIR);
-    }
-
-    return path;
 }
 
 void ovirt_rest_call_async(OvirtProxy *proxy,
