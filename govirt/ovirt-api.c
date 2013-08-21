@@ -39,6 +39,7 @@
 
 
 struct _OvirtApiPrivate {
+    OvirtCollection *storage_domains;
     OvirtCollection *vms;
 };
 
@@ -69,6 +70,7 @@ static void ovirt_api_dispose(GObject *object)
 {
     OvirtApi *api = OVIRT_API(object);
 
+    g_clear_object(&api->priv->storage_domains);
     g_clear_object(&api->priv->vms);
 
     G_OBJECT_CLASS(ovirt_api_parent_class)->dispose(object);
@@ -127,4 +129,31 @@ OvirtCollection *ovirt_api_get_vms(OvirtApi *api)
     api->priv->vms = ovirt_collection_new(href, "vms", OVIRT_TYPE_VM, "vm");
 
     return api->priv->vms;
+}
+
+
+/**
+ * ovirt_api_get_storage_domains:
+ * @api: a #OvirtApi
+ *
+ * Return value: (transfer full):
+ */
+OvirtCollection *ovirt_api_get_storage_domains(OvirtApi *api)
+{
+    const char *href;
+
+    g_return_val_if_fail(OVIRT_IS_API(api), NULL);
+
+    if (api->priv->storage_domains != NULL)
+        return api->priv->storage_domains;
+
+    href = ovirt_resource_get_sub_collection(OVIRT_RESOURCE(api), "storagedomains");
+    if (href == NULL)
+        return NULL;
+
+    api->priv->storage_domains = ovirt_collection_new(href, "storage_domains",
+                                                      OVIRT_TYPE_STORAGE_DOMAIN,
+                                                      "storage_domain");
+
+    return api->priv->storage_domains;
 }
