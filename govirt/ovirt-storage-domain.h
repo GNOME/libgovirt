@@ -24,6 +24,7 @@
 
 #include <gio/gio.h>
 #include <glib-object.h>
+#include <govirt/ovirt-collection.h>
 #include <govirt/ovirt-resource.h>
 #include <govirt/ovirt-types.h>
 
@@ -81,6 +82,8 @@ struct _OvirtStorageDomainClass
 GType ovirt_storage_domain_get_type(void);
 
 OvirtStorageDomain *ovirt_storage_domain_new(void);
+
+OvirtCollection *ovirt_storage_domain_get_files(OvirtStorageDomain *domain);
 
 G_END_DECLS
 

@@ -29,6 +29,8 @@
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_STORAGE_DOMAIN, OvirtStorageDomainPrivate))
 
 struct _OvirtStorageDomainPrivate {
+    OvirtCollection *files;
+
     OvirtStorageDomainType type;
     gboolean is_master;
     guint64 available;
@@ -125,6 +127,18 @@ static void ovirt_storage_domain_set_property(GObject *object,
     }
 }
 
+
+static void
+ovirt_storage_domain_dispose(GObject *obj)
+{
+    OvirtStorageDomain *domain = OVIRT_STORAGE_DOMAIN(obj);
+
+    g_clear_object(&domain->priv->files);
+
+    G_OBJECT_CLASS(ovirt_storage_domain_parent_class)->dispose(obj);
+}
+
+
 static gboolean ovirt_storage_domain_init_from_xml(OvirtResource *resource,
                                                    RestXmlNode *node,
                                                    GError **error)
@@ -143,6 +157,7 @@ static gboolean ovirt_storage_domain_init_from_xml(OvirtResource *resource,
     return parent_class->init_from_xml(resource, node, error);
 }
 
+
 static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
@@ -152,6 +167,7 @@ static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
     g_type_class_add_private(klass, sizeof(OvirtStorageDomainPrivate));
 
     resource_class->init_from_xml = ovirt_storage_domain_init_from_xml;
+    object_class->dispose = ovirt_storage_domain_dispose;
     object_class->get_property = ovirt_storage_domain_get_property;
     object_class->set_property = ovirt_storage_domain_set_property;
 
@@ -331,4 +347,37 @@ ovirt_storage_domain_refresh_from_xml(OvirtStorageDomain *domain,
     };
 
     return ovirt_resource_parse_xml(OVIRT_RESOURCE(domain), node, storage_domain_elements);
+}
+
+
+/**
+ * ovirt_storage_domain_get_files:
+ * @domain: a #OvirtStorageDomain
+ *
+ * Gets a #OvirtCollection representing the list of remote files from a
+ * storage domain object.  This method does not initiate any network
+ * activity, the remote file list must be then be fetched using
+ * ovirt_collection_fetch() or ovirt_collection_fetch_async().
+ *
+ * Return value: (transfer full): a #OvirtCollection representing the list
+ * of files associated with @domain.
+ */
+OvirtCollection *ovirt_storage_domain_get_files(OvirtStorageDomain *domain)
+{
+    const char *href;
+
+    g_return_val_if_fail(OVIRT_IS_STORAGE_DOMAIN(domain), NULL);
+
+    if (domain->priv->files != NULL)
+        return domain->priv->files;
+
+    href = ovirt_resource_get_sub_collection(OVIRT_RESOURCE(domain), "files");
+    if (href == NULL)
+        return NULL;
+
+    domain->priv->files = ovirt_collection_new(href, "files",
+                                               OVIRT_TYPE_RESOURCE,
+                                               "file");
+
+    return domain->priv->files;
 }
