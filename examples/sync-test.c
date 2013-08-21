@@ -25,6 +25,23 @@
 #include <govirt/govirt.h>
 #include "govirt/glib-compat.h"
 
+static const char *
+genum_get_nick (GType enum_type, gint value)
+{
+    GEnumClass *enum_class;
+    GEnumValue *enum_value;
+
+    g_return_val_if_fail (G_TYPE_IS_ENUM (enum_type), NULL);
+
+    enum_class = g_type_class_ref(enum_type);
+    enum_value = g_enum_get_value(enum_class, value);
+    g_type_class_unref(enum_class);
+
+    if (enum_value != NULL)
+        return enum_value->value_nick;
+
+    g_return_val_if_reached(NULL);
+}
 
 static gboolean
 authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
@@ -38,6 +55,58 @@ authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
                  "password", g_getenv("LIBGOVIRT_TEST_PASSWORD"),
                  NULL);
     return TRUE;
+}
+
+static void list_storage_domains(OvirtApi *api, OvirtProxy *proxy)
+{
+    GError *error = NULL;
+    OvirtCollection *collection;
+    GList *storage_domains;
+
+
+    collection = ovirt_api_get_storage_domains(api);
+    ovirt_collection_fetch(collection, proxy, &error);
+    if (error != NULL) {
+        g_debug("failed to fetch storage domains: %s", error->message);
+        g_clear_error(&error);
+    }
+
+    storage_domains = g_hash_table_get_values(ovirt_collection_get_resources(collection));
+    for (; storage_domains != NULL; storage_domains = storage_domains->next) {
+        OvirtStorageDomain *domain;
+        OvirtCollection *file_collection;
+        GList *files;
+        char *name;
+        int type;
+
+        domain = OVIRT_STORAGE_DOMAIN(storage_domains->data);
+        g_object_get(G_OBJECT(domain), "type", &type, "name", &name, NULL);
+        g_print("storage domain: %s (type %s)\n", name,
+                genum_get_nick(OVIRT_TYPE_STORAGE_DOMAIN_TYPE, type));
+
+        file_collection = ovirt_storage_domain_get_files(domain);
+        if (file_collection == NULL) {
+            goto next;
+        }
+        ovirt_collection_fetch(file_collection, proxy, &error);
+        if (error != NULL) {
+            g_debug("failed to fetch files for storage domain %s: %s",
+                    name, error->message);
+            g_clear_error(&error);
+        }
+        files = g_hash_table_get_values(ovirt_collection_get_resources(file_collection));
+        for (; files != NULL; files = files->next) {
+            char *filename;
+            g_object_get(G_OBJECT(files->data), "name", &filename, NULL);
+            g_print("file: %s\n", filename);
+            g_free(filename);
+        }
+
+next:
+        g_free(name);
+    }
+
+
 }
 
 
@@ -128,6 +197,12 @@ int main(int argc, char **argv)
     g_print("\tSecure port: %d\n", secure_port);
     g_print("\tCA certificate: %p\n", ca_cert);
     g_print("\tTicket: %s\n", ticket);
+
+    {
+    list_storage_domains(api, proxy);
+
+    }
+
 
 error:
     g_free(ticket);
