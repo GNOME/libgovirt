@@ -23,6 +23,7 @@
 #define __OVIRT_H__
 
 #include <govirt/ovirt-enum-types.h>
+#include <govirt/ovirt-api.h>
 #include <govirt/ovirt-collection.h>
 #include <govirt/ovirt-error.h>
 #include <govirt/ovirt-proxy.h>

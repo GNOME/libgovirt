@@ -50,6 +50,9 @@ GOVIRT_0.2.0 {
 };
 
 GOVIRT_0.2.1 {
+        ovirt_api_get_type;
+        ovirt_api_new;
+
         ovirt_collection_fetch;
         ovirt_collection_fetch_async;
         ovirt_collection_fetch_finish;
