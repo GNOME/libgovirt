@@ -46,9 +46,6 @@ static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm,
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_VM, OvirtVmPrivate))
 
 struct _OvirtVmPrivate {
-    char *uuid;
-    char *href;
-    char *name;
     OvirtVmState state;
     OvirtVmDisplay *display;
 } ;
@@ -122,17 +119,6 @@ static void ovirt_vm_dispose(GObject *object)
     G_OBJECT_CLASS(ovirt_vm_parent_class)->dispose(object);
 }
 
-static void ovirt_vm_finalize(GObject *object)
-{
-    OvirtVm *vm = OVIRT_VM(object);
-
-    g_free(vm->priv->name);
-    g_free(vm->priv->href);
-    g_free(vm->priv->uuid);
-
-    G_OBJECT_CLASS(ovirt_vm_parent_class)->finalize(object);
-}
-
 
 static gboolean ovirt_vm_init_from_xml(OvirtResource *resource,
                                        RestXmlNode *node,
@@ -159,7 +145,6 @@ static void ovirt_vm_class_init(OvirtVmClass *klass)
 
     resource_class->init_from_xml = ovirt_vm_init_from_xml;
     object_class->dispose = ovirt_vm_dispose;
-    object_class->finalize = ovirt_vm_finalize;
     object_class->get_property = ovirt_vm_get_property;
     object_class->set_property = ovirt_vm_set_property;
 
@@ -566,6 +551,7 @@ void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
                             gpointer user_data)
 {
     GSimpleAsyncResult *result;
+    char *href;
 
     g_return_if_fail(OVIRT_IS_VM(vm));
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
@@ -574,8 +560,10 @@ void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
     result = g_simple_async_result_new(G_OBJECT(vm), callback,
                                        user_data,
                                        ovirt_vm_refresh_async);
-    ovirt_rest_call_async(proxy, "GET", vm->priv->href, result, cancellable,
+    g_object_get(G_OBJECT(vm), "href", &href, NULL);
+    ovirt_rest_call_async(proxy, "GET", href, result, cancellable,
                           ovirt_vm_refresh_async_cb, vm, NULL);
+    g_free(href);
 }
 
 gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
