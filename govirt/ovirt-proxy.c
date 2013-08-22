@@ -203,7 +203,7 @@ RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
     rest_proxy_call_add_header(call, "All-Content", "true");
 
     if (!rest_proxy_call_sync(call, error)) {
-        g_warning("Error while getting VM list");
+        g_warning("Error while getting collection");
         g_object_unref(G_OBJECT(call));
         return NULL;
     }
