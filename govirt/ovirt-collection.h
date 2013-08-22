@@ -25,6 +25,7 @@
 #include <gio/gio.h>
 #include <glib-object.h>
 #include <govirt/ovirt-types.h>
+#include <govirt/ovirt-resource.h>
 
 G_BEGIN_DECLS
 
@@ -57,6 +58,20 @@ struct _OvirtCollectionClass
 
 GType ovirt_collection_get_type(void);
 GHashTable *ovirt_collection_get_resources(OvirtCollection *collection);
+
+OvirtResource *ovirt_collection_lookup_resource(OvirtCollection *collection,
+                                                const char *name);
+gboolean ovirt_collection_fetch(OvirtCollection *collection,
+                                OvirtProxy *proxy,
+                                GError **error);
+void ovirt_collection_fetch_async(OvirtCollection *collection,
+                                  OvirtProxy *proxy,
+                                  GCancellable *cancellable,
+                                  GAsyncReadyCallback callback,
+                                  gpointer user_data);
+GList *ovirt_collection_fetch_finish(OvirtCollection *collection,
+                                     GAsyncResult *result,
+                                     GError **err);
 
 G_END_DECLS
 
