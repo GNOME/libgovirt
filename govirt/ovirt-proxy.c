@@ -764,6 +764,8 @@ OvirtProxy *ovirt_proxy_new(const char *uri)
  */
 GList *ovirt_proxy_get_vms(OvirtProxy *proxy)
 {
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
+
     if (proxy->priv->vms != NULL) {
         return g_hash_table_get_values(proxy->priv->vms);
     }
