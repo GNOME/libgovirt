@@ -57,6 +57,10 @@ GOVIRT_0.2.1 {
         ovirt_collection_fetch_async;
         ovirt_collection_fetch_finish;
         ovirt_collection_lookup_resource;
+
+        ovirt_proxy_fetch_api;
+        ovirt_proxy_fetch_api_async;
+        ovirt_proxy_fetch_api_finish;
 } GOVIRT_0.2.0;
 
 

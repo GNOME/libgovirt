@@ -43,6 +43,7 @@ struct _OvirtProxyPrivate {
     GHashTable *vms;
     GByteArray *ca_cert;
     gboolean admin_mode;
+    OvirtApi *api;
 };
 
 #define OVIRT_PROXY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE((o), OVIRT_TYPE_PROXY, OvirtProxyPrivate))
@@ -771,4 +772,102 @@ GList *ovirt_proxy_get_vms(OvirtProxy *proxy)
     }
 
     return NULL;
+}
+
+
+static void ovirt_proxy_set_api_from_xml(OvirtProxy *proxy,
+                                         RestXmlNode *node,
+                                         GError **error)
+{
+    if (proxy->priv->api != NULL) {
+        g_object_unref(G_OBJECT(proxy->priv->api));
+    }
+    proxy->priv->api = ovirt_api_new_from_xml(node, error);
+
+}
+
+
+/**
+ * ovirt_proxy_fetch_api:
+ * @proxy: a #OvirtProxy
+ * @error: #GError to set on error, or NULL
+ *
+ * Return value: (transfer full):
+ */
+OvirtApi *ovirt_proxy_fetch_api(OvirtProxy *proxy, GError **error)
+{
+    RestXmlNode *api_node;
+
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
+
+    api_node = ovirt_proxy_get_collection_xml(proxy, "", error);
+    if (api_node == NULL) {
+        return NULL;
+    }
+
+    ovirt_proxy_set_api_from_xml(proxy, api_node, error);
+
+    rest_xml_node_unref(api_node);
+
+    return proxy->priv->api;
+}
+
+
+static gboolean fetch_api_async_cb(OvirtProxy* proxy,
+                                   RestXmlNode *root_node,
+                                   gpointer user_data,
+                                   GError **error)
+{
+    ovirt_proxy_set_api_from_xml(proxy, root_node, error);
+
+    return TRUE;
+}
+
+
+/**
+ * ovirt_proxy_fetch_api_async:
+ * @proxy: a #OvirtProxy
+ * @callback: (scope async): completion callback
+ * @user_data: (closure): opaque data for callback
+ */
+void ovirt_proxy_fetch_api_async(OvirtProxy *proxy,
+                                 GCancellable *cancellable,
+                                 GAsyncReadyCallback callback,
+                                 gpointer user_data)
+{
+    GSimpleAsyncResult *result;
+
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
+
+    result = g_simple_async_result_new (G_OBJECT(proxy), callback,
+                                        user_data,
+                                        ovirt_proxy_fetch_api_async);
+    ovirt_proxy_get_collection_xml_async(proxy, "", result, cancellable,
+                                         fetch_api_async_cb, NULL, NULL);
+}
+
+
+/**
+ * ovirt_proxy_fetch_api_finish:
+ * @proxy: a #OvirtProxy
+ * @result: (transfer none): async method result
+ *
+ * Return value: (transfer none): an #OvirtApi instance to interact with
+ * oVirt/RHEV REST API.
+ */
+OvirtApi *
+ovirt_proxy_fetch_api_finish(OvirtProxy *proxy,
+                             GAsyncResult *result,
+                             GError **err)
+{
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
+    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(proxy),
+                                                        ovirt_proxy_fetch_api_async),
+                         NULL);
+
+    if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
+        return NULL;
+
+    return proxy->priv->api;
 }

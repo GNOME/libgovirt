@@ -23,6 +23,7 @@
 #define __OVIRT_PROXY_H__
 
 #include <rest/rest-proxy.h>
+#include <govirt/ovirt-api.h>
 #include <govirt/ovirt-types.h>
 #include <govirt/ovirt-vm.h>
 
@@ -80,5 +81,14 @@ void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
 GByteArray *ovirt_proxy_fetch_ca_certificate_finish(OvirtProxy *proxy,
                                                     GAsyncResult *result,
                                                     GError **err);
+
+OvirtApi  *ovirt_proxy_fetch_api(OvirtProxy *proxy, GError **error);
+void ovirt_proxy_fetch_api_async(OvirtProxy *proxy,
+                                 GCancellable *cancellable,
+                                 GAsyncReadyCallback callback,
+                                 gpointer user_data);
+OvirtApi *ovirt_proxy_fetch_api_finish(OvirtProxy *proxy,
+                                       GAsyncResult *result,
+                                       GError **err);
 
 #endif
