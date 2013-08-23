@@ -39,7 +39,7 @@
 
 
 struct _OvirtApiPrivate {
-    gboolean unused;
+    OvirtCollection *vms;
 };
 
 
@@ -64,11 +64,25 @@ static gboolean ovirt_api_init_from_xml(OvirtResource *resource,
     return parent_class->init_from_xml(resource, node, error);
 }
 
+
+static void ovirt_api_dispose(GObject *object)
+{
+    OvirtApi *api = OVIRT_API(object);
+
+    g_clear_object(&api->priv->vms);
+
+    G_OBJECT_CLASS(ovirt_api_parent_class)->dispose(object);
+}
+
+
 static void ovirt_api_class_init(OvirtApiClass *klass)
 {
+    GObjectClass *object_class = G_OBJECT_CLASS(klass);
     OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
 
     g_type_class_add_private(klass, sizeof(OvirtApiPrivate));
+
+    object_class->dispose = ovirt_api_dispose;
 
     resource_class->init_from_xml = ovirt_api_init_from_xml;
 }
@@ -84,7 +98,33 @@ OvirtApi *ovirt_api_new_from_xml(RestXmlNode *node, GError **error)
                                    "xml-node", node, NULL));
 }
 
+
 OvirtApi *ovirt_api_new(void)
 {
     return OVIRT_API(g_initable_new(OVIRT_TYPE_API, NULL, NULL, NULL));
+}
+
+
+/**
+ * ovirt_api_get_vms:
+ * @api: a #OvirtApi
+ *
+ * Return value: (transfer full):
+ */
+OvirtCollection *ovirt_api_get_vms(OvirtApi *api)
+{
+    const char *href;
+
+    g_return_val_if_fail(OVIRT_IS_API(api), NULL);
+
+    if (api->priv->vms != NULL)
+        return api->priv->vms;
+
+    href = ovirt_resource_get_sub_collection(OVIRT_RESOURCE(api), "vms");
+    if (href == NULL)
+        return NULL;
+
+    api->priv->vms = ovirt_collection_new(href, "vms", OVIRT_TYPE_VM, "vm");
+
+    return api->priv->vms;
 }

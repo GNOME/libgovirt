@@ -24,6 +24,7 @@
 
 #include <gio/gio.h>
 #include <glib-object.h>
+#include <govirt/ovirt-collection.h>
 #include <govirt/ovirt-resource.h>
 #include <govirt/ovirt-types.h>
 
@@ -59,6 +60,8 @@ struct _OvirtApiClass
 
 GType ovirt_api_get_type(void);
 OvirtApi *ovirt_api_new(void);
+
+OvirtCollection *ovirt_api_get_vms(OvirtApi *api);
 
 G_END_DECLS
 
