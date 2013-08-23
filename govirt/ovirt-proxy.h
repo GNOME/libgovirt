@@ -62,17 +62,27 @@ struct _OvirtProxyClass {
 GType ovirt_proxy_get_type(void);
 
 OvirtProxy *ovirt_proxy_new(const char *uri);
+
+G_DEPRECATED_FOR(ovirt_collection_lookup_resource)
 OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name);
+
+G_DEPRECATED_FOR(ovirt_collection_get_resources)
 GList *ovirt_proxy_get_vms(OvirtProxy *proxy);
 
+G_DEPRECATED_FOR(ovirt_collection_fetch)
 gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error);
+
+G_DEPRECATED_FOR(ovirt_collection_fetch_async)
 void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
                                  GCancellable *cancellable,
                                  GAsyncReadyCallback callback,
                                  gpointer user_data);
+
+G_DEPRECATED_FOR(ovirt_collection_fetch_finish)
 GList *ovirt_proxy_fetch_vms_finish(OvirtProxy *proxy,
                                     GAsyncResult *result,
                                     GError **err);
+
 gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error);
 void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
                                             GCancellable *cancellable,

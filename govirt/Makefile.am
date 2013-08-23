@@ -44,6 +44,7 @@ libgovirt_la_SOURCES =						\
 	ovirt-collection.c					\
 	ovirt-error.c						\
 	ovirt-proxy.c						\
+	ovirt-proxy-deprecated.c				\
 	ovirt-resource.c					\
 	ovirt-rest-call.c					\
 	ovirt-utils.c						\

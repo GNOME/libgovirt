@@ -27,6 +27,11 @@
 
 static GMainLoop *main_loop;
 
+typedef struct {
+    OvirtProxy *proxy;
+    const char *vm_name;
+} AsyncData;
+
 static gboolean
 authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
                 gboolean retrying, gpointer user_data)
@@ -42,6 +47,7 @@ authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
     return TRUE;
 }
 
+
 static void got_ticket_cb(GObject *source_object,
                           GAsyncResult *result,
                           gpointer user_data)
@@ -54,7 +60,6 @@ static void got_ticket_cb(GObject *source_object,
     guint secure_port;
     OvirtVmDisplayType type;
     gchar *ticket = NULL;
-    //GByteArray *ca_cert;
 
     g_debug("Got ticket");
     vm = OVIRT_VM(source_object);
@@ -86,6 +91,7 @@ static void got_ticket_cb(GObject *source_object,
     g_print("\tPort: %d\n", port);
     g_print("\tSecure port: %d\n", secure_port);
     g_print("\tTicket: %s\n", ticket);
+
     g_main_loop_quit(main_loop);
 }
 
@@ -95,18 +101,17 @@ static void vm_started_cb(GObject *source_object,
 {
     GError *error = NULL;
     OvirtVm *vm;
-    OvirtProxy *proxy;
+    AsyncData *data = (AsyncData *)user_data;
 
     g_debug("Started VM");
     vm = OVIRT_VM(source_object);
-    proxy = OVIRT_PROXY(user_data);
     ovirt_vm_start_finish(vm, result, &error);
     if (error != NULL) {
         g_debug("failed to start VM: %s", error->message);
         g_main_loop_quit(main_loop);
         return;
     }
-    ovirt_vm_get_ticket_async(vm, proxy, NULL, got_ticket_cb, proxy);
+    ovirt_vm_get_ticket_async(vm, data->proxy, NULL, got_ticket_cb, data);
 }
 
 static void vms_fetched_cb(GObject *source_object,
@@ -114,22 +119,23 @@ static void vms_fetched_cb(GObject *source_object,
                            gpointer user_data)
 {
     GError *error = NULL;
-    OvirtProxy *proxy;
+    OvirtCollection *vms;
     OvirtVm *vm;
     OvirtVmState state;
+    AsyncData *data = (AsyncData *)user_data;
 
     g_debug("Fetched VMs");
-    proxy = OVIRT_PROXY(source_object);
-    ovirt_proxy_fetch_vms_finish(proxy, result, &error);
+    vms = OVIRT_COLLECTION(source_object);
+    ovirt_collection_fetch_finish(vms, result, &error);
     if (error != NULL) {
         g_debug("failed to fetch VMs: %s", error->message);
         g_main_loop_quit(main_loop);
         return;
     }
 
-    vm = ovirt_proxy_lookup_vm(proxy, user_data);
+    vm = OVIRT_VM(ovirt_collection_lookup_resource(vms, data->vm_name));
     if (vm == NULL) {
-        g_debug("could not find VM '%s'", (char *)user_data);
+        g_debug("could not find VM '%s'", data->vm_name);
         g_main_loop_quit(main_loop);
         return;
     }
@@ -137,15 +143,40 @@ static void vms_fetched_cb(GObject *source_object,
     g_return_if_fail(vm != NULL);
     g_object_get(G_OBJECT(vm), "state", &state, NULL);
     if (state != OVIRT_VM_STATE_UP) {
-        ovirt_vm_start_async(vm, proxy, NULL, vm_started_cb, proxy);
+        ovirt_vm_start_async(vm, data->proxy, NULL, vm_started_cb, data);
         if (error != NULL) {
             g_debug("failed to start VM: %s", error->message);
             g_main_loop_quit(main_loop);
             return;
         }
     } else {
-        ovirt_vm_get_ticket_async(vm, proxy, NULL, got_ticket_cb, proxy);
+        ovirt_vm_get_ticket_async(vm, data->proxy, NULL, got_ticket_cb, data);
     }
+}
+
+
+static void api_fetched_cb(GObject *source_object,
+                           GAsyncResult *result,
+                           gpointer user_data)
+{
+    GError *error = NULL;
+    OvirtProxy *proxy;
+    OvirtApi *api;
+    OvirtCollection *vms;
+
+    g_debug("Fetched API");
+    proxy = OVIRT_PROXY(source_object);
+    api = ovirt_proxy_fetch_api_finish(proxy, result, &error);
+    if (error != NULL) {
+        g_debug("failed to fetch api: %s", error->message);
+        g_main_loop_quit(main_loop);
+        return;
+    }
+
+    vms = ovirt_api_get_vms(api);
+    g_assert(vms != NULL);
+
+    ovirt_collection_fetch_async(vms, proxy, NULL, vms_fetched_cb, user_data);
 }
 
 static void fetched_ca_cert_cb(GObject *source_object,
@@ -170,13 +201,14 @@ static void fetched_ca_cert_cb(GObject *source_object,
         return;
     }
     g_print("\tCA certificate: %p\n", ca_cert);
-    ovirt_proxy_fetch_vms_async(proxy, NULL, vms_fetched_cb, user_data);
+    ovirt_proxy_fetch_api_async(proxy, NULL, api_fetched_cb, user_data);
 }
 
 static gboolean start(gpointer user_data)
 {
     char **argv = (char **)user_data;
     OvirtProxy *proxy = NULL;
+    AsyncData *data;
 
     proxy = ovirt_proxy_new (argv[1]);
     if (proxy == NULL)
@@ -185,10 +217,12 @@ static gboolean start(gpointer user_data)
     g_signal_connect(G_OBJECT(proxy), "authenticate",
                      G_CALLBACK(authenticate_cb), NULL);
 
-
+    data = g_new0(AsyncData, 1);
+    data->proxy = proxy;
+    data->vm_name = argv[2];
     ovirt_proxy_fetch_ca_certificate_async(proxy, NULL,
                                            fetched_ca_cert_cb,
-                                           argv[2]);
+                                           data);
 
     return G_SOURCE_REMOVE;
 }

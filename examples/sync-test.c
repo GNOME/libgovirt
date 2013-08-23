@@ -25,6 +25,7 @@
 #include <govirt/govirt.h>
 #include "govirt/glib-compat.h"
 
+
 static gboolean
 authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
                 G_GNUC_UNUSED gboolean retrying, gpointer user_data)
@@ -39,8 +40,11 @@ authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
     return TRUE;
 }
 
+
 int main(int argc, char **argv)
 {
+    OvirtApi *api;
+    OvirtCollection *vms;
     OvirtProxy *proxy = NULL;
     OvirtVm *vm = NULL;
     OvirtVmDisplay *display = NULL;
@@ -74,13 +78,21 @@ int main(int argc, char **argv)
     }
     g_object_get(G_OBJECT(proxy), "ca-cert", &ca_cert, NULL);
 
-    ovirt_proxy_fetch_vms(proxy, &error);
+    api = ovirt_proxy_fetch_api(proxy, &error);
     if (error != NULL) {
         g_debug("failed to lookup %s: %s", argv[2], error->message);
         goto error;
     }
 
-    vm = ovirt_proxy_lookup_vm(proxy, argv[2]);
+    g_assert(api != NULL);
+    vms= ovirt_api_get_vms(api);
+    g_assert(vms != NULL);
+    ovirt_collection_fetch(vms, proxy, &error);
+    if (error != NULL) {
+        g_debug("failed to lookup %s: %s", argv[2], error->message);
+        goto error;
+    }
+    vm = OVIRT_VM(ovirt_collection_lookup_resource(vms, argv[2]));
     g_return_val_if_fail(vm != NULL, -1);
     g_object_get(G_OBJECT(vm), "state", &state, NULL);
     if (state != OVIRT_VM_STATE_UP) {

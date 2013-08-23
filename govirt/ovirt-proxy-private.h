@@ -29,6 +29,13 @@
 
 G_BEGIN_DECLS
 
+struct _OvirtProxyPrivate {
+    GHashTable *vms;
+    GByteArray *ca_cert;
+    gboolean admin_mode;
+    OvirtApi *api;
+};
+
 RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
                                             const char *href,
                                             GError **error);
