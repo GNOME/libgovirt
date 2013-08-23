@@ -407,18 +407,27 @@ static gboolean ovirt_resource_init_from_xml_real(OvirtResource *resource,
 {
     const char *guid;
     const char *href;
+    gboolean is_api;
+
+    /* Special casing the root 'api' node here is ugly,
+     * but this is the only resource-like object which does not have
+     * href/guid properties, so I prefer not to make these optional,
+     * nor to be able to make them mandatory/optional through a
+     * gobject property. So this is just hardcoded here for now...
+     */
+    is_api = OVIRT_IS_API(resource);
 
     g_return_val_if_fail(resource->priv->xml != NULL, FALSE);
 
     guid = rest_xml_node_get_attr(node, "id");
-    if (guid == NULL) {
+    if ((guid == NULL) && !is_api) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
                     "missing mandatory 'id' attribute");
         return FALSE;
     }
 
     href = rest_xml_node_get_attr(node, "href");
-    if (href == NULL) {
+    if ((href == NULL) && !is_api) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
                     "missing mandatory 'href' attribute");
         return FALSE;
