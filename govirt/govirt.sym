@@ -73,6 +73,8 @@ GOVIRT_0.2.1 {
         ovirt_storage_domain_new;
 
         ovirt_storage_domain_get_files;
+
+        ovirt_vm_get_cdroms;
 } GOVIRT_0.2.0;
 
 

@@ -24,6 +24,7 @@
 
 #include <gio/gio.h>
 #include <glib-object.h>
+#include <govirt/ovirt-collection.h>
 #include <govirt/ovirt-resource.h>
 #include <govirt/ovirt-types.h>
 
@@ -112,6 +113,9 @@ void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
 gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
                                  GAsyncResult *result,
                                  GError **err);
+
+OvirtCollection *ovirt_vm_get_cdroms(OvirtVm *vm);
+
 G_END_DECLS
 
 #endif /* __OVIRT_VM_H__ */

@@ -22,12 +22,7 @@
 
 #include <config.h>
 
-#include "ovirt-enum-types.h"
-#include "ovirt-error.h"
-#include "ovirt-proxy.h"
-#include "ovirt-rest-call.h"
-#include "ovirt-vm.h"
-#include "ovirt-vm-display.h"
+#include "govirt.h"
 #include "govirt-private.h"
 
 #include <rest/rest-xml-node.h>
@@ -46,6 +41,8 @@ static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm,
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_VM, OvirtVmPrivate))
 
 struct _OvirtVmPrivate {
+    OvirtCollection *cdroms;
+
     OvirtVmState state;
     OvirtVmDisplay *display;
 } ;
@@ -114,6 +111,7 @@ static void ovirt_vm_dispose(GObject *object)
 {
     OvirtVm *vm = OVIRT_VM(object);
 
+    g_clear_object(&vm->priv->cdroms);
     g_clear_object(&vm->priv->display);
 
     G_OBJECT_CLASS(ovirt_vm_parent_class)->dispose(object);
@@ -576,4 +574,37 @@ gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
                          FALSE);
 
     return ovirt_rest_call_finish(result, err);
+}
+
+
+/**
+ * ovirt_vm_get_cdroms:
+ * @vm: a #OvirtVm
+ *
+ * Gets a #OvirtCollection representing the list of remote cdroms from a
+ * virtual machine object.  This method does not initiate any network
+ * activity, the remote cdrom list must be then be fetched using
+ * ovirt_collection_fetch() or ovirt_collection_fetch_async().
+ *
+ * Return value: (transfer full): a #OvirtCollection representing the list
+ * of cdroms associated with @vm.
+ */
+OvirtCollection *ovirt_vm_get_cdroms(OvirtVm *vm)
+{
+    const char *href;
+
+    g_return_val_if_fail(OVIRT_IS_VM(vm), NULL);
+
+    if (vm->priv->cdroms != NULL)
+        return vm->priv->cdroms;
+
+    href = ovirt_resource_get_sub_collection(OVIRT_RESOURCE(vm), "cdroms");
+    if (href == NULL)
+        return NULL;
+
+    vm->priv->cdroms =  ovirt_collection_new(href, "cdroms",
+                                             OVIRT_TYPE_CDROM,
+                                             "cdrom");
+
+    return vm->priv->cdroms;
 }
