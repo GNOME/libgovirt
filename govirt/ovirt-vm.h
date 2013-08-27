@@ -61,19 +61,19 @@ typedef enum {
     OVIRT_VM_STATE_DOWN,
     OVIRT_VM_STATE_UP,
     OVIRT_VM_STATE_REBOOTING,
-    OVIRT_VM_STATE_POWERING_UP,
-    OVIRT_VM_STATE_POWERED_DOWN,
+    OVIRT_VM_STATE_POWERING_UP, /*< nick=powering_up >*/
+    OVIRT_VM_STATE_POWERED_DOWN, /*< nick=powered_down >*/
     OVIRT_VM_STATE_PAUSED,
     OVIRT_VM_STATE_MIGRATING,
     OVIRT_VM_STATE_UNKNOWN,
-    OVIRT_VM_STATE_NOT_RESPONDING,
-    OVIRT_VM_STATE_WAIT_FOR_LAUNCH,
-    OVIRT_VM_STATE_REBOOT_IN_PROGRESS,
-    OVIRT_VM_STATE_SAVING_STATE,
-    OVIRT_VM_STATE_RESTORING_STATE,
+    OVIRT_VM_STATE_NOT_RESPONDING, /*< nick=not_responding >*/
+    OVIRT_VM_STATE_WAIT_FOR_LAUNCH, /*< nick=wait_for_launch >*/
+    OVIRT_VM_STATE_REBOOT_IN_PROGRESS, /*< nick=reboot_in_progress >*/
+    OVIRT_VM_STATE_SAVING_STATE, /*< nick=saving_state >*/
+    OVIRT_VM_STATE_RESTORING_STATE, /*< nick=restoring_state >*/
     OVIRT_VM_STATE_SUSPENDED,
-    OVIRT_VM_STATE_IMAGE_LOCKED,
-    OVIRT_VM_STATE_POWERING_DOWN,
+    OVIRT_VM_STATE_IMAGE_LOCKED, /*< nick=image_locked >*/
+    OVIRT_VM_STATE_POWERING_DOWN, /*< nick=powering_down >*/
 } OvirtVmState;
 
 GType ovirt_vm_get_type(void);
