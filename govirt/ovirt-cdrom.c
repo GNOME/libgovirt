@@ -134,6 +134,19 @@ static gboolean ovirt_cdrom_init_from_xml(OvirtResource *resource,
 }
 
 
+static char *ovirt_cdrom_to_xml(OvirtResource *resource)
+{
+    OvirtCdrom *cdrom;
+
+    g_return_val_if_fail(OVIRT_IS_CDROM(resource), NULL);
+    cdrom = OVIRT_CDROM(resource);
+    g_return_val_if_fail(cdrom->priv->file != NULL, NULL);
+
+    return g_strdup_printf("<cdrom>\n\t<file id=\"%s\"/>\n</cdrom>",
+                           cdrom->priv->file);
+}
+
+
 static void ovirt_cdrom_class_init(OvirtCdromClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
@@ -143,6 +156,7 @@ static void ovirt_cdrom_class_init(OvirtCdromClass *klass)
     g_type_class_add_private(klass, sizeof(OvirtCdromPrivate));
 
     resource_class->init_from_xml = ovirt_cdrom_init_from_xml;
+    resource_class->to_xml = ovirt_cdrom_to_xml;
     object_class->finalize = ovirt_cdrom_finalize;
     object_class->get_property = ovirt_cdrom_get_property;
     object_class->set_property = ovirt_cdrom_set_property;
