@@ -66,6 +66,10 @@ GType ovirt_resource_get_type(void);
 const char *ovirt_resource_get_sub_collection(OvirtResource *resource,
                                               const char *sub_collection);
 
+gboolean ovirt_resource_update(OvirtResource *resource,
+                               OvirtProxy *proxy,
+                               GError **error);
+
 G_END_DECLS
 
 #endif /* __OVIRT_RESOURCE_H__ */
