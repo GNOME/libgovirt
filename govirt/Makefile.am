@@ -36,6 +36,7 @@ noinst_HEADERS =						\
 	ovirt-proxy-private.h					\
 	ovirt-resource-private.h				\
 	ovirt-rest-call.h					\
+	ovirt-resource-rest-call.h				\
 	ovirt-storage-domain-private.h				\
 	ovirt-utils.h						\
 	ovirt-vm-private.h					\
@@ -51,6 +52,7 @@ libgovirt_la_SOURCES =						\
 	ovirt-proxy-deprecated.c				\
 	ovirt-resource.c					\
 	ovirt-rest-call.c					\
+	ovirt-resource-rest-call.c				\
 	ovirt-storage-domain.c					\
 	ovirt-utils.c						\
 	ovirt-vm.c						\
