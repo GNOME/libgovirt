@@ -28,8 +28,6 @@
 
 G_BEGIN_DECLS
 
-#define OVIRT_API_BASE_DIR "/api/"
-
 typedef enum {
     OVIRT_VM_ACTION_SHUTDOWN,
     OVIRT_VM_ACTION_START,

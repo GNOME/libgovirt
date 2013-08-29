@@ -27,6 +27,8 @@
 
 G_BEGIN_DECLS
 
+#define OVIRT_API_BASE_DIR "/api/"
+
 RestXmlNode *ovirt_rest_xml_node_from_call(RestProxyCall *call);
 const char *ovirt_rest_xml_node_get_content(RestXmlNode *node, ...);
 
@@ -34,6 +36,7 @@ const char *ovirt_utils_genum_get_nick (GType enum_type, gint value);
 int ovirt_utils_genum_get_value (GType enum_type, const char *nick,
                                  gint default_value);
 gboolean ovirt_utils_boolean_from_string(const char *value);
+const char *ovirt_utils_strip_api_base_dir(const char *path);
 
 G_END_DECLS
 

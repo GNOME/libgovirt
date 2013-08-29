@@ -131,16 +131,6 @@ static void dump_vm(OvirtVm *vm)
 #endif
 
 
-static const char *ovirt_rest_strip_api_base_dir(const char *path)
-{
-    if (g_str_has_prefix(path, OVIRT_API_BASE_DIR)) {
-        g_debug("stripping %s from %s", OVIRT_API_BASE_DIR, path);
-        path += strlen(OVIRT_API_BASE_DIR);
-    }
-
-    return path;
-}
-
 RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
                                             const char *href,
                                             GError **error)
@@ -151,7 +141,7 @@ RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
 
     call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
-    href = ovirt_rest_strip_api_base_dir(href);
+    href = ovirt_utils_strip_api_base_dir(href);
     rest_proxy_call_set_function(call, href);
     rest_proxy_call_add_header(call, "All-Content", "true");
 
@@ -252,7 +242,7 @@ void ovirt_rest_call_async(OvirtProxy *proxy,
     if (method != NULL) {
         rest_proxy_call_set_method(call, method);
     }
-    href = ovirt_rest_strip_api_base_dir(href);
+    href = ovirt_utils_strip_api_base_dir(href);
     rest_proxy_call_set_function(call, href);
     /* FIXME: to set or not to set ?? */
     rest_proxy_call_add_header(call, "All-Content", "true");

@@ -22,6 +22,8 @@
 
 #include <config.h>
 
+#include <string.h>
+
 #include <rest/rest-xml-parser.h>
 
 #include "ovirt-utils.h"
@@ -120,4 +122,15 @@ ovirt_utils_boolean_from_string(const char *value)
     g_return_val_if_fail(value != NULL, FALSE);
 
     return (g_strcmp0(value, "true") == 0);
+}
+
+
+G_GNUC_INTERNAL const char *ovirt_utils_strip_api_base_dir(const char *path)
+{
+    if (g_str_has_prefix(path, OVIRT_API_BASE_DIR)) {
+        g_debug("stripping %s from %s", OVIRT_API_BASE_DIR, path);
+        path += strlen(OVIRT_API_BASE_DIR);
+    }
+
+    return path;
 }

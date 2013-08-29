@@ -28,7 +28,6 @@
 #include <rest/rest-xml-node.h>
 #include <rest/rest-xml-parser.h>
 #include <stdlib.h>
-#include <string.h>
 
 typedef gboolean (*ActionResponseParser)(RestXmlNode *node, OvirtVm *vm, GError **error);
 static gboolean parse_action_response(RestProxyCall *call, OvirtVm *vm,
@@ -303,20 +302,6 @@ ovirt_vm_stop_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
     return ovirt_vm_action_finish(vm, result, err);
 }
 
-static const char *ovirt_rest_strip_api_base_dir(const char *path)
-{
-    if (g_str_has_prefix(path, OVIRT_API_BASE_DIR)) {
-        path += strlen(OVIRT_API_BASE_DIR);
-    } else {
-        /* action href should always be prefixed by /api/ */
-        /* it would be easier to remove /api/ from the RestProxy base
-         * URL but unfortunately I couldn't get this to work
-         */
-        g_warn_if_reached();
-    }
-
-    return path;
-}
 
 static gboolean
 ovirt_vm_action(OvirtVm *vm, OvirtProxy *proxy, const char *action,
@@ -331,7 +316,7 @@ ovirt_vm_action(OvirtVm *vm, OvirtProxy *proxy, const char *action,
     g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
 
     function = ovirt_resource_get_action(OVIRT_RESOURCE(vm), action);
-    function = ovirt_rest_strip_api_base_dir(function);
+    function = ovirt_utils_strip_api_base_dir(function);
     g_return_val_if_fail(function != NULL, FALSE);
 
     call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
