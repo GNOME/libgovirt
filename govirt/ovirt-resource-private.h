@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 
 const char *ovirt_resource_get_action(OvirtResource *resource,
                                       const char *action);
+char *ovirt_resource_to_xml(OvirtResource *resource);
 
 G_END_DECLS
 

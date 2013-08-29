@@ -456,3 +456,17 @@ static gboolean ovirt_resource_init_from_xml(OvirtResource *resource,
 
     return klass->init_from_xml(resource, node, error);
 }
+
+
+char *ovirt_resource_to_xml(OvirtResource *resource)
+{
+    OvirtResourceClass *klass;
+
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), NULL);
+
+    klass = OVIRT_RESOURCE_GET_CLASS(resource);
+    if (klass->to_xml == NULL)
+        return NULL;
+
+    return klass->to_xml(resource);
+}

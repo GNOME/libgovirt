@@ -56,8 +56,9 @@ struct _OvirtResourceClass
     gboolean (*init_from_xml)(OvirtResource *resource,
                               RestXmlNode *node,
                               GError **error);
+    char *(*to_xml)(OvirtResource *resource);
 
-    gpointer padding[20];
+    gpointer padding[19];
 };
 
 GType ovirt_resource_get_type(void);
