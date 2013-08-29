@@ -91,12 +91,27 @@ static gboolean ovirt_cdrom_refresh_from_xml(OvirtCdrom *cdrom,
     RestXmlNode *file_node;
     const char *file;
     const char *file_key = g_intern_string("file");
+    char *name;
 
     file_node = g_hash_table_lookup(node->children, file_key);
     if (file_node == NULL)
         return FALSE;
     file = rest_xml_node_get_attr(file_node, "id");
     cdrom->priv->file = g_strdup(file);
+
+    g_object_get(G_OBJECT(cdrom), "name", &name, NULL);
+    if (name == NULL) {
+        /* Build up fake name as ovirt_collection_refresh_from_xml()
+         * expects it to be set (it uses it as a hash table key), but
+         * it's not set in oVirt XML as of 3.2. There can only be
+         * one cdrom node in an oVirt VM so this should be good
+         * enough for now
+         */
+        g_debug("Setting fake 'name' for cdrom resource");
+        g_object_set(G_OBJECT(cdrom), "name", "cdrom0", NULL);
+    } else {
+        g_free(name);
+    }
 
     return TRUE;
 }
@@ -137,7 +152,6 @@ static void ovirt_cdrom_class_init(OvirtCdromClass *klass)
                                      "Name of the CD image",
                                      NULL,
                                      G_PARAM_READWRITE |
-                                     G_PARAM_CONSTRUCT_ONLY |
                                      G_PARAM_STATIC_STRINGS);
     g_object_class_install_property(object_class,
                                     PROP_FILE,
