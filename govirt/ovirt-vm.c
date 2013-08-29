@@ -446,25 +446,6 @@ static enum OvirtResponseStatus parse_action_status(RestXmlNode *root,
     g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
 }
 
-static void parse_fault(RestXmlNode *root, GError **error)
-{
-    RestXmlNode *reason_node;
-    RestXmlNode *detail_node;
-    const char *reason_key = g_intern_string("reason");
-    const char *detail_key = g_intern_string("detail");
-
-    g_return_if_fail(g_strcmp0(root->name, "fault") == 0);
-
-    reason_node = g_hash_table_lookup(root->children, reason_key);
-    if (reason_node == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'reason' node");
-        g_return_if_reached();
-    }
-    g_debug("Reason: %s\n", root->content);
-    detail_node = g_hash_table_lookup(root->children, detail_key);
-    g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_FAILED, "%s: %s", reason_node->content,
-                (detail_node == NULL)?"":detail_node->content);
-}
 
 static gboolean
 parse_action_response(RestProxyCall *call, OvirtVm *vm,
@@ -493,7 +474,7 @@ parse_action_response(RestProxyCall *call, OvirtVm *vm,
 
             fault_node = g_hash_table_lookup(root->children, fault_key);
             if (fault_node != NULL) {
-                parse_fault(fault_node, &fault_error);
+                ovirt_utils_gerror_from_xml_fault(fault_node, &fault_error);
                 if (fault_error != NULL) {
                     g_clear_error(error);
                     g_propagate_error(error, fault_error);

@@ -28,6 +28,8 @@
 
 #include "ovirt-utils.h"
 
+#include "ovirt-error.h"
+
 RestXmlNode *
 ovirt_rest_xml_node_from_call(RestProxyCall *call)
 {
@@ -133,4 +135,35 @@ G_GNUC_INTERNAL const char *ovirt_utils_strip_api_base_dir(const char *path)
     }
 
     return path;
+}
+
+
+G_GNUC_INTERNAL gboolean ovirt_utils_gerror_from_xml_fault(RestXmlNode *root, GError **error)
+{
+    RestXmlNode *reason_node;
+    RestXmlNode *detail_node;
+    const char *reason_key = g_intern_string("reason");
+    const char *detail_key = g_intern_string("detail");
+
+    g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
+
+    if (g_strcmp0(root->name, "fault") != 0)
+        return FALSE;
+
+    reason_node = g_hash_table_lookup(root->children, reason_key);
+    if (reason_node == NULL) {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'reason' node");
+        g_return_val_if_reached(FALSE);
+    }
+    g_debug("Reason: %s\n", reason_node->content);
+    detail_node = g_hash_table_lookup(root->children, detail_key);
+    if (detail_node != NULL) {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_FAILED, "%s: %s",
+                    reason_node->content, detail_node->content);
+    } else {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_FAILED, "%s",
+                    reason_node->content);
+    }
+
+    return TRUE;
 }

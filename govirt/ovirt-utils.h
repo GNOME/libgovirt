@@ -31,6 +31,7 @@ G_BEGIN_DECLS
 
 RestXmlNode *ovirt_rest_xml_node_from_call(RestProxyCall *call);
 const char *ovirt_rest_xml_node_get_content(RestXmlNode *node, ...);
+gboolean ovirt_utils_gerror_from_xml_fault(RestXmlNode *root, GError **error);
 
 const char *ovirt_utils_genum_get_nick (GType enum_type, gint value);
 int ovirt_utils_genum_get_value (GType enum_type, const char *nick,
