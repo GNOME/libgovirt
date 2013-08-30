@@ -22,6 +22,9 @@
 
 #include <config.h>
 #include "ovirt-cdrom.h"
+#include "ovirt-proxy.h"
+#include "ovirt-resource-private.h"
+#include "ovirt-resource-rest-call.h"
 
 #define OVIRT_CDROM_GET_PRIVATE(obj)                         \
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_CDROM, OvirtCdromPrivate))
@@ -176,4 +179,27 @@ static void ovirt_cdrom_class_init(OvirtCdromClass *klass)
 static void ovirt_cdrom_init(OvirtCdrom *cdrom)
 {
     cdrom->priv = OVIRT_CDROM_GET_PRIVATE(cdrom);
+}
+
+
+gboolean ovirt_cdrom_update(OvirtCdrom *cdrom,
+                            gboolean current,
+                            OvirtProxy *proxy,
+                            GError **error)
+{
+    OvirtRestCall *call;
+    gboolean success;
+
+    call = OVIRT_REST_CALL(ovirt_resource_rest_call_new(REST_PROXY(proxy),
+                                                        OVIRT_RESOURCE(cdrom)));
+    rest_proxy_call_set_method(REST_PROXY_CALL(call), "PUT");
+
+    if (current) {
+        rest_proxy_call_add_param(REST_PROXY_CALL(call), "current", NULL);
+    }
+    success = ovirt_resource_rest_call_sync(call, error);
+
+    g_object_unref(G_OBJECT(call));
+
+    return success;
 }

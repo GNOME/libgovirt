@@ -58,6 +58,9 @@ struct _OvirtCdromClass
 
 GType ovirt_cdrom_get_type(void);
 
+gboolean ovirt_cdrom_update(OvirtCdrom *cdrom, gboolean current,
+                            OvirtProxy *proxy, GError **error);
+
 G_END_DECLS
 
 #endif /* __OVIRT_CDROM_H__ */
