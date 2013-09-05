@@ -219,6 +219,7 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
                              GAsyncReadyCallback callback,
                              gpointer user_data)
 {
+    OvirtRestCall *call;
     GSimpleAsyncResult *result;
     const char *function;
     OvirtVmInvokeActionData *data;
@@ -239,7 +240,9 @@ ovirt_vm_invoke_action_async(OvirtVm *vm,
     data->vm = vm;
     data->parser = response_parser;
 
-    ovirt_rest_call_async(proxy, "POST", function, result, cancellable,
+    call = ovirt_rest_call_new(proxy, "POST", function);
+
+    ovirt_rest_call_async(call, result, cancellable,
                           ovirt_vm_invoke_action_async_cb, data,
                           (GDestroyNotify)ovirt_vm_invoke_action_data_free);
 }
@@ -515,6 +518,7 @@ void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
                             GAsyncReadyCallback callback,
                             gpointer user_data)
 {
+    OvirtRestCall *call;
     GSimpleAsyncResult *result;
     char *href;
 
@@ -526,7 +530,8 @@ void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
                                        user_data,
                                        ovirt_vm_refresh_async);
     g_object_get(G_OBJECT(vm), "href", &href, NULL);
-    ovirt_rest_call_async(proxy, "GET", href, result, cancellable,
+    call = ovirt_rest_call_new(proxy, "GET", href);
+    ovirt_rest_call_async(call, result, cancellable,
                           ovirt_vm_refresh_async_cb, vm, NULL);
     g_free(href);
 }

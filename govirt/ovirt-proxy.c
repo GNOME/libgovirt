@@ -222,33 +222,45 @@ call_async_cb(RestProxyCall *call, const GError *error,
     ovirt_proxy_call_async_data_free(data);
 }
 
-void ovirt_rest_call_async(OvirtProxy *proxy,
-                           const char *method,
-                           const char *href,
+
+OvirtRestCall *ovirt_rest_call_new(OvirtProxy *proxy,
+                                   const char *method,
+                                   const char *href)
+{
+    OvirtRestCall *call;
+
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
+
+    call = OVIRT_REST_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
+    if (method != NULL) {
+        rest_proxy_call_set_method(REST_PROXY_CALL(call), method);
+    }
+    href = ovirt_utils_strip_api_base_dir(href);
+    rest_proxy_call_set_function(REST_PROXY_CALL(call), href);
+    /* FIXME: to set or not to set ?? */
+    rest_proxy_call_add_header(REST_PROXY_CALL(call), "All-Content", "true");
+
+    return call;
+}
+
+
+void ovirt_rest_call_async(OvirtRestCall *call,
                            GSimpleAsyncResult *result,
                            GCancellable *cancellable,
                            OvirtProxyCallAsyncCb callback,
                            gpointer user_data,
                            GDestroyNotify destroy_func)
 {
-    RestProxyCall *call;
+    OvirtProxy *proxy;
     GError *error;
     OvirtProxyCallAsyncData *data;
 
-    g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
-
-    call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
-    if (method != NULL) {
-        rest_proxy_call_set_method(call, method);
-    }
-    href = ovirt_utils_strip_api_base_dir(href);
-    rest_proxy_call_set_function(call, href);
-    /* FIXME: to set or not to set ?? */
-    rest_proxy_call_add_header(call, "All-Content", "true");
+    g_object_get(G_OBJECT(call), "proxy", &proxy, NULL);
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
 
     data = g_slice_new0(OvirtProxyCallAsyncData);
-    data->proxy = g_object_ref(proxy);
+    data->proxy = proxy;
     data->result = result;
     data->call_async_cb = callback;
     data->call_user_data = user_data;
@@ -259,7 +271,8 @@ void ovirt_rest_call_async(OvirtProxy *proxy,
                                                         call, NULL);
     }
 
-    if (!rest_proxy_call_async(call, call_async_cb, NULL, data, &error)) {
+    if (!rest_proxy_call_async(REST_PROXY_CALL(call), call_async_cb, NULL,
+                               data, &error)) {
         g_warning("Error while getting collection XML");
         g_simple_async_result_set_from_error(result, error);
         g_simple_async_result_complete(result);
@@ -267,6 +280,7 @@ void ovirt_rest_call_async(OvirtProxy *proxy,
         ovirt_proxy_call_async_data_free(data);
     }
 }
+
 
 gboolean ovirt_rest_call_finish(GAsyncResult *result, GError **err)
 {
@@ -333,13 +347,17 @@ void ovirt_proxy_get_collection_xml_async(OvirtProxy *proxy,
                                           GDestroyNotify destroy_func)
 {
     OvirtProxyGetCollectionAsyncData *data;
+    OvirtRestCall *call;
 
     data = g_slice_new0(OvirtProxyGetCollectionAsyncData);
     data->parser = callback;
     data->user_data = user_data;
     data->destroy_user_data = destroy_func;
 
-    ovirt_rest_call_async(proxy, "GET", href, result, cancellable,
+    call = ovirt_rest_call_new(proxy, "GET", href);
+
+
+    ovirt_rest_call_async(call, result, cancellable,
                           get_collection_xml_async_cb, data,
                           (GDestroyNotify)ovirt_proxy_get_collection_async_data_destroy);
 }

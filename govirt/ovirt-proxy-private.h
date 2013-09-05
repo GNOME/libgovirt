@@ -22,10 +22,10 @@
 #ifndef __OVIRT_PROXY_PRIVATE_H__
 #define __OVIRT_PROXY_PRIVATE_H__
 
-#include <rest/rest-proxy-call.h>
 #include <rest/rest-xml-node.h>
 
 #include "ovirt-proxy.h"
+#include "ovirt-rest-call.h"
 
 G_BEGIN_DECLS
 
@@ -55,9 +55,10 @@ typedef gboolean (*OvirtProxyCallAsyncCb)(OvirtProxy *proxy,
                                           RestProxyCall *call,
                                           gpointer user_data,
                                           GError **error);
-void ovirt_rest_call_async(OvirtProxy *proxy,
-                           const char *method,
-                           const char *href,
+OvirtRestCall *ovirt_rest_call_new(OvirtProxy *proxy,
+                                   const char *method,
+                                   const char *href);
+void ovirt_rest_call_async(OvirtRestCall *call,
                            GSimpleAsyncResult *result,
                            GCancellable *cancellable,
                            OvirtProxyCallAsyncCb callback,

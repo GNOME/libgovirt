@@ -23,14 +23,14 @@
 #define __OVIRT_RESOURCE_PRIVATE_H__
 
 #include <ovirt-resource.h>
+#include <ovirt-rest-call.h>
 
 G_BEGIN_DECLS
 
 const char *ovirt_resource_get_action(OvirtResource *resource,
                                       const char *action);
 char *ovirt_resource_to_xml(OvirtResource *resource);
-gboolean ovirt_resource_rest_call(OvirtResource *resource, OvirtProxy *proxy,
-                                  const char *method, GError **error);
+gboolean ovirt_resource_rest_call_sync(OvirtRestCall *call, GError **error);
 
 G_END_DECLS
 

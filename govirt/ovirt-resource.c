@@ -472,37 +472,46 @@ char *ovirt_resource_to_xml(OvirtResource *resource)
 }
 
 
-G_GNUC_INTERNAL gboolean ovirt_resource_rest_call(OvirtResource *resource,
-                                                  OvirtProxy *proxy,
-                                                  const char *method,
-                                                  GError **error)
+G_GNUC_INTERNAL gboolean ovirt_resource_rest_call_sync(OvirtRestCall *call,
+                                                       GError **error)
 {
-    RestProxyCall *call;
-
-    call = REST_PROXY_CALL(ovirt_resource_rest_call_new(REST_PROXY(proxy), resource));
-    rest_proxy_call_set_method(call, method);
-    rest_proxy_call_add_param(call, "async", "false");
-
-    if (!rest_proxy_call_sync(call, error)) {
+    if (!rest_proxy_call_sync(REST_PROXY_CALL(call), error)) {
         RestXmlNode *root;
         GError *local_error = NULL;
 
-        root = ovirt_rest_xml_node_from_call(call);
+        root = ovirt_rest_xml_node_from_call(REST_PROXY_CALL(call));
         ovirt_utils_gerror_from_xml_fault(root, &local_error);
         if (local_error != NULL) {
             g_clear_error(error);
+            g_warning("Error while updating resource");
+            g_warning("message: %s", local_error->message);
             g_propagate_error(error, local_error);
         }
-        g_warning("Error while updating %p", resource);
-        g_warning("message: %s", (*error)->message);
-        g_object_unref(G_OBJECT(call));
 
         return FALSE;
     }
 
+    return TRUE;
+}
+
+
+static gboolean ovirt_resource_rest_call(OvirtResource *resource,
+                                         OvirtProxy *proxy,
+                                         const char *method,
+                                         GError **error)
+{
+    OvirtRestCall *call;
+    gboolean success;
+
+    call = OVIRT_REST_CALL(ovirt_resource_rest_call_new(REST_PROXY(proxy),
+                                                        resource));
+    rest_proxy_call_set_method(REST_PROXY_CALL(call), method);
+
+    success = ovirt_resource_rest_call_sync(call, error);
+
     g_object_unref(G_OBJECT(call));
 
-    return TRUE;
+    return success;
 }
 
 
