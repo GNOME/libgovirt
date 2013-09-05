@@ -34,16 +34,84 @@
 
 
 struct _OvirtRestCallPrivate {
-    gboolean unused;
+    char *href;
 };
 
 
 G_DEFINE_ABSTRACT_TYPE(OvirtRestCall, ovirt_rest_call, REST_TYPE_PROXY_CALL);
 
 
+enum {
+    PROP_0,
+    PROP_METHOD,
+    PROP_HREF,
+};
+
+
 GQuark ovirt_rest_call_error_quark(void)
 {
     return g_quark_from_static_string("ovirt-rest-call");
+}
+
+
+static void ovirt_rest_call_get_property(GObject *object,
+                                         guint prop_id,
+                                         GValue *value,
+                                         GParamSpec *pspec)
+{
+    OvirtRestCall *call = OVIRT_REST_CALL(object);
+
+    switch (prop_id) {
+    case PROP_METHOD: {
+        const char *method;
+
+        method = rest_proxy_call_get_method(REST_PROXY_CALL(call));
+        g_value_set_string(value, method);
+        break;
+    }
+    case PROP_HREF:
+        g_value_set_string(value, call->priv->href);
+        break;
+    default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+    }
+}
+
+
+static void ovirt_rest_call_set_property(GObject *object,
+                                         guint prop_id,
+                                         const GValue *value,
+                                         GParamSpec *pspec)
+{
+    OvirtRestCall *call = OVIRT_REST_CALL(object);
+
+    switch (prop_id) {
+    case PROP_METHOD:
+        rest_proxy_call_set_method(REST_PROXY_CALL(call),
+                                   g_value_get_string(value));
+        break;
+    case PROP_HREF: {
+        const char *function;
+
+        g_free(call->priv->href);
+        call->priv->href = g_value_dup_string(value);
+        function = ovirt_utils_strip_api_base_dir(call->priv->href);
+        rest_proxy_call_set_function(REST_PROXY_CALL(call), function);
+        break;
+    }
+    default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+    }
+}
+
+
+static void ovirt_rest_call_finalize(GObject *object)
+{
+    OvirtRestCall *call = OVIRT_REST_CALL(object);
+
+    g_free(call->priv->href);
+
+    G_OBJECT_CLASS(ovirt_rest_call_parent_class)->finalize(object);
 }
 
 
@@ -74,7 +142,29 @@ static void ovirt_rest_call_class_init(OvirtRestCallClass *klass)
 
     g_type_class_add_private(klass, sizeof(OvirtRestCallPrivate));
 
+    object_class->get_property = ovirt_rest_call_get_property;
+    object_class->set_property = ovirt_rest_call_set_property;
     object_class->constructed = ovirt_rest_call_constructed;
+    object_class->finalize = ovirt_rest_call_finalize;
+
+    param_spec = g_param_spec_string("method",
+                                     "Method",
+                                     "REST method for the call",
+                                     NULL,
+                                     G_PARAM_READWRITE |
+                                     G_PARAM_STATIC_STRINGS);
+    g_object_class_install_property(object_class,
+                                    PROP_METHOD,
+                                    param_spec);
+    param_spec = g_param_spec_string("href",
+                                     "Href",
+                                     "Resource Href",
+                                     NULL,
+                                     G_PARAM_READWRITE |
+                                     G_PARAM_STATIC_STRINGS);
+    g_object_class_install_property(object_class,
+                                    PROP_HREF,
+                                    param_spec);
 }
 
 
