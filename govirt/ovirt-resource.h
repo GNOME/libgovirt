@@ -69,6 +69,14 @@ const char *ovirt_resource_get_sub_collection(OvirtResource *resource,
 gboolean ovirt_resource_update(OvirtResource *resource,
                                OvirtProxy *proxy,
                                GError **error);
+void ovirt_resource_update_async(OvirtResource *resource,
+                                 OvirtProxy *proxy,
+                                 GCancellable *cancellable,
+                                 GAsyncReadyCallback callback,
+                                 gpointer user_data);
+gboolean ovirt_resource_update_finish(OvirtResource *resource,
+                                      GAsyncResult *result,
+                                      GError **err);
 
 G_END_DECLS
 

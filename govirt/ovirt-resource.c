@@ -28,6 +28,7 @@
 
 #include "govirt-private.h"
 #include "ovirt-error.h"
+#include "ovirt-proxy-private.h"
 #include "ovirt-resource.h"
 
 #define OVIRT_RESOURCE_GET_PRIVATE(obj)                         \
@@ -529,4 +530,58 @@ gboolean ovirt_resource_update(OvirtResource *resource,
                                                "PUT", error);
 
     return call_successful;
+}
+
+static gboolean ovirt_resource_update_async_cb(OvirtProxy *proxy, RestProxyCall *call,
+                                               gpointer user_data, GError **error)
+{
+    g_return_val_if_fail(REST_IS_PROXY_CALL(call), FALSE);
+    g_warning("foo");
+
+    /* if error */
+#if 0
+    root = ovirt_rest_xml_node_from_call(call);
+    parse_action_response(call, data->vm, data->parser, &action_error);
+    rest_xml_node_unref(root);
+#endif
+
+    return TRUE;
+}
+
+
+void ovirt_resource_update_async(OvirtResource *resource,
+                                 OvirtProxy *proxy,
+                                 GCancellable *cancellable,
+                                 GAsyncReadyCallback callback,
+                                 gpointer user_data)
+{
+    GSimpleAsyncResult *result;
+    OvirtResourceRestCall *call;
+
+    g_return_if_fail(OVIRT_IS_RESOURCE(resource));
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
+
+    result = g_simple_async_result_new(G_OBJECT(resource), callback,
+                                       user_data,
+                                       ovirt_resource_update_async);
+
+    call = ovirt_resource_rest_call_new(REST_PROXY(proxy), resource);
+    rest_proxy_call_set_method(REST_PROXY_CALL(call), "PUT");
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
+                          ovirt_resource_update_async_cb, NULL, NULL);
+}
+
+
+gboolean ovirt_resource_update_finish(OvirtResource *resource,
+                                      GAsyncResult *result,
+                                      GError **err)
+{
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
+    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(resource),
+                                                        ovirt_resource_update_async),
+                         FALSE);
+    g_return_val_if_fail((err == NULL) || (*err == NULL), FALSE);
+
+    return ovirt_rest_call_finish(result, err);
 }
