@@ -140,7 +140,7 @@ RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
 
-    call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
+    call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
     href = ovirt_utils_strip_api_base_dir(href);
     rest_proxy_call_set_function(call, href);
     rest_proxy_call_add_header(call, "All-Content", "true");
@@ -238,7 +238,7 @@ void ovirt_rest_call_async(OvirtProxy *proxy,
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
-    call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
+    call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
     if (method != NULL) {
         rest_proxy_call_set_method(call, method);
     }

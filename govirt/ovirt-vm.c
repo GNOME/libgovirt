@@ -320,7 +320,7 @@ ovirt_vm_action(OvirtVm *vm, OvirtProxy *proxy, const char *action,
     function = ovirt_utils_strip_api_base_dir(function);
     g_return_val_if_fail(function != NULL, FALSE);
 
-    call = REST_PROXY_CALL(ovirt_rest_call_new(REST_PROXY(proxy)));
+    call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
     rest_proxy_call_set_method(call, "POST");
     rest_proxy_call_set_function(call, function);
     rest_proxy_call_add_param(call, "async", "false");

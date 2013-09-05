@@ -54,7 +54,6 @@ struct _OvirtRestCallClass
 };
 
 G_GNUC_INTERNAL GType ovirt_rest_call_get_type(void);
-G_GNUC_INTERNAL OvirtRestCall *ovirt_rest_call_new(RestProxy *proxy);
 
 G_END_DECLS
 

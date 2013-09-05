@@ -23,7 +23,7 @@
 #define __OVIRT_RESOURCE_REST_CALL_H__
 
 #include <govirt/ovirt-resource.h>
-#include <rest/rest-proxy.h>
+#include <govirt/ovirt-rest-call.h>
 
 G_BEGIN_DECLS
 
@@ -40,7 +40,7 @@ typedef struct _OvirtResourceRestCallClass OvirtResourceRestCallClass;
 
 struct _OvirtResourceRestCall
 {
-    RestProxyCall parent;
+    OvirtRestCall parent;
 
     OvirtResourceRestCallPrivate *priv;
 
@@ -49,7 +49,7 @@ struct _OvirtResourceRestCall
 
 struct _OvirtResourceRestCallClass
 {
-    RestProxyCallClass parent_class;
+    OvirtRestCallClass parent_class;
 
     gpointer padding[20];
 };

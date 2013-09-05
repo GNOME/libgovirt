@@ -36,7 +36,7 @@
 struct _OvirtResourceRestCallPrivate {
     OvirtResource *resource;
 } ;
-G_DEFINE_TYPE(OvirtResourceRestCall, ovirt_resource_rest_call, REST_TYPE_PROXY_CALL);
+G_DEFINE_TYPE(OvirtResourceRestCall, ovirt_resource_rest_call, OVIRT_TYPE_REST_CALL);
 
 enum {
     PROP_0,
@@ -142,21 +142,12 @@ OvirtResourceRestCall *ovirt_resource_rest_call_new(RestProxy *proxy,
                                                     OvirtResource *resource)
 {
     OvirtResourceRestCall *call;
-    gboolean admin;
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
     call = OVIRT_RESOURCE_REST_CALL(g_object_new(OVIRT_TYPE_RESOURCE_REST_CALL,
                                                  "proxy", proxy,
                                                  "resource", resource,
                                                  NULL));
-    g_return_val_if_fail(call != NULL, NULL);
-    g_object_get(G_OBJECT(proxy), "admin", &admin, NULL);
-    if (admin) {
-        rest_proxy_call_add_header(REST_PROXY_CALL(call), "Filter", "false");
-    } else {
-        rest_proxy_call_add_header(REST_PROXY_CALL(call), "Filter", "true");
-    }
-
 
     return call;
 }
