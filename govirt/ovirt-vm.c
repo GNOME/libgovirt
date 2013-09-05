@@ -22,12 +22,13 @@
 
 #include <config.h>
 
+#include <stdlib.h>
+#include <rest/rest-xml-node.h>
+#include <rest/rest-xml-parser.h>
+
 #include "govirt.h"
 #include "govirt-private.h"
 
-#include <rest/rest-xml-node.h>
-#include <rest/rest-xml-parser.h>
-#include <stdlib.h>
 
 typedef gboolean (*ActionResponseParser)(RestXmlNode *node, OvirtVm *vm, GError **error);
 static gboolean parse_action_response(RestProxyCall *call, OvirtVm *vm,
