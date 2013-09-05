@@ -475,19 +475,12 @@ char *ovirt_resource_to_xml(OvirtResource *resource)
 G_GNUC_INTERNAL gboolean ovirt_resource_rest_call(OvirtResource *resource,
                                                   OvirtProxy *proxy,
                                                   const char *method,
-                                                  const char *href,
                                                   GError **error)
 {
     RestProxyCall *call;
-    const char *function;
-
-    g_return_val_if_fail(href != NULL, FALSE);
-
-    function = ovirt_utils_strip_api_base_dir(href);
 
     call = REST_PROXY_CALL(ovirt_resource_rest_call_new(REST_PROXY(proxy), resource));
     rest_proxy_call_set_method(call, method);
-    rest_proxy_call_set_function(call, function);
     rest_proxy_call_add_param(call, "async", "false");
 
     if (!rest_proxy_call_sync(call, error)) {
@@ -500,7 +493,7 @@ G_GNUC_INTERNAL gboolean ovirt_resource_rest_call(OvirtResource *resource,
             g_clear_error(error);
             g_propagate_error(error, local_error);
         }
-        g_warning("Error while updating %p (%s)", resource, function);
+        g_warning("Error while updating %p", resource);
         g_warning("message: %s", (*error)->message);
         g_object_unref(G_OBJECT(call));
 
@@ -517,20 +510,14 @@ gboolean ovirt_resource_update(OvirtResource *resource,
                                OvirtProxy *proxy,
                                GError **error)
 {
-    char *href;
     gboolean call_successful;
 
     g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
     g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
 
-
-    g_object_get(G_OBJECT(resource), "href", &href, NULL);
-    g_return_val_if_fail(href != NULL, FALSE);
     call_successful = ovirt_resource_rest_call(resource, proxy,
-                                               "PUT", href,
-                                               error);
-    g_free(href);
+                                               "PUT", error);
 
     return call_successful;
 }

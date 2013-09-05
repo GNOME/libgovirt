@@ -30,8 +30,7 @@ const char *ovirt_resource_get_action(OvirtResource *resource,
                                       const char *action);
 char *ovirt_resource_to_xml(OvirtResource *resource);
 gboolean ovirt_resource_rest_call(OvirtResource *resource, OvirtProxy *proxy,
-                                  const char *method, const char *href,
-                                  GError **error);
+                                  const char *method, GError **error);
 
 G_END_DECLS
 

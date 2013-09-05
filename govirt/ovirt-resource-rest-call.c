@@ -28,6 +28,7 @@
 #include "ovirt-resource-private.h"
 #include "ovirt-resource-rest-call.h"
 #include "ovirt-rest-call-error.h"
+#include "ovirt-utils.h"
 #include <rest/rest-params.h>
 
 #define OVIRT_RESOURCE_REST_CALL_GET_PRIVATE(obj)                         \
@@ -69,9 +70,16 @@ static void ovirt_resource_rest_call_set_property(GObject *object,
     OvirtResourceRestCall *call = OVIRT_RESOURCE_REST_CALL(object);
 
     switch (prop_id) {
-    case PROP_RESOURCE:
+    case PROP_RESOURCE: {
+        char *href;
+
         call->priv->resource = g_value_dup_object(value);
+        g_object_get(G_OBJECT(call->priv->resource), "href", &href, NULL);
+        g_return_if_fail(href != NULL);
+        g_object_set(object, "href", href, NULL);
+        g_free(href);
         break;
+    }
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
