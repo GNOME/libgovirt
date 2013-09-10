@@ -24,12 +24,14 @@
 
 #include <string.h>
 
+#include <libsoup/soup.h>
+#include <rest/rest-params.h>
+
 #include "ovirt-proxy.h"
 #include "ovirt-resource-private.h"
 #include "ovirt-resource-rest-call.h"
 #include "ovirt-rest-call-error.h"
 #include "ovirt-utils.h"
-#include <rest/rest-params.h>
 
 #define OVIRT_RESOURCE_REST_CALL_GET_PRIVATE(obj)                         \
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_RESOURCE_REST_CALL, OvirtResourceRestCallPrivate))
@@ -85,6 +87,30 @@ static void ovirt_resource_rest_call_set_property(GObject *object,
     }
 }
 
+
+static void append_params(OvirtResourceRestCall *call, RestParams *params)
+{
+    GHashTable *params_hash;
+
+    params_hash = rest_params_as_string_hash_table(params);
+    if (g_hash_table_size(params_hash) > 0) {
+        char *serialized_params;
+        char *href;
+        char *new_href;
+
+        serialized_params = soup_form_encode_hash(params_hash);
+        g_object_get(G_OBJECT(call), "href", &href, NULL);
+        new_href = g_strconcat(href, "?", serialized_params, NULL);
+        g_object_set(G_OBJECT(call), "href", new_href, NULL);
+        g_warning("PARAMS: [%s]", serialized_params);
+        g_warning("NEW HREF: [%s]", new_href);
+        g_free(new_href);
+        g_free(href);
+        g_free(serialized_params);
+    }
+    g_hash_table_unref(params_hash);
+}
+
 static gboolean ovirt_resource_rest_call_class_serialize_params(RestProxyCall *call,
                                                                 gchar **content_type,
                                                                 gchar **content,
@@ -92,6 +118,7 @@ static gboolean ovirt_resource_rest_call_class_serialize_params(RestProxyCall *c
                                                                 GError **error)
 {
     OvirtResourceRestCall *self;
+    RestParams *params;
 
     g_return_val_if_fail(OVIRT_IS_RESOURCE_REST_CALL(call), FALSE);
     g_return_val_if_fail(content_type != NULL, FALSE);
@@ -103,6 +130,14 @@ static gboolean ovirt_resource_rest_call_class_serialize_params(RestProxyCall *c
     *content_type = g_strdup("application/xml");
     *content = ovirt_resource_to_xml(self->priv->resource);
     *content_len = strlen(*content);
+
+    params = rest_proxy_call_get_params(call);
+    if (!rest_params_are_strings(params)) {
+        g_set_error(error, OVIRT_REST_CALL_ERROR, 0,
+                    "unexpected parameter type in REST call");
+        return FALSE;
+    }
+    append_params(self, params);
 
     return TRUE;
 }
