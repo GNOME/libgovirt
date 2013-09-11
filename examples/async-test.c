@@ -48,20 +48,48 @@ authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
 }
 
 
+static void updated_cdrom_cb(GObject *source_object,
+                            GAsyncResult *result,
+                            gpointer user_data)
+{
+    GError *error = NULL;
+    g_warning("updated cdrom cb");
+    ovirt_cdrom_update_finish(OVIRT_CDROM(source_object),
+                              result, &error);
+    if (error != NULL) {
+        g_debug("failed to update cdrom resource: %s", error->message);
+    }
+
+    g_main_loop_quit(main_loop);
+}
+
+
 static void cdroms_fetched_cb(GObject *source_object,
                               GAsyncResult *result,
                               gpointer user_data)
 {
     OvirtCollection *cdroms = OVIRT_COLLECTION(source_object);
     GError *error = NULL;
+    GList *it;
+    GHashTable *resources;
+    AsyncData *data = (AsyncData *)user_data;
 
+    g_debug("fetched CDROMs");
     ovirt_collection_fetch_finish(cdroms, result, &error);
     if (error != NULL) {
         g_debug("failed to fetch cdroms collection: %s", error->message);
         g_main_loop_quit(main_loop);
         return;
     }
-    g_main_loop_quit(main_loop);
+    g_debug("updating CDROM");
+    resources = ovirt_collection_get_resources(cdroms);
+    for (it = g_hash_table_get_values(resources); it != NULL; it = it->next) {
+        g_assert(OVIRT_IS_CDROM(it->data));
+        g_object_set(G_OBJECT(it->data), "file", "newimage.iso", NULL);
+        ovirt_cdrom_update_async(OVIRT_CDROM(it->data), FALSE, data->proxy, NULL,
+                                    updated_cdrom_cb, user_data);
+
+    }
 }
 
 static void got_ticket_cb(GObject *source_object,
@@ -113,7 +141,7 @@ static void got_ticket_cb(GObject *source_object,
     cdroms = ovirt_vm_get_cdroms(vm);
     g_assert(cdroms != NULL);
     ovirt_collection_fetch_async(cdroms, data->proxy, NULL,
-                                 cdroms_fetched_cb, NULL);
+                                 cdroms_fetched_cb, data);
 }
 
 static void vm_started_cb(GObject *source_object,
@@ -201,8 +229,8 @@ static void api_fetched_cb(GObject *source_object,
 }
 
 static void fetched_ca_cert_cb(GObject *source_object,
-                        GAsyncResult *result,
-                        gpointer user_data)
+                               GAsyncResult *result,
+                               gpointer user_data)
 {
     GError *error = NULL;
     GByteArray *ca_cert;
