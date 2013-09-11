@@ -1,3 +1,21 @@
+0.3.0 -
+====================
+
+Changes since 0.2.0:
+
+- Add support for listing storage domains and the files they contain
+- Add support for changing the CDRom available in a VM
+- Introduced an OvirtApi class which represents the toplevel oVirt
+  collection from which one can access VMs, storage domains, ...
+  This means that various OvirtProxy methods to fetch VMs have been deprecated
+  in favour of using OvirtApi + OvirtCollection methods
+- Rework certificate handling, OvirtProxy now has a 'ssl-ca-file' property
+  that can be used to specify which CA certificate should be used to validate
+  remote certificates.
+- Certificate checking is now enforced by default unless
+  OvirtProxy::ssl-strict is set to FALSE
+- ABI/API hasn't been broken, even though some functions were deprecated
+
 0.2.0 - July 5, 2013
 ====================
 

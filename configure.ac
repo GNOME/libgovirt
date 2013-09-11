@@ -3,7 +3,7 @@
 AC_PREREQ(2.63)
 
 m4_define([govirt_major_version], [0])
-m4_define([govirt_minor_version], [2])
+m4_define([govirt_minor_version], [3])
 m4_define([govirt_micro_version], [0])
 m4_define([govirt_version],
           [govirt_major_version.govirt_minor_version.govirt_micro_version])
@@ -38,9 +38,9 @@ AC_SUBST(G_OVIRT_MICRO_VERSION)
 # CURRENT	If the API or ABI interface has changed (reset REVISION to 0)
 # REVISION	If the API and ABI remains the same, but bugs are fixed.
 # AGE		Don't use.
-LT_CURRENT=2
+LT_CURRENT=3
 LT_REVISION=0
-LT_AGE=0
+LT_AGE=1
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
