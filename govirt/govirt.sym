@@ -57,6 +57,8 @@ GOVIRT_0.2.1 {
 
         ovirt_cdrom_get_type;
         ovirt_cdrom_update;
+        ovirt_cdrom_update_async;
+        ovirt_cdrom_update_finish;
 
         ovirt_collection_fetch;
         ovirt_collection_fetch_async;

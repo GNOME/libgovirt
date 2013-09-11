@@ -23,6 +23,7 @@
 #include <config.h>
 #include "ovirt-cdrom.h"
 #include "ovirt-proxy.h"
+#include "ovirt-proxy-private.h"
 #include "ovirt-resource-private.h"
 #include "ovirt-resource-rest-call.h"
 
@@ -202,4 +203,47 @@ gboolean ovirt_cdrom_update(OvirtCdrom *cdrom,
     g_object_unref(G_OBJECT(call));
 
     return success;
+}
+
+
+void ovirt_cdrom_update_async(OvirtCdrom *cdrom,
+                              gboolean current,
+                              OvirtProxy *proxy,
+                              GCancellable *cancellable,
+                              GAsyncReadyCallback callback,
+                              gpointer user_data)
+{
+
+    GSimpleAsyncResult *result;
+    OvirtResourceRestCall *call;
+
+    g_return_if_fail(OVIRT_IS_CDROM(cdrom));
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
+
+    result = g_simple_async_result_new(G_OBJECT(cdrom), callback,
+                                       user_data,
+                                       ovirt_cdrom_update_async);
+
+    call = ovirt_resource_rest_call_new(REST_PROXY(proxy), OVIRT_RESOURCE(cdrom));
+    rest_proxy_call_set_method(REST_PROXY_CALL(call), "PUT");
+    if (current) {
+        rest_proxy_call_add_param(REST_PROXY_CALL(call), "current", NULL);
+    }
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
+                          NULL, NULL, NULL);
+}
+
+
+gboolean ovirt_cdrom_update_finish(OvirtCdrom *cdrom,
+                                   GAsyncResult *result,
+                                   GError **err)
+{
+    g_return_val_if_fail(OVIRT_IS_CDROM(cdrom), FALSE);
+    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(cdrom),
+                                                        ovirt_cdrom_update_async),
+                         FALSE);
+    g_return_val_if_fail((err == NULL) || (*err == NULL), FALSE);
+
+    return ovirt_rest_call_finish(result, err);
 }

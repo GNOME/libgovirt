@@ -61,6 +61,16 @@ GType ovirt_cdrom_get_type(void);
 gboolean ovirt_cdrom_update(OvirtCdrom *cdrom, gboolean current,
                             OvirtProxy *proxy, GError **error);
 
+void ovirt_cdrom_update_async(OvirtCdrom *cdrom,
+                              gboolean current,
+                              OvirtProxy *proxy,
+                              GCancellable *cancellable,
+                                  GAsyncReadyCallback callback,
+                                  gpointer user_data);
+gboolean ovirt_cdrom_update_finish(OvirtCdrom *cdrom,
+                                   GAsyncResult *result,
+                                   GError **err);
+
 G_END_DECLS
 
 #endif /* __OVIRT_CDROM_H__ */
