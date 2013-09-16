@@ -19,6 +19,7 @@ libgovirt_la_HEADERS =						\
 	ovirt-cdrom.h						\
 	ovirt-collection.h					\
 	ovirt-error.h						\
+	ovirt-options.h						\
 	ovirt-proxy.h						\
 	ovirt-resource.h					\
 	ovirt-rest-call-error.h					\
@@ -50,6 +51,7 @@ libgovirt_la_SOURCES =						\
 	ovirt-cdrom.c						\
 	ovirt-collection.c					\
 	ovirt-error.c						\
+	ovirt-options.c						\
 	ovirt-proxy.c						\
 	ovirt-proxy-deprecated.c				\
 	ovirt-resource.c					\

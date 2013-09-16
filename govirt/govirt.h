@@ -27,6 +27,7 @@
 #include <govirt/ovirt-cdrom.h>
 #include <govirt/ovirt-collection.h>
 #include <govirt/ovirt-error.h>
+#include <govirt/ovirt-options.h>
 #include <govirt/ovirt-proxy.h>
 #include <govirt/ovirt-resource.h>
 #include <govirt/ovirt-rest-call-error.h>

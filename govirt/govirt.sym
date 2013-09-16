@@ -50,6 +50,9 @@ GOVIRT_0.2.0 {
 };
 
 GOVIRT_0.2.1 {
+        ovirt_get_option_group;
+        ovirt_set_proxy_options;
+
         ovirt_api_get_type;
         ovirt_api_new;
         ovirt_api_get_vms;
