@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 
 struct _OvirtProxyPrivate {
     GHashTable *vms;
-    GByteArray *ca_cert;
+    char *tmp_ca_file;
     gboolean admin_mode;
     OvirtApi *api;
 };

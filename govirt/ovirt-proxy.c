@@ -49,6 +49,12 @@ enum {
 
 #define CA_CERT_FILENAME "ca.crt"
 
+static gboolean set_ca_cert_from_data(OvirtProxy *proxy,
+                                      char *ca_cert_data,
+                                      gsize ca_cert_len);
+static GByteArray *get_ca_cert_data(OvirtProxy *proxy);
+static void ovirt_proxy_set_tmp_ca_file(OvirtProxy *proxy, const char *ca_file);
+
 #ifdef OVIRT_DEBUG
 static void dump_display(OvirtVmDisplay *display)
 {
@@ -392,15 +398,110 @@ error:
     return ca_file;
 }
 
-static void set_downloaded_ca_cert(OvirtProxy *proxy,
-                                   char *ca_cert_data,
-                                   gsize ca_cert_len)
+static GByteArray *get_ca_cert_data(OvirtProxy *proxy)
 {
-    if (proxy->priv->ca_cert != NULL)
-        g_byte_array_unref(proxy->priv->ca_cert);
-    proxy->priv->ca_cert = g_byte_array_new_take((guint8 *)ca_cert_data,
-                                                 ca_cert_len);
+    char *ca_file;
+    char *content;
+    gsize length;
+    GError *error = NULL;
+    gboolean read_success;
+
+    g_object_get(G_OBJECT(proxy), "ssl-ca-file", &ca_file, NULL);
+    if (ca_file == NULL) {
+        return NULL;
+    }
+    read_success = g_file_get_contents(ca_file, &content, &length, &error);
+    if (!read_success) {
+        if (error != NULL) {
+            g_warning("Couldn't read %s: %s", ca_file, error->message);
+        } else {
+            g_warning("Couldn't read %s", ca_file);
+        }
+        g_free(ca_file);
+        return NULL;
+    }
+    g_free(ca_file);
+
+    return g_byte_array_new_take((guchar *)content, length);
+}
+
+static void ovirt_proxy_set_tmp_ca_file(OvirtProxy *proxy, const char *ca_file)
+{
+    if (proxy->priv->tmp_ca_file != NULL) {
+        int unlink_failed;
+        unlink_failed = g_unlink(proxy->priv->tmp_ca_file);
+        if (unlink_failed == -1) {
+            g_warning("Failed to unlink '%s'", proxy->priv->tmp_ca_file);
+        }
+        g_free(proxy->priv->tmp_ca_file);
+    }
+    proxy->priv->tmp_ca_file = g_strdup(ca_file);
+    if (ca_file != NULL) {
+        g_object_set(G_OBJECT(proxy), "ssl-ca-file", ca_file, NULL);
+    }
+}
+
+static gboolean set_ca_cert_from_data(OvirtProxy *proxy,
+                                      char *ca_cert_data,
+                                      gsize ca_cert_len)
+{
+    /* This function is quite complicated for historical reasons, we
+     * initially only had a ca-cert property in OvirtProxy with type
+     * GByteArray. RestProxy then got a ssl-ca-file property storing a
+     * filename. We want to use ssl-ca-file as the canonical property,
+     * and set ca-cert value from it. However, when the user sets
+     * the ca-cert property, we need to create a temporary file in order
+     * to be able to keep the ssl-ca-file property synced with it
+     */
+    GFile *ca_file = NULL;
+    GFileIOStream *iostream;
+    GOutputStream *output;
+    char *ca_file_path;
+    gboolean write_ok;
+    GError *error = NULL;
+    gboolean result = FALSE;
+
+    ca_file = g_file_new_tmp("govirt-ca-XXXXXX.crt", &iostream, &error);
+    if (ca_file == NULL) {
+        if (error != NULL) {
+            g_warning("Failed to create temporary file for CA certificate: %s",
+                      error->message);
+        } else {
+            g_warning("Failed to create temporary file for CA certificate");
+        }
+
+        goto end;
+    }
+    output = g_io_stream_get_output_stream(G_IO_STREAM(iostream));
+    g_return_val_if_fail(output != NULL, FALSE);
+    write_ok = g_output_stream_write_all(output, ca_cert_data, ca_cert_len,
+                                         NULL, NULL, &error);
+    if (!write_ok) {
+        char *path;
+        path = g_file_get_path(ca_file);
+        if (error != NULL) {
+            g_warning("Failed to write ca file '%s': %s",
+                      path, error->message);
+        } else {
+            g_warning("Failed to write ca file '%s'", path);
+        }
+        g_free(path);
+        goto end;
+    }
+    ca_file_path = g_file_get_path(ca_file);
+    g_warn_if_fail(ca_file_path != NULL);
+    ovirt_proxy_set_tmp_ca_file(proxy, ca_file_path);
+    g_free(ca_file_path);
+
     g_object_notify(G_OBJECT(proxy), "ca-cert");
+    result = TRUE;
+
+end:
+    if (ca_file != NULL) {
+        g_object_unref(G_OBJECT(ca_file));
+    }
+    g_clear_error(&error);
+    return result;
 }
 
 gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
@@ -426,7 +527,7 @@ gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
     if (!load_ok)
         goto error;
 
-    set_downloaded_ca_cert(proxy, cert_data, cert_length);
+    set_ca_cert_from_data(proxy, cert_data, cert_length);
 
 error:
     if (source != NULL)
@@ -457,7 +558,7 @@ static void ca_file_loaded_cb(GObject *source_object,
 
     proxy = g_async_result_get_source_object(G_ASYNC_RESULT(fetch_result));
 
-    set_downloaded_ca_cert(OVIRT_PROXY(proxy), cert_data, cert_length);
+    set_ca_cert_from_data(OVIRT_PROXY(proxy), cert_data, cert_length);
     g_object_unref(proxy);
     g_simple_async_result_set_op_res_gboolean(fetch_result, TRUE);
     g_simple_async_result_complete (fetch_result);
@@ -503,10 +604,7 @@ GByteArray *ovirt_proxy_fetch_ca_certificate_finish(OvirtProxy *proxy,
     if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
         return NULL;
 
-    if (proxy->priv->ca_cert == NULL)
-        return NULL;
-
-    return g_byte_array_ref(proxy->priv->ca_cert);
+    return get_ca_cert_data(proxy);
 }
 
 static void ovirt_proxy_get_property(GObject *object,
@@ -518,7 +616,7 @@ static void ovirt_proxy_get_property(GObject *object,
 
     switch (prop_id) {
     case PROP_CA_CERT:
-        g_value_set_boxed(value, proxy->priv->ca_cert);
+        g_value_take_boxed(value, get_ca_cert_data(proxy));
         break;
     case PROP_ADMIN:
         g_value_set_boolean(value, proxy->priv->admin_mode);
@@ -537,11 +635,12 @@ static void ovirt_proxy_set_property(GObject *object,
     OvirtProxy *proxy = OVIRT_PROXY(object);
 
     switch (prop_id) {
-    case PROP_CA_CERT:
-        if (proxy->priv->ca_cert != NULL)
-            g_byte_array_unref(proxy->priv->ca_cert);
-        proxy->priv->ca_cert = g_value_dup_boxed(value);
+    case PROP_CA_CERT: {
+        GByteArray *ca_cert;
+        ca_cert = g_value_get_boxed(value);
+        set_ca_cert_from_data(proxy, (char *)ca_cert->data, ca_cert->len);
         break;
+    }
 
     case PROP_ADMIN:
         proxy->priv->admin_mode = g_value_get_boolean(value);
@@ -570,9 +669,7 @@ ovirt_proxy_finalize(GObject *obj)
 {
     OvirtProxy *proxy = OVIRT_PROXY(obj);
 
-    if (proxy->priv->ca_cert != NULL)
-        g_byte_array_unref(proxy->priv->ca_cert);
-    proxy->priv->ca_cert = NULL;
+    ovirt_proxy_set_tmp_ca_file(proxy, NULL);
 
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->finalize(obj);
 }
@@ -608,10 +705,20 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
     g_type_class_add_private(klass, sizeof(OvirtProxyPrivate));
 }
 
+static void ssl_ca_file_changed(GObject *gobject,
+                                GParamSpec *pspec,
+                                gpointer user_data)
+{
+    ovirt_proxy_set_tmp_ca_file(OVIRT_PROXY(gobject), NULL);
+}
+
 static void
 ovirt_proxy_init(OvirtProxy *self)
 {
     self->priv = OVIRT_PROXY_GET_PRIVATE(self);
+
+    g_signal_connect(G_OBJECT(self), "notify::ssl-ca-file",
+                     (GCallback)ssl_ca_file_changed, NULL);
 }
 
 OvirtProxy *ovirt_proxy_new(const char *uri)
