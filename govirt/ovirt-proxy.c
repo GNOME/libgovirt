@@ -618,7 +618,6 @@ OvirtProxy *ovirt_proxy_new(const char *uri)
 {
     return g_object_new(OVIRT_TYPE_PROXY,
                         "url-format", uri,
-                        "ssl-strict", FALSE,
                         NULL);
 }
 
