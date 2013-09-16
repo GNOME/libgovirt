@@ -44,14 +44,14 @@ GOptionGroup* ovirt_get_option_group(void)
 {
     const GOptionEntry entries[] = {
         { "ovirt-ca-file", '\0', 0, G_OPTION_ARG_FILENAME, &ca_file,
-          N_("Root CA certificate file for secure SSL connections"), N_("<file>") },
+          "Root CA certificate file for secure SSL connections", "<file>" },
         { "ovirt-version", '\0', G_OPTION_FLAG_NO_ARG, G_OPTION_ARG_CALLBACK, option_version,
-          N_("Display libgovirt version information"), NULL },
+          "Display libgovirt version information", NULL },
         { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
     };
     GOptionGroup *grp;
 
-    grp = g_option_group_new("ovirt", _("oVirt Options:"), _("Show oVirt Options"), NULL, NULL);
+    grp = g_option_group_new("ovirt", "oVirt Options:", "Show oVirt Options", NULL, NULL);
     g_option_group_add_entries(grp, entries);
 
     return grp;
