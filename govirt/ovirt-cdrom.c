@@ -98,10 +98,10 @@ static gboolean ovirt_cdrom_refresh_from_xml(OvirtCdrom *cdrom,
     char *name;
 
     file_node = g_hash_table_lookup(node->children, file_key);
-    if (file_node == NULL)
-        return FALSE;
-    file = rest_xml_node_get_attr(file_node, "id");
-    cdrom->priv->file = g_strdup(file);
+    if (file_node != NULL) {
+        file = rest_xml_node_get_attr(file_node, "id");
+        cdrom->priv->file = g_strdup(file);
+    }
 
     g_object_get(G_OBJECT(cdrom), "name", &name, NULL);
     if (name == NULL) {
