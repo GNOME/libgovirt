@@ -100,7 +100,7 @@ static void append_params(OvirtResourceRestCall *call, RestParams *params)
 
         serialized_params = soup_form_encode_hash(params_hash);
         g_object_get(G_OBJECT(call), "href", &href, NULL);
-        new_href = g_strconcat(href, "?", serialized_params, NULL);
+        new_href = g_strconcat(href, ";", serialized_params, NULL);
         g_object_set(G_OBJECT(call), "href", new_href, NULL);
         g_warning("PARAMS: [%s]", serialized_params);
         g_warning("NEW HREF: [%s]", new_href);
