@@ -69,9 +69,9 @@ void ovirt_collection_fetch_async(OvirtCollection *collection,
                                   GCancellable *cancellable,
                                   GAsyncReadyCallback callback,
                                   gpointer user_data);
-GList *ovirt_collection_fetch_finish(OvirtCollection *collection,
-                                     GAsyncResult *result,
-                                     GError **err);
+gboolean ovirt_collection_fetch_finish(OvirtCollection *collection,
+                                       GAsyncResult *result,
+                                       GError **err);
 
 G_END_DECLS
 

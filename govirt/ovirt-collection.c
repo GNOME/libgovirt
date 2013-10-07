@@ -403,20 +403,19 @@ void ovirt_collection_fetch_async(OvirtCollection *collection,
  * returned list should not be freed nor modified, and can become invalid
  * any time a #OvirtCollection call completes.
  */
-GList *
-ovirt_collection_fetch_finish(OvirtCollection *collection,
-                              GAsyncResult *result,
-                              GError **err)
+gboolean ovirt_collection_fetch_finish(OvirtCollection *collection,
+                                       GAsyncResult *result,
+                                       GError **err)
 {
-    g_return_val_if_fail(OVIRT_IS_COLLECTION(collection), NULL);
+    g_return_val_if_fail(OVIRT_IS_COLLECTION(collection), FALSE);
     g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(collection),
                                                         ovirt_collection_fetch_async),
-                         NULL);
+                         FALSE);
 
     if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
-        return NULL;
+        return FALSE;
 
-    return g_hash_table_get_values(ovirt_collection_get_resources(collection));
+    return g_simple_async_result_get_op_res_gboolean(G_SIMPLE_ASYNC_RESULT(result));
 }
 
 
