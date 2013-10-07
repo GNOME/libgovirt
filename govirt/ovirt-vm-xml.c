@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ovirt-enum-types.h"
+#include "ovirt-utils.h"
 #include "ovirt-vm.h"
 #include "ovirt-vm-display.h"
 #include "ovirt-vm-private.h"
@@ -129,27 +131,20 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
 
 static gboolean vm_set_state_from_xml(OvirtVm *vm, RestXmlNode *node)
 {
-    RestXmlNode *state;
+    RestXmlNode *state_node;
 
-    state = rest_xml_node_find(node, "status");
-    state = rest_xml_node_find(state, "state");
-    if (state != NULL) {
-        gboolean res = FALSE;
-        g_return_val_if_fail(state->content != NULL, FALSE);
-        if (strcmp(state->content, "down") == 0) {
-            g_object_set(G_OBJECT(vm), "state", OVIRT_VM_STATE_DOWN, NULL);
-            res = TRUE;
-        } else if (strcmp(state->content, "up") == 0) {
-            /* FIXME: check "UP" state name in the rsdl file */
-            g_object_set(G_OBJECT(vm), "state", OVIRT_VM_STATE_UP, NULL);
-            res = TRUE;
-        } else if (strcmp(state->content, "reboot_in_progress") == 0) {
-            g_object_set(G_OBJECT(vm), "state", OVIRT_VM_STATE_REBOOTING, NULL);
-            res = TRUE;
-        } else {
-            g_warning("Couldn't parse VM state: %s", state->content);
-        }
-        return res;
+    state_node = rest_xml_node_find(node, "status");
+    state_node = rest_xml_node_find(state_node, "state");
+    if (state_node != NULL) {
+        int state;
+
+        g_return_val_if_fail(state_node->content != NULL, FALSE);
+        state = ovirt_utils_genum_get_value(OVIRT_TYPE_VM_STATE,
+                                            state_node->content,
+                                            OVIRT_VM_STATE_UNKNOWN);
+        g_object_set(G_OBJECT(vm), "state", state, NULL);
+
+        return TRUE;
     }
 
     return FALSE;
