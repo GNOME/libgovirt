@@ -343,23 +343,23 @@ static gboolean
 ovirt_resource_set_sub_collections_from_xml(OvirtResource *resource,
                                             RestXmlNode *node)
 {
-    RestXmlNode *link;
+    RestXmlNode *link_node;
     const char *link_key = g_intern_string("link");
 
-    link = g_hash_table_lookup(node->children, link_key);
-    if (link == NULL)
+    link_node = g_hash_table_lookup(node->children, link_key);
+    if (link_node == NULL)
         return FALSE;
 
-    for (; link != NULL; link = link->next) {
+    for (; link_node != NULL; link_node = link_node->next) {
         const char *link_name;
         const char *href;
 
-        g_warn_if_fail(link != NULL);
-        g_warn_if_fail(link->name != NULL);
-        g_warn_if_fail(strcmp(link->name, "link") == 0);
+        g_warn_if_fail(link_node != NULL);
+        g_warn_if_fail(link_node->name != NULL);
+        g_warn_if_fail(strcmp(link_node->name, "link") == 0);
 
-        link_name = rest_xml_node_get_attr(link, "rel");
-        href = rest_xml_node_get_attr(link, "href");
+        link_name = rest_xml_node_get_attr(link_node, "rel");
+        href = rest_xml_node_get_attr(link_node, "href");
 
         if ((link_name != NULL) && (href != NULL)) {
             ovirt_resource_add_sub_collection(resource, link_name, href);
