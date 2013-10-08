@@ -27,6 +27,7 @@
 #include <libsoup/soup.h>
 #include <rest/rest-params.h>
 
+#include "glib-compat.h"
 #include "ovirt-proxy.h"
 #include "ovirt-resource-private.h"
 #include "ovirt-resource-rest-call.h"
