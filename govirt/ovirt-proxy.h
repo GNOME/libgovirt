@@ -29,6 +29,10 @@
 
 G_BEGIN_DECLS
 
+#if !GLIB_CHECK_VERSION(2,32,0)
+#define G_DEPRECATED_FOR(name) G_GNUC_DEPRECATED_FOR(name)
+#endif
+
 #define OVIRT_TYPE_PROXY ovirt_proxy_get_type()
 
 #define OVIRT_PROXY(obj) \
