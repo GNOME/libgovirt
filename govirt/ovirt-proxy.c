@@ -31,6 +31,7 @@
 #include "ovirt-vm-display.h"
 #include "govirt-private.h"
 
+#include <errno.h>
 #include <string.h>
 #include <glib/gstdio.h>
 
@@ -446,6 +447,7 @@ static void ovirt_proxy_set_tmp_ca_file(OvirtProxy *proxy, const char *ca_file)
 }
 
 
+#if GLIB_CHECK_VERSION(2, 32, 0)
 static char *write_to_tmp_file(const char *template,
                                const char *data,
                                gsize data_len,
@@ -478,6 +480,56 @@ end:
 
     return result;
 }
+#else
+static char *write_to_tmp_file(const char *template,
+                               const char *data,
+                               gsize data_len,
+                               GError **error)
+{
+    int fd = -1;
+    char *tmp_file = NULL;
+    char *result = NULL;
+
+    fd = g_file_open_tmp(template, &tmp_file, error);
+    if (fd == -1) {
+        goto end;
+    }
+
+    while (data_len != 0) {
+        ssize_t bytes_written;
+        bytes_written = write(fd, data, data_len);
+        if (bytes_written == -1) {
+            if ((errno != EINTR) || (errno != EAGAIN)) {
+                g_set_error(error, G_FILE_ERROR,
+                            g_file_error_from_errno(errno),
+                            "Failed to write to '%s': %s",
+                            tmp_file, strerror(errno));
+                goto end;
+            }
+        }
+        g_assert(bytes_written <= (ssize_t)data_len);
+        data_len -= bytes_written;
+    }
+
+    result = tmp_file;
+    tmp_file = NULL;
+
+end:
+    if (fd != -1) {
+        int close_status = close(fd);
+        if (close_status != 0) {
+            g_set_error(error, G_FILE_ERROR,
+                        g_file_error_from_errno(errno),
+                        "Failed to close '%s': %s",
+                        result, strerror(errno));
+            g_free(result);
+            result = NULL;
+        }
+    }
+    g_free(tmp_file);
+    return result;
+}
+#endif
 
 
 static gboolean set_ca_cert_from_data(OvirtProxy *proxy,
