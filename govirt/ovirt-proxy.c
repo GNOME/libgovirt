@@ -445,6 +445,41 @@ static void ovirt_proxy_set_tmp_ca_file(OvirtProxy *proxy, const char *ca_file)
     }
 }
 
+
+static char *write_to_tmp_file(const char *template,
+                               const char *data,
+                               gsize data_len,
+                               GError **error)
+{
+    GFile *tmp_file = NULL;
+    GFileIOStream *iostream;
+    GOutputStream *output;
+    gboolean write_ok;
+    char *result = NULL;
+
+    tmp_file = g_file_new_tmp(template, &iostream, error);
+    if (tmp_file == NULL) {
+        goto end;
+    }
+    output = g_io_stream_get_output_stream(G_IO_STREAM(iostream));
+    g_return_val_if_fail(output != NULL, FALSE);
+    write_ok = g_output_stream_write_all(output, data, data_len,
+                                         NULL, NULL, error);
+    if (!write_ok) {
+        goto end;
+    }
+
+    return g_file_get_path(tmp_file);
+
+end:
+    if (tmp_file != NULL) {
+        g_object_unref(G_OBJECT(tmp_file));
+    }
+
+    return result;
+}
+
+
 static gboolean set_ca_cert_from_data(OvirtProxy *proxy,
                                       char *ca_cert_data,
                                       gsize ca_cert_len)
@@ -457,43 +492,17 @@ static gboolean set_ca_cert_from_data(OvirtProxy *proxy,
      * the ca-cert property, we need to create a temporary file in order
      * to be able to keep the ssl-ca-file property synced with it
      */
-    GFile *ca_file = NULL;
-    GFileIOStream *iostream;
-    GOutputStream *output;
     char *ca_file_path;
-    gboolean write_ok;
     GError *error = NULL;
     gboolean result = FALSE;
 
-    ca_file = g_file_new_tmp("govirt-ca-XXXXXX.crt", &iostream, &error);
-    if (ca_file == NULL) {
-        if (error != NULL) {
-            g_warning("Failed to create temporary file for CA certificate: %s",
-                      error->message);
-        } else {
-            g_warning("Failed to create temporary file for CA certificate");
-        }
+    ca_file_path = write_to_tmp_file("govirt-ca-XXXXXX.crt", ca_cert_data, ca_cert_len, &error);
+    if (ca_file_path == NULL) {
+        g_warning("Failed to create temporary file for CA certificate: %s",
+                  error->message);
+        goto end;
+    }
 
-        goto end;
-    }
-    output = g_io_stream_get_output_stream(G_IO_STREAM(iostream));
-    g_return_val_if_fail(output != NULL, FALSE);
-    write_ok = g_output_stream_write_all(output, ca_cert_data, ca_cert_len,
-                                         NULL, NULL, &error);
-    if (!write_ok) {
-        char *path;
-        path = g_file_get_path(ca_file);
-        if (error != NULL) {
-            g_warning("Failed to write ca file '%s': %s",
-                      path, error->message);
-        } else {
-            g_warning("Failed to write ca file '%s'", path);
-        }
-        g_free(path);
-        goto end;
-    }
-    ca_file_path = g_file_get_path(ca_file);
-    g_warn_if_fail(ca_file_path != NULL);
     ovirt_proxy_set_tmp_ca_file(proxy, ca_file_path);
     g_free(ca_file_path);
 
@@ -501,12 +510,10 @@ static gboolean set_ca_cert_from_data(OvirtProxy *proxy,
     result = TRUE;
 
 end:
-    if (ca_file != NULL) {
-        g_object_unref(G_OBJECT(ca_file));
-    }
     g_clear_error(&error);
     return result;
 }
+
 
 gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
 {
