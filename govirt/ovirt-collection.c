@@ -395,13 +395,9 @@ void ovirt_collection_fetch_async(OvirtCollection *collection,
 /**
  * ovirt_collection_fetch_finish:
  * @collection: a #OvirtCollection
- * @result: (transfer none): async method result
+ * @result: async method result
  *
- * Return value: (transfer none) (element-type OvirtResource): the list of
- * #OvirtResource contained in @collection. The elements stored in the list
- * inherit from #OvirtResource, but their actual type is stored in the  The
- * returned list should not be freed nor modified, and can become invalid
- * any time a #OvirtCollection call completes.
+ * Return value: TRUE if successful, FALSE otherwise, with @error set.
  */
 gboolean ovirt_collection_fetch_finish(OvirtCollection *collection,
                                        GAsyncResult *result,
