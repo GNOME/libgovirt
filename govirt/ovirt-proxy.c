@@ -367,10 +367,10 @@ void ovirt_proxy_get_collection_xml_async(OvirtProxy *proxy,
 
     call = ovirt_rest_call_new(proxy, "GET", href);
 
-
     ovirt_rest_call_async(call, result, cancellable,
                           get_collection_xml_async_cb, data,
                           (GDestroyNotify)ovirt_proxy_get_collection_async_data_destroy);
+    g_object_unref(call);
 }
 
 
