@@ -103,8 +103,6 @@ static void append_params(OvirtResourceRestCall *call, RestParams *params)
         g_object_get(G_OBJECT(call), "href", &href, NULL);
         new_href = g_strconcat(href, ";", serialized_params, NULL);
         g_object_set(G_OBJECT(call), "href", new_href, NULL);
-        g_warning("PARAMS: [%s]", serialized_params);
-        g_warning("NEW HREF: [%s]", new_href);
         g_free(new_href);
         g_free(href);
         g_free(serialized_params);
