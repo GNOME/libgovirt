@@ -34,6 +34,8 @@ struct _OvirtProxyPrivate {
     char *tmp_ca_file;
     gboolean admin_mode;
     OvirtApi *api;
+
+    gulong ssl_ca_file_changed_id;
 };
 
 RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,

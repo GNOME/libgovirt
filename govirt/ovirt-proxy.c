@@ -442,7 +442,13 @@ static void ovirt_proxy_set_tmp_ca_file(OvirtProxy *proxy, const char *ca_file)
     }
     proxy->priv->tmp_ca_file = g_strdup(ca_file);
     if (ca_file != NULL) {
+        /* Not blocking this signal would cause the callback to call again
+         * set_tmp_ca_file with a NULL ca_file, undoing the work we just did */
+        g_signal_handler_block(G_OBJECT(proxy),
+                               proxy->priv->ssl_ca_file_changed_id);
         g_object_set(G_OBJECT(proxy), "ssl-ca-file", ca_file, NULL);
+        g_signal_handler_unblock(G_OBJECT(proxy),
+                                 proxy->priv->ssl_ca_file_changed_id);
     }
 }
 
@@ -778,10 +784,13 @@ static void ssl_ca_file_changed(GObject *gobject,
 static void
 ovirt_proxy_init(OvirtProxy *self)
 {
+    gulong handler_id;
+
     self->priv = OVIRT_PROXY_GET_PRIVATE(self);
 
-    g_signal_connect(G_OBJECT(self), "notify::ssl-ca-file",
-                     (GCallback)ssl_ca_file_changed, NULL);
+    handler_id = g_signal_connect(G_OBJECT(self), "notify::ssl-ca-file",
+                                  (GCallback)ssl_ca_file_changed, NULL);
+    self->priv->ssl_ca_file_changed_id = handler_id;
 }
 
 OvirtProxy *ovirt_proxy_new(const char *uri)
