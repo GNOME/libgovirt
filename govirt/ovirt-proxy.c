@@ -405,7 +405,7 @@ error:
 
 static GByteArray *get_ca_cert_data(OvirtProxy *proxy)
 {
-    char *ca_file;
+    char *ca_file = NULL;
     char *content;
     gsize length;
     GError *error = NULL;
