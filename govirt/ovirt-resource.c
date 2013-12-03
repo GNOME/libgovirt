@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include <rest/rest-xml-node.h>
+#include <rest/rest-xml-parser.h>
 
 #include "govirt-private.h"
 #include "ovirt-error.h"

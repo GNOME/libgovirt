@@ -26,6 +26,7 @@ libgovirt_la_HEADERS =						\
 	ovirt-storage-domain.h					\
 	ovirt-types.h						\
 	ovirt-vm.h						\
+	ovirt-vm-pool.h						\
 	ovirt-vm-display.h					\
 	$(NULL)
 
@@ -62,6 +63,7 @@ libgovirt_la_SOURCES =						\
 	ovirt-vm.c						\
 	ovirt-vm-display.c					\
 	ovirt-vm-xml.c						\
+	ovirt-vm-pool.c						\
 	$(NULL)
 
 nodist_libgovirt_la_HEADERS =					\

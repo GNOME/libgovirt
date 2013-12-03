@@ -63,6 +63,7 @@ OvirtApi *ovirt_api_new(void);
 
 OvirtCollection *ovirt_api_get_storage_domains(OvirtApi *api);
 OvirtCollection *ovirt_api_get_vms(OvirtApi *api);
+OvirtCollection *ovirt_api_get_vm_pools(OvirtApi *api);
 
 G_END_DECLS
 

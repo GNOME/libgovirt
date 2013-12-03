@@ -52,10 +52,6 @@ enum OvirtResponseStatus {
     OVIRT_RESPONSE_COMPLETE
 };
 
-ActionResponseParser response_parsers[] = {
-    [OVIRT_VM_ACTION_TICKET] = parse_ticket_status
-};
-
 enum {
     PROP_0,
     PROP_STATE,

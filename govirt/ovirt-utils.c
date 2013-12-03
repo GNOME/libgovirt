@@ -22,6 +22,7 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <string.h>
 
 #include <rest/rest-xml-parser.h>
@@ -126,6 +127,50 @@ ovirt_utils_boolean_from_string(const char *value)
     return (g_strcmp0(value, "true") == 0);
 }
 
+G_GNUC_INTERNAL gboolean
+ovirt_utils_guint64_from_string(const char *value_str, guint64 *value)
+{
+    char *end_ptr;
+    guint64 result;
+
+    g_return_val_if_fail(value_str != NULL, FALSE);
+
+    result = g_ascii_strtoull(value_str, &end_ptr, 10);
+    if ((result == G_MAXUINT64) && (errno == ERANGE)) {
+        /* overflow */
+        return FALSE;
+    }
+    if ((result == 0) && (errno == EINVAL)) {
+        /* should not happen, invalid base */
+        return FALSE;
+    }
+    if (*end_ptr != '\0') {
+        return FALSE;
+    }
+
+    *value = result;
+
+    return TRUE;
+}
+
+G_GNUC_INTERNAL gboolean
+ovirt_utils_guint_from_string(const char *value_str, guint *value)
+{
+    guint64 value64;
+    gboolean success;
+
+    success = ovirt_utils_guint64_from_string(value_str, &value64);
+    if (!success) {
+        return FALSE;
+    }
+    if (value64 > G_MAXUINT32) {
+        return FALSE;
+    }
+
+    *value = (guint)value64;
+
+    return TRUE;
+}
 
 G_GNUC_INTERNAL const char *ovirt_utils_strip_api_base_dir(const char *path)
 {

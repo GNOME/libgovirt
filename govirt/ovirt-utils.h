@@ -36,6 +36,8 @@ gboolean ovirt_utils_gerror_from_xml_fault(RestXmlNode *root, GError **error);
 const char *ovirt_utils_genum_get_nick (GType enum_type, gint value);
 int ovirt_utils_genum_get_value (GType enum_type, const char *nick,
                                  gint default_value);
+gboolean ovirt_utils_guint64_from_string(const char *value_str, guint64 *value);
+gboolean ovirt_utils_guint_from_string(const char *value_str, guint *value);
 gboolean ovirt_utils_boolean_from_string(const char *value);
 const char *ovirt_utils_strip_api_base_dir(const char *path);
 

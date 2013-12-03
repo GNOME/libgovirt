@@ -2,6 +2,7 @@
  * ovirt-api.c: oVirt API entry point
  *
  * Copyright (C) 2012, 2013 Red Hat, Inc.
+ * Copyright (C) 2013 Iordan Iordanov <i@iiordanov.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +28,7 @@
 #include "ovirt-proxy.h"
 #include "ovirt-rest-call.h"
 #include "ovirt-api.h"
+#include "ovirt-vm-pool.h"
 #include "govirt-private.h"
 
 #include <rest/rest-xml-node.h>
@@ -41,6 +43,7 @@
 struct _OvirtApiPrivate {
     OvirtCollection *storage_domains;
     OvirtCollection *vms;
+    OvirtCollection *vm_pools;
 };
 
 
@@ -72,6 +75,7 @@ static void ovirt_api_dispose(GObject *object)
 
     g_clear_object(&api->priv->storage_domains);
     g_clear_object(&api->priv->vms);
+    g_clear_object(&api->priv->vm_pools);
 
     G_OBJECT_CLASS(ovirt_api_parent_class)->dispose(object);
 }
@@ -129,6 +133,30 @@ OvirtCollection *ovirt_api_get_vms(OvirtApi *api)
     api->priv->vms = ovirt_collection_new(href, "vms", OVIRT_TYPE_VM, "vm");
 
     return api->priv->vms;
+}
+
+/**
+ * ovirt_api_get_vm_pools:
+ * @api: a #OvirtApi
+ *
+ * Return value: (transfer full):
+ */
+OvirtCollection *ovirt_api_get_vm_pools(OvirtApi *api)
+{
+    const char *href;
+
+    g_return_val_if_fail(OVIRT_IS_API(api), NULL);
+
+    if (api->priv->vm_pools != NULL)
+        return api->priv->vm_pools;
+
+    href = ovirt_resource_get_sub_collection(OVIRT_RESOURCE(api), "vmpools");
+    if (href == NULL)
+        return NULL;
+
+    api->priv->vm_pools = ovirt_collection_new(href, "vmpools", OVIRT_TYPE_VM_POOL, "vmpool");
+
+    return api->priv->vm_pools;
 }
 
 

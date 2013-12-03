@@ -34,5 +34,6 @@
 #include <govirt/ovirt-storage-domain.h>
 #include <govirt/ovirt-vm.h>
 #include <govirt/ovirt-vm-display.h>
+#include <govirt/ovirt-vm-pool.h>
 
 #endif /* __OVIRT_H__ */
