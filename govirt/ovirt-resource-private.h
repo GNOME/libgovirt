@@ -32,6 +32,12 @@ const char *ovirt_resource_get_action(OvirtResource *resource,
 char *ovirt_resource_to_xml(OvirtResource *resource);
 gboolean ovirt_resource_rest_call_sync(OvirtRestCall *call, GError **error);
 
+typedef gboolean (*ActionResponseParser)(RestXmlNode *node, OvirtResource *resource, GError **error);
+gboolean ovirt_resource_action(OvirtResource *resource, OvirtProxy *proxy,
+                               const char *action,
+                               ActionResponseParser response_parser,
+                               GError **error);
+
 G_END_DECLS
 
 #endif /* __OVIRT_RESOURCE_PRIVATE_H__ */

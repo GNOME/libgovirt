@@ -30,11 +30,10 @@
 #include "govirt-private.h"
 
 
-typedef gboolean (*ActionResponseParser)(RestXmlNode *node, OvirtVm *vm, GError **error);
 static gboolean parse_action_response(RestProxyCall *call, OvirtVm *vm,
                                       ActionResponseParser response_parser,
                                       GError **error);
-static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm,
+static gboolean parse_ticket_status(RestXmlNode *root, OvirtResource *resource,
                                     GError **error);
 
 #define OVIRT_VM_GET_PRIVATE(obj)                         \
@@ -307,68 +306,28 @@ ovirt_vm_stop_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
 }
 
 
-static gboolean
-ovirt_vm_action(OvirtVm *vm, OvirtProxy *proxy, const char *action,
-                ActionResponseParser response_parser, GError **error)
-{
-    RestProxyCall *call;
-    const char *function;
-
-    g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
-    g_return_val_if_fail(action != NULL, FALSE);
-    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
-    g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
-
-    function = ovirt_resource_get_action(OVIRT_RESOURCE(vm), action);
-    function = ovirt_utils_strip_api_base_dir(function);
-    g_return_val_if_fail(function != NULL, FALSE);
-
-    call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
-    rest_proxy_call_set_method(call, "POST");
-    rest_proxy_call_set_function(call, function);
-    rest_proxy_call_add_param(call, "async", "false");
-
-    if (!rest_proxy_call_sync(call, error)) {
-        GError *call_error = NULL;
-        g_warning("Error while running %s on %p", action, vm);
-        /* Even in error cases we may have a response body describing
-         * the failure, try to parse that */
-        parse_action_response(call, vm, response_parser, &call_error);
-        if (call_error != NULL) {
-            g_clear_error(error);
-            g_propagate_error(error, call_error);
-        }
-
-        g_object_unref(G_OBJECT(call));
-        return FALSE;
-    }
-
-    parse_action_response(call, vm, response_parser, error);
-
-    g_object_unref(G_OBJECT(call));
-
-    return TRUE;
-}
-
 gboolean ovirt_vm_get_ticket(OvirtVm *vm, OvirtProxy *proxy, GError **error)
 {
-    return ovirt_vm_action(vm, proxy, "ticket",
-                           parse_ticket_status,
-                           error);
+    return ovirt_resource_action(OVIRT_RESOURCE(vm), proxy, "ticket",
+                                 parse_ticket_status,
+                                 error);
 }
 
 gboolean ovirt_vm_start(OvirtVm *vm, OvirtProxy *proxy, GError **error)
 {
-    return ovirt_vm_action(vm, proxy, "start", NULL, error);
+    return ovirt_resource_action(OVIRT_RESOURCE(vm), proxy, "start",
+                                 NULL, error);
 }
 
 gboolean ovirt_vm_stop(OvirtVm *vm, OvirtProxy *proxy, GError **error)
 {
-    return ovirt_vm_action(vm, proxy, "stop", NULL, error);
+    return ovirt_resource_action(OVIRT_RESOURCE(vm), proxy, "stop",
+                                 NULL, error);
 }
 
-static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm, GError **error)
+static gboolean parse_ticket_status(RestXmlNode *root, OvirtResource *resource, GError **error)
 {
+    OvirtVm *vm;
     RestXmlNode *node;
     const char *ticket_key = g_intern_string("ticket");
     const char *value_key = g_intern_string("value");
@@ -376,9 +335,10 @@ static gboolean parse_ticket_status(RestXmlNode *root, OvirtVm *vm, GError **err
     OvirtVmDisplay *display;
 
     g_return_val_if_fail(root != NULL, FALSE);
-    g_return_val_if_fail(vm != NULL, FALSE);
+    g_return_val_if_fail(OVIRT_IS_VM(resource), FALSE);
     g_return_val_if_fail(error == NULL || *error == NULL, FALSE);
 
+    vm = OVIRT_VM(resource);
     root = g_hash_table_lookup(root->children, ticket_key);
     if (root == NULL) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'ticket' node");
@@ -467,7 +427,7 @@ parse_action_response(RestProxyCall *call, OvirtVm *vm,
         status = parse_action_status(root, error);
         if (status  == OVIRT_RESPONSE_COMPLETE) {
             if (response_parser) {
-                result = response_parser(root, vm, error);
+                result = response_parser(root, OVIRT_RESOURCE(vm), error);
             } else {
                 result = TRUE;
             }

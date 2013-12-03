@@ -585,3 +585,146 @@ gboolean ovirt_resource_update_finish(OvirtResource *resource,
 
     return ovirt_rest_call_finish(result, err);
 }
+
+
+enum OvirtResponseStatus {
+    OVIRT_RESPONSE_UNKNOWN,
+    OVIRT_RESPONSE_FAILED,
+    OVIRT_RESPONSE_PENDING,
+    OVIRT_RESPONSE_IN_PROGRESS,
+    OVIRT_RESPONSE_COMPLETE
+};
+
+static gboolean parse_action_response(RestProxyCall *call, OvirtResource *resource,
+                                      ActionResponseParser response_parser,
+                                      GError **error);
+
+gboolean
+ovirt_resource_action(OvirtResource *resource, OvirtProxy *proxy,
+                      const char *action,
+                      ActionResponseParser response_parser,
+                      GError **error)
+{
+    RestProxyCall *call;
+    const char *function;
+
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
+    g_return_val_if_fail(action != NULL, FALSE);
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
+    g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
+
+    function = ovirt_resource_get_action(OVIRT_RESOURCE(resource), action);
+    function = ovirt_utils_strip_api_base_dir(function);
+    g_return_val_if_fail(function != NULL, FALSE);
+
+    call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
+    rest_proxy_call_set_method(call, "POST");
+    rest_proxy_call_set_function(call, function);
+    rest_proxy_call_add_param(call, "async", "false");
+
+    if (!rest_proxy_call_sync(call, error)) {
+        GError *call_error = NULL;
+        g_warning("Error while running %s on %p", action, resource);
+        /* Even in error cases we may have a response body describing
+         * the failure, try to parse that */
+        parse_action_response(call, resource, response_parser, &call_error);
+        if (call_error != NULL) {
+            g_clear_error(error);
+            g_propagate_error(error, call_error);
+        }
+
+        g_object_unref(G_OBJECT(call));
+        return FALSE;
+    }
+
+    parse_action_response(call, resource, response_parser, error);
+
+    g_object_unref(G_OBJECT(call));
+
+    return TRUE;
+}
+
+
+static enum OvirtResponseStatus parse_action_status(RestXmlNode *root,
+                                                    GError **error)
+{
+    RestXmlNode *node;
+    const char *status_key = g_intern_string("status");
+    const char *state_key = g_intern_string("state");
+
+    g_return_val_if_fail(g_strcmp0(root->name, "action") == 0,
+                         OVIRT_RESPONSE_UNKNOWN);
+    g_return_val_if_fail(error == NULL || *error == NULL,
+                         OVIRT_RESPONSE_UNKNOWN);
+
+    node = g_hash_table_lookup(root->children, status_key);
+    if (node == NULL) {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'status' node");
+        g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
+    }
+    node = g_hash_table_lookup(node->children, state_key);
+    if (node == NULL) {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'state' node");
+        g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
+    }
+    g_debug("State: %s\n", node->content);
+    if (g_strcmp0(node->content, "complete") == 0) {
+        return OVIRT_RESPONSE_COMPLETE;
+    } else if (g_strcmp0(node->content, "pending") == 0) {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action is pending");
+        return OVIRT_RESPONSE_PENDING;
+    } else if (g_strcmp0(node->content, "in_progress") == 0) {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action is in progress");
+        return OVIRT_RESPONSE_IN_PROGRESS;
+    } else if (g_strcmp0(node->content, "failed") == 0) {
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action has failed");
+        return OVIRT_RESPONSE_FAILED;
+    }
+
+    g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "unknown action failure");
+    g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
+}
+
+
+static gboolean
+parse_action_response(RestProxyCall *call, OvirtResource *resource,
+                      ActionResponseParser response_parser, GError **error)
+{
+    RestXmlNode *root;
+    gboolean result;
+
+    result = FALSE;
+    root = ovirt_rest_xml_node_from_call(call);
+
+    if (g_strcmp0(root->name, "action") == 0) {
+        enum OvirtResponseStatus status;
+
+        status = parse_action_status(root, error);
+        if (status  == OVIRT_RESPONSE_COMPLETE) {
+            if (response_parser) {
+                result = response_parser(root, resource, error);
+            } else {
+                result = TRUE;
+            }
+        } if (status == OVIRT_RESPONSE_FAILED) {
+            const char *fault_key = g_intern_string("fault");
+            GError *fault_error = NULL;
+            RestXmlNode *fault_node = NULL;
+
+            fault_node = g_hash_table_lookup(root->children, fault_key);
+            if (fault_node != NULL) {
+                ovirt_utils_gerror_from_xml_fault(fault_node, &fault_error);
+                if (fault_error != NULL) {
+                    g_clear_error(error);
+                    g_propagate_error(error, fault_error);
+                }
+            }
+        }
+    } else {
+        g_warn_if_reached();
+    }
+
+    rest_xml_node_unref(root);
+
+    return result;
+}
