@@ -728,3 +728,87 @@ parse_action_response(RestProxyCall *call, OvirtResource *resource,
 
     return result;
 }
+
+typedef struct {
+    OvirtResource *resource;
+    ActionResponseParser parser;
+} OvirtResourceInvokeActionData;
+
+static gboolean ovirt_resource_invoke_action_async_cb(OvirtProxy *proxy,
+                                                      RestProxyCall *call,
+                                                      gpointer user_data,
+                                                      GError **error)
+{
+    OvirtResourceInvokeActionData *data;
+    GError *action_error = NULL;
+
+    g_return_val_if_fail(REST_IS_PROXY_CALL(call), FALSE);
+    data = (OvirtResourceInvokeActionData *)user_data;
+
+    parse_action_response(call, data->resource, data->parser, &action_error);
+    if (action_error != NULL) {
+        g_propagate_error(error, action_error);
+        return  FALSE;
+    }
+
+    return TRUE;
+}
+
+
+static void
+ovirt_resource_invoke_action_data_free(OvirtResourceInvokeActionData *data)
+{
+    g_slice_free(OvirtResourceInvokeActionData, data);
+}
+
+
+void
+ovirt_resource_invoke_action_async(OvirtResource *resource,
+                                   const char *action,
+                                   OvirtProxy *proxy,
+                                   ActionResponseParser response_parser,
+                                   GCancellable *cancellable,
+                                   GAsyncReadyCallback callback,
+                                   gpointer user_data)
+{
+    OvirtRestCall *call;
+    GSimpleAsyncResult *result;
+    const char *function;
+    OvirtResourceInvokeActionData *data;
+
+    g_return_if_fail(OVIRT_IS_RESOURCE(resource));
+    g_return_if_fail(action != NULL);
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
+
+    g_debug("invoking '%s' action on %p using %p", action, resource, proxy);
+    function = ovirt_resource_get_action(resource, action);
+    g_return_if_fail(function != NULL);
+
+    result = g_simple_async_result_new(G_OBJECT(resource), callback,
+                                       user_data,
+                                       ovirt_resource_invoke_action_async);
+    data = g_slice_new(OvirtResourceInvokeActionData);
+    data->resource = resource;
+    data->parser = response_parser;
+
+    call = ovirt_rest_call_new(proxy, "POST", function);
+
+    ovirt_rest_call_async(call, result, cancellable,
+                          ovirt_resource_invoke_action_async_cb, data,
+                          (GDestroyNotify)ovirt_resource_invoke_action_data_free);
+}
+
+
+gboolean
+ovirt_resource_action_finish(OvirtResource *resource,
+                             GAsyncResult *result,
+                             GError **err)
+{
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
+    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(resource),
+                                                        ovirt_resource_invoke_action_async),
+                         FALSE);
+
+    return ovirt_rest_call_finish(result, err);
+}

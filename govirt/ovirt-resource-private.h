@@ -38,6 +38,17 @@ gboolean ovirt_resource_action(OvirtResource *resource, OvirtProxy *proxy,
                                ActionResponseParser response_parser,
                                GError **error);
 
+void ovirt_resource_invoke_action_async(OvirtResource *resource,
+                                        const char *action,
+                                        OvirtProxy *proxy,
+                                        ActionResponseParser response_parser,
+                                        GCancellable *cancellable,
+                                        GAsyncReadyCallback callback,
+                                        gpointer user_data);
+gboolean ovirt_resource_action_finish(OvirtResource *resource,
+                                      GAsyncResult *result,
+                                      GError **err);
+
 G_END_DECLS
 
 #endif /* __OVIRT_RESOURCE_PRIVATE_H__ */
