@@ -93,6 +93,8 @@ GOVIRT_0.3.1 {
         ovirt_vm_pool_get_type;
         ovirt_vm_pool_new;
         ovirt_vm_pool_allocate_vm;
+        ovirt_vm_pool_allocate_vm_async;
+        ovirt_vm_pool_allocate_vm_finish;
 } GOVIRT_0.2.1;
 
 # .... define new API here using predicted next version number ....

@@ -59,6 +59,12 @@ GType ovirt_vm_pool_get_type(void);
 OvirtVmPool *ovirt_vm_pool_new(void);
 
 gboolean ovirt_vm_pool_allocate_vm(OvirtVmPool *vm_pool, OvirtProxy *proxy, GError **error);
+void ovirt_vm_pool_allocate_vm_async(OvirtVmPool *vm_pool, OvirtProxy *proxy,
+                                     GCancellable *cancellable,
+                                     GAsyncReadyCallback callback,
+                                     gpointer user_data);
+gboolean ovirt_vm_pool_allocate_vm_finish(OvirtVmPool *vm_pool,
+                                          GAsyncResult *result, GError **err);
 
 G_END_DECLS
 

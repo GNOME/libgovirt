@@ -178,6 +178,24 @@ gboolean ovirt_vm_pool_allocate_vm(OvirtVmPool *vm_pool, OvirtProxy *proxy, GErr
 }
 
 
+void ovirt_vm_pool_allocate_vm_async(OvirtVmPool *vm_pool, OvirtProxy *proxy,
+                                     GCancellable *cancellable,
+                                     GAsyncReadyCallback callback,
+                                     gpointer user_data)
+{
+    ovirt_resource_invoke_action_async(OVIRT_RESOURCE(vm_pool), "allocatevm",
+                                       proxy, NULL, cancellable,
+                                       callback, user_data);
+}
+
+
+gboolean ovirt_vm_pool_allocate_vm_finish(OvirtVmPool *vm_pool,
+                                          GAsyncResult *result, GError **err)
+{
+    return ovirt_resource_action_finish(OVIRT_RESOURCE(vm_pool), result, err);
+}
+
+
 static gboolean vm_pool_set_size_from_xml(OvirtVmPool *vm_pool, RestXmlNode *node)
 {
     RestXmlNode *size_node;
