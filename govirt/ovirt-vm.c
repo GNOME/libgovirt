@@ -542,7 +542,7 @@ gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
 {
     g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
     g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(vm),
-                                                        ovirt_vm_invoke_action_async),
+                                                        ovirt_vm_refresh_async),
                          FALSE);
 
     return ovirt_rest_call_finish(result, err);
