@@ -30,9 +30,6 @@
 #include "govirt-private.h"
 
 
-static gboolean parse_action_response(RestProxyCall *call, OvirtVm *vm,
-                                      ActionResponseParser response_parser,
-                                      GError **error);
 static gboolean parse_ticket_status(RestXmlNode *root, OvirtResource *resource,
                                     GError **error);
 
@@ -180,82 +177,6 @@ OvirtVm *ovirt_vm_new(void)
     return OVIRT_VM(g_initable_new(OVIRT_TYPE_VM, NULL, NULL, NULL));
 }
 
-typedef struct {
-    OvirtVm *vm;
-    ActionResponseParser parser;
-} OvirtVmInvokeActionData;
-
-static gboolean ovirt_vm_invoke_action_async_cb(OvirtProxy *proxy, RestProxyCall *call,
-                                                gpointer user_data, GError **error)
-{
-    OvirtVmInvokeActionData *data;
-    GError *action_error = NULL;
-
-    g_return_val_if_fail(REST_IS_PROXY_CALL(call), FALSE);
-    data = (OvirtVmInvokeActionData *)user_data;
-
-    parse_action_response(call, data->vm, data->parser, &action_error);
-    if (action_error != NULL) {
-        g_propagate_error(error, action_error);
-        return  FALSE;
-    }
-
-    return TRUE;
-}
-
-static void
-ovirt_vm_invoke_action_data_free(OvirtVmInvokeActionData *data)
-{
-    g_slice_free(OvirtVmInvokeActionData, data);
-}
-
-static void
-ovirt_vm_invoke_action_async(OvirtVm *vm,
-                             const char *action,
-                             OvirtProxy *proxy,
-                             ActionResponseParser response_parser,
-                             GCancellable *cancellable,
-                             GAsyncReadyCallback callback,
-                             gpointer user_data)
-{
-    OvirtRestCall *call;
-    GSimpleAsyncResult *result;
-    const char *function;
-    OvirtVmInvokeActionData *data;
-
-    g_return_if_fail(OVIRT_IS_VM(vm));
-    g_return_if_fail(action != NULL);
-    g_return_if_fail(OVIRT_IS_PROXY(proxy));
-    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
-
-    g_debug("invoking '%s' action on %p using %p", action, vm, proxy);
-    function = ovirt_resource_get_action(OVIRT_RESOURCE(vm), action);
-    g_return_if_fail(function != NULL);
-
-    result = g_simple_async_result_new(G_OBJECT(vm), callback,
-                                       user_data,
-                                       ovirt_vm_invoke_action_async);
-    data = g_slice_new(OvirtVmInvokeActionData);
-    data->vm = vm;
-    data->parser = response_parser;
-
-    call = ovirt_rest_call_new(proxy, "POST", function);
-
-    ovirt_rest_call_async(call, result, cancellable,
-                          ovirt_vm_invoke_action_async_cb, data,
-                          (GDestroyNotify)ovirt_vm_invoke_action_data_free);
-}
-
-static gboolean
-ovirt_vm_action_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
-{
-    g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(vm),
-                                                        ovirt_vm_invoke_action_async),
-                         FALSE);
-
-    return ovirt_rest_call_finish(result, err);
-}
 
 void
 ovirt_vm_get_ticket_async(OvirtVm *vm, OvirtProxy *proxy,
@@ -263,14 +184,16 @@ ovirt_vm_get_ticket_async(OvirtVm *vm, OvirtProxy *proxy,
                           GAsyncReadyCallback callback,
                           gpointer user_data)
 {
-    ovirt_vm_invoke_action_async(vm, "ticket", proxy, parse_ticket_status,
-                                 cancellable, callback, user_data);
+    ovirt_resource_invoke_action_async(OVIRT_RESOURCE(vm), "ticket",
+                                       proxy, parse_ticket_status,
+                                       cancellable, callback,
+                                       user_data);
 }
 
 gboolean
 ovirt_vm_get_ticket_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
 {
-    return ovirt_vm_action_finish(vm, result, err);
+    return ovirt_resource_action_finish(OVIRT_RESOURCE(vm), result, err);
 }
 
 void
@@ -279,14 +202,14 @@ ovirt_vm_start_async(OvirtVm *vm, OvirtProxy *proxy,
                      GAsyncReadyCallback callback,
                      gpointer user_data)
 {
-    ovirt_vm_invoke_action_async(vm, "start", proxy, NULL,
-                                 cancellable, callback, user_data);
+    ovirt_resource_invoke_action_async(OVIRT_RESOURCE(vm), "start", proxy, NULL,
+                                       cancellable, callback, user_data);
 }
 
 gboolean
 ovirt_vm_start_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
 {
-    return ovirt_vm_action_finish(vm, result, err);
+    return ovirt_resource_action_finish(OVIRT_RESOURCE(vm), result, err);
 }
 
 void
@@ -295,14 +218,14 @@ ovirt_vm_stop_async(OvirtVm *vm, OvirtProxy *proxy,
                     GAsyncReadyCallback callback,
                     gpointer user_data)
 {
-    ovirt_vm_invoke_action_async(vm, "stop", proxy, NULL,
-                                 cancellable, callback, user_data);
+    ovirt_resource_invoke_action_async(OVIRT_RESOURCE(vm), "stop", proxy, NULL,
+                                       cancellable, callback, user_data);
 }
 
 gboolean
 ovirt_vm_stop_finish(OvirtVm *vm, GAsyncResult *result, GError **err)
 {
-    return ovirt_vm_action_finish(vm, result, err);
+    return ovirt_resource_action_finish(OVIRT_RESOURCE(vm), result, err);
 }
 
 
@@ -370,89 +293,6 @@ static gboolean parse_ticket_status(RestXmlNode *root, OvirtResource *resource, 
     return TRUE;
 }
 
-static enum OvirtResponseStatus parse_action_status(RestXmlNode *root,
-                                                    GError **error)
-{
-    RestXmlNode *node;
-    const char *status_key = g_intern_string("status");
-    const char *state_key = g_intern_string("state");
-
-    g_return_val_if_fail(g_strcmp0(root->name, "action") == 0,
-                         OVIRT_RESPONSE_UNKNOWN);
-    g_return_val_if_fail(error == NULL || *error == NULL,
-                         OVIRT_RESPONSE_UNKNOWN);
-
-    node = g_hash_table_lookup(root->children, status_key);
-    if (node == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'status' node");
-        g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
-    }
-    node = g_hash_table_lookup(node->children, state_key);
-    if (node == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'state' node");
-        g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
-    }
-    g_debug("State: %s\n", node->content);
-    if (g_strcmp0(node->content, "complete") == 0) {
-        return OVIRT_RESPONSE_COMPLETE;
-    } else if (g_strcmp0(node->content, "pending") == 0) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action is pending");
-        return OVIRT_RESPONSE_PENDING;
-    } else if (g_strcmp0(node->content, "in_progress") == 0) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action is in progress");
-        return OVIRT_RESPONSE_IN_PROGRESS;
-    } else if (g_strcmp0(node->content, "failed") == 0) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action has failed");
-        return OVIRT_RESPONSE_FAILED;
-    }
-
-    g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "unknown action failure");
-    g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
-}
-
-
-static gboolean
-parse_action_response(RestProxyCall *call, OvirtVm *vm,
-                      ActionResponseParser response_parser, GError **error)
-{
-    RestXmlNode *root;
-    gboolean result;
-
-    result = FALSE;
-    root = ovirt_rest_xml_node_from_call(call);
-
-    if (g_strcmp0(root->name, "action") == 0) {
-        enum OvirtResponseStatus status;
-
-        status = parse_action_status(root, error);
-        if (status  == OVIRT_RESPONSE_COMPLETE) {
-            if (response_parser) {
-                result = response_parser(root, OVIRT_RESOURCE(vm), error);
-            } else {
-                result = TRUE;
-            }
-        } if (status == OVIRT_RESPONSE_FAILED) {
-            const char *fault_key = g_intern_string("fault");
-            GError *fault_error = NULL;
-            RestXmlNode *fault_node = NULL;
-
-            fault_node = g_hash_table_lookup(root->children, fault_key);
-            if (fault_node != NULL) {
-                ovirt_utils_gerror_from_xml_fault(fault_node, &fault_error);
-                if (fault_error != NULL) {
-                    g_clear_error(error);
-                    g_propagate_error(error, fault_error);
-                }
-            }
-        }
-    } else {
-        g_warn_if_reached();
-    }
-
-    rest_xml_node_unref(root);
-
-    return result;
-}
 
 static gboolean ovirt_vm_refresh_async_cb(OvirtProxy *proxy, RestProxyCall *call,
                                           gpointer user_data, GError **error)
