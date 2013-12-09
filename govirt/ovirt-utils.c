@@ -163,7 +163,7 @@ ovirt_utils_guint_from_string(const char *value_str, guint *value)
     if (!success) {
         return FALSE;
     }
-    if (value64 > G_MAXUINT32) {
+    if (value64 > G_MAXUINT) {
         return FALSE;
     }
 
