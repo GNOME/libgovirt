@@ -212,3 +212,26 @@ G_GNUC_INTERNAL gboolean ovirt_utils_gerror_from_xml_fault(RestXmlNode *root, GE
 
     return TRUE;
 }
+
+
+G_GNUC_INTERNAL gboolean g_object_set_guint_property_from_xml(GObject *g_object,
+                                                                  RestXmlNode *node,
+                                                                  const gchar *node_name,
+                                                                  const gchar *prop_name)
+{
+    RestXmlNode *sub_node;
+    GParamSpec *spec;
+    sub_node = rest_xml_node_find(node, node_name);
+    if (sub_node != NULL && sub_node->content != NULL) {
+        guint value;
+        if (!ovirt_utils_guint_from_string(sub_node->content, &value)) {
+            return FALSE;
+        }
+        spec = g_object_class_find_property(G_OBJECT_GET_CLASS(g_object), prop_name);
+        if (spec != NULL && spec->value_type == G_TYPE_UINT) {
+            g_object_set(g_object, prop_name, value, NULL);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}

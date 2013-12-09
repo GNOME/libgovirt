@@ -196,61 +196,11 @@ gboolean ovirt_vm_pool_allocate_vm_finish(OvirtVmPool *vm_pool,
 }
 
 
-static gboolean vm_pool_set_size_from_xml(OvirtVmPool *vm_pool, RestXmlNode *node)
-{
-    RestXmlNode *size_node;
-    size_node = rest_xml_node_find(node, "size");
-    if (size_node != NULL) {
-        guint size;
-        g_return_val_if_fail(size_node->content != NULL, FALSE);
-        if (!ovirt_utils_guint_from_string(size_node->content, &size)) {
-            return FALSE;
-        }
-        g_object_set(G_OBJECT(vm_pool), "size", size, NULL);
-        return TRUE;
-    }
-    return FALSE;
-}
-
-
-static gboolean vm_pool_set_prestarted_vms_from_xml(OvirtVmPool *vm_pool, RestXmlNode *node)
-{
-    RestXmlNode *prestarted_vms_node;
-    prestarted_vms_node = rest_xml_node_find(node, "prestarted_vms");
-    if (prestarted_vms_node != NULL) {
-        guint prestarted_vms;
-        g_return_val_if_fail(prestarted_vms_node->content != NULL, FALSE);
-        if (!ovirt_utils_guint_from_string(prestarted_vms_node->content, &prestarted_vms)) {
-            return FALSE;
-        }
-        g_object_set(G_OBJECT(vm_pool), "prestarted_vms", prestarted_vms, NULL);
-        return TRUE;
-    }
-    return FALSE;
-}
-
-
-static gboolean vm_pool_set_max_user_vms_from_xml(OvirtVmPool *vm_pool, RestXmlNode *node)
-{
-    RestXmlNode *max_user_vms_node;
-    max_user_vms_node = rest_xml_node_find(node, "max_user_vms");
-    if (max_user_vms_node != NULL) {
-        guint max_user_vms;
-        g_return_val_if_fail(max_user_vms_node->content != NULL, FALSE);
-        if (!ovirt_utils_guint_from_string(max_user_vms_node->content, &max_user_vms)) {
-            return FALSE;
-        }
-        g_object_set(G_OBJECT(vm_pool), "max_user_vms", max_user_vms, NULL);
-        return TRUE;
-    }
-    return FALSE;
-}
-
-
 static gboolean ovirt_vm_pool_refresh_from_xml(OvirtVmPool *vm_pool, RestXmlNode *node)
 {
-    vm_pool_set_size_from_xml(vm_pool, node);
-    vm_pool_set_prestarted_vms_from_xml(vm_pool, node);
-    vm_pool_set_max_user_vms_from_xml(vm_pool, node);
+    g_object_set_guint_property_from_xml(G_OBJECT(vm_pool), node, "size", "size");
+    g_object_set_guint_property_from_xml(G_OBJECT(vm_pool), node, "prestarted_vms", "prestarted_vms");
+    g_object_set_guint_property_from_xml(G_OBJECT(vm_pool), node, "max_user_vms", "max_user_vms");
+
     return TRUE;
 }
