@@ -34,7 +34,7 @@
 #include <errno.h>
 #include <string.h>
 #include <glib/gstdio.h>
-
+#include <libsoup/soup-cookie.h>
 #include <rest/rest-xml-node.h>
 #include <rest/rest-xml-parser.h>
 
@@ -46,6 +46,7 @@ enum {
     PROP_0,
     PROP_CA_CERT,
     PROP_ADMIN,
+    PROP_SESSION_ID
 };
 
 #define CA_CERT_FILENAME "ca.crt"
@@ -689,11 +690,31 @@ static void ovirt_proxy_get_property(GObject *object,
     case PROP_ADMIN:
         g_value_set_boolean(value, proxy->priv->admin_mode);
         break;
+    case PROP_SESSION_ID:
+        g_value_set_string(value, proxy->priv->jsessionid);
+        break;
 
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
 }
+
+
+static void ovirt_proxy_set_session_id(OvirtProxy *proxy, const char *session_id)
+{
+    SoupCookie *cookie;
+    char *url;
+
+    g_object_get(G_OBJECT(proxy), "url-format", &url, NULL);
+    g_return_if_fail(url != NULL);
+
+    g_free(proxy->priv->jsessionid);
+    proxy->priv->jsessionid = g_strdup(session_id);
+    cookie = soup_cookie_new("JSESSIONID", session_id, url, "/api", -1);
+    g_free(url);
+    soup_cookie_jar_add_cookie(proxy->priv->cookie_jar, cookie);
+}
+
 
 static void ovirt_proxy_set_property(GObject *object,
                                      guint prop_id,
@@ -712,6 +733,10 @@ static void ovirt_proxy_set_property(GObject *object,
 
     case PROP_ADMIN:
         proxy->priv->admin_mode = g_value_get_boolean(value);
+        break;
+
+    case PROP_SESSION_ID:
+        ovirt_proxy_set_session_id(proxy, g_value_get_string(value));
         break;
 
     default:
@@ -743,6 +768,7 @@ ovirt_proxy_finalize(GObject *obj)
     OvirtProxy *proxy = OVIRT_PROXY(obj);
 
     ovirt_proxy_set_tmp_ca_file(proxy, NULL);
+    g_free(proxy->priv->jsessionid);
 
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->finalize(obj);
 }
@@ -774,6 +800,14 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
                                                          FALSE,
                                                          G_PARAM_READWRITE |
                                                          G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(oclass,
+                                    PROP_SESSION_ID,
+                                    g_param_spec_string("session-id",
+                                                        "session-id",
+                                                        "oVirt/RHEV JSESSIONID",
+                                                        NULL,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
 
     g_type_class_add_private(klass, sizeof(OvirtProxyPrivate));
 }
