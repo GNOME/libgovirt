@@ -729,6 +729,11 @@ ovirt_proxy_dispose(GObject *obj)
         proxy->priv->vms = NULL;
     }
 
+    if (proxy->priv->cookie_jar) {
+        g_object_unref(G_OBJECT(proxy->priv->cookie_jar));
+        proxy->priv->cookie_jar = NULL;
+    }
+
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->dispose(obj);
 }
 
@@ -790,12 +795,20 @@ ovirt_proxy_init(OvirtProxy *self)
     handler_id = g_signal_connect(G_OBJECT(self), "notify::ssl-ca-file",
                                   (GCallback)ssl_ca_file_changed, NULL);
     self->priv->ssl_ca_file_changed_id = handler_id;
+    self->priv->cookie_jar = soup_cookie_jar_new();
+    g_warning("adding cookie jar");
+    rest_proxy_add_soup_feature(REST_PROXY(self),
+                                SOUP_SESSION_FEATURE(self->priv->cookie_jar));
 }
 
 OvirtProxy *ovirt_proxy_new(const char *uri)
 {
+    /* We disable cookies upon OvirtProxy creation as we will be
+     * adding our own cookie jar to OvirtProxy
+     */
     return g_object_new(OVIRT_TYPE_PROXY,
                         "url-format", uri,
+                        "disable-cookies", TRUE,
                         NULL);
 }
 

@@ -23,6 +23,8 @@
 #define __OVIRT_PROXY_PRIVATE_H__
 
 #include <rest/rest-xml-node.h>
+#include <libsoup/soup-cookie-jar.h>
+#include <libsoup/soup-session-feature.h>
 
 #include "ovirt-proxy.h"
 #include "ovirt-rest-call.h"
@@ -34,6 +36,7 @@ struct _OvirtProxyPrivate {
     char *tmp_ca_file;
     gboolean admin_mode;
     OvirtApi *api;
+    SoupCookieJar *cookie_jar;
 
     gulong ssl_ca_file_changed_id;
 };

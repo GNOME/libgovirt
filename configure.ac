@@ -101,7 +101,7 @@ AC_SUBST(GLIB_MKENUMS)
 GOBJECT_INTROSPECTION_CHECK([1.30.0])
 
 dnl **** Check for librest ****
-PKG_CHECK_MODULES([REST], [rest-0.7 >= 0.7.13])
+PKG_CHECK_MODULES([REST], [rest-0.7 >= 0.7.92])
 
 dnl ---------------------------------------------------------------------------
 dnl - Build self tests
