@@ -87,24 +87,15 @@ OvirtActionRestCall *ovirt_action_rest_call_new(RestProxy *proxy)
 {
     OvirtActionRestCall *call;
     gboolean admin;
-    char *session_id;
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
     call = OVIRT_ACTION_REST_CALL(g_object_new(OVIRT_TYPE_ACTION_REST_CALL, "proxy", proxy, NULL));
     g_return_val_if_fail(call != NULL, NULL);
-    g_object_get(G_OBJECT(proxy), "admin", &admin, "session-id", &session_id, NULL);
+    g_object_get(G_OBJECT(proxy), "admin", &admin, NULL);
     if (admin) {
         rest_proxy_call_add_header(REST_PROXY_CALL(call), "Filter", "false");
     } else {
         rest_proxy_call_add_header(REST_PROXY_CALL(call), "Filter", "true");
-    }
-    rest_proxy_call_add_header(REST_PROXY_CALL(call), "Prefer", "persistent-auth");
-    if (session_id != NULL) {
-        char *header;
-        header = g_strdup_printf("JSESSIONID=%s", session_id);
-        rest_proxy_call_add_header(REST_PROXY_CALL(call), "Cookie", header);
-        g_free(header);
-        g_free(session_id);
     }
 
     return call;

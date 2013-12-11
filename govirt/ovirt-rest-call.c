@@ -118,30 +118,17 @@ static void ovirt_rest_call_finalize(GObject *object)
 static void ovirt_rest_call_constructed(GObject *object)
 {
     OvirtProxy *proxy;
-    OvirtRestCall *call = OVIRT_REST_CALL(object);
 
     G_OBJECT_CLASS(ovirt_rest_call_parent_class)->constructed(object);
 
     g_object_get(object, "proxy", &proxy, NULL);
     if (proxy != NULL) {
         gboolean admin;
-        char *session_id;
-        g_object_get(G_OBJECT(proxy),
-                     "admin", &admin,
-                     "session-id", &session_id,
-                     NULL);
+        g_object_get(G_OBJECT(proxy), "admin", &admin, NULL);
         if (admin) {
             rest_proxy_call_add_header(REST_PROXY_CALL(object), "Filter", "false");
         } else {
             rest_proxy_call_add_header(REST_PROXY_CALL(object), "Filter", "true");
-        }
-        rest_proxy_call_add_header(REST_PROXY_CALL(call), "Prefer", "persistent-auth");
-        if (session_id != NULL) {
-            char *header;
-            header = g_strdup_printf("JSESSIONID=%s", session_id);
-            rest_proxy_call_add_header(REST_PROXY_CALL(call), "Cookie", header);
-            g_free(header);
-            g_free(session_id);
         }
         g_object_unref(proxy);
     }
