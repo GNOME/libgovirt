@@ -97,6 +97,8 @@ OvirtActionRestCall *ovirt_action_rest_call_new(RestProxy *proxy)
     } else {
         rest_proxy_call_add_header(REST_PROXY_CALL(call), "Filter", "true");
     }
+    rest_proxy_call_add_header(REST_PROXY_CALL(call),
+                               "Prefer", "persistent-auth");
 
     return call;
 }

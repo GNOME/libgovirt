@@ -130,6 +130,8 @@ static void ovirt_rest_call_constructed(GObject *object)
         } else {
             rest_proxy_call_add_header(REST_PROXY_CALL(object), "Filter", "true");
         }
+        rest_proxy_call_add_header(REST_PROXY_CALL(object),
+                                   "Prefer", "persistent-auth");
         g_object_unref(proxy);
     }
 }
