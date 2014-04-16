@@ -70,6 +70,7 @@ static void ovirt_cdrom_set_property(GObject *object,
 
     switch (prop_id) {
     case PROP_FILE:
+        g_free(cdrom->priv->file);
         cdrom->priv->file = g_value_dup_string(value);
         break;
     default:
