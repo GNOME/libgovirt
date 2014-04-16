@@ -232,6 +232,7 @@ void ovirt_cdrom_update_async(OvirtCdrom *cdrom,
     }
     ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
                           NULL, NULL, NULL);
+    g_object_unref(G_OBJECT(call));
 }
 
 

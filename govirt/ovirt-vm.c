@@ -329,6 +329,7 @@ void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
     call = ovirt_rest_call_new(proxy, "GET", href);
     ovirt_rest_call_async(call, result, cancellable,
                           ovirt_vm_refresh_async_cb, vm, NULL);
+    g_object_unref(G_OBJECT(call));
     g_free(href);
 }
 

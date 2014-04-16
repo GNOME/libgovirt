@@ -287,7 +287,6 @@ void ovirt_rest_call_async(OvirtRestCall *call,
         g_warning("Error while getting collection XML");
         g_simple_async_result_set_from_error(result, error);
         g_simple_async_result_complete(result);
-        g_object_unref(G_OBJECT(call));
         ovirt_proxy_call_async_data_free(data);
     }
 }
