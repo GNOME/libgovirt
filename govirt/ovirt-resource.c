@@ -537,7 +537,8 @@ static gboolean ovirt_resource_update_async_cb(OvirtProxy *proxy, RestProxyCall 
                                                gpointer user_data, GError **error)
 {
     g_return_val_if_fail(REST_IS_PROXY_CALL(call), FALSE);
-    g_warning("foo");
+
+    g_warn_if_reached();
 
     /* if error */
 #if 0

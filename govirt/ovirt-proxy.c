@@ -830,7 +830,6 @@ ovirt_proxy_init(OvirtProxy *self)
                                   (GCallback)ssl_ca_file_changed, NULL);
     self->priv->ssl_ca_file_changed_id = handler_id;
     self->priv->cookie_jar = soup_cookie_jar_new();
-    g_warning("adding cookie jar");
     rest_proxy_add_soup_feature(REST_PROXY(self),
                                 SOUP_SESSION_FEATURE(self->priv->cookie_jar));
 }
