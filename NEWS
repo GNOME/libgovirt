@@ -1,3 +1,12 @@
+0.3.1 -
+
+Changes since 0.3.1:
+
+- Handle cookies set by the oVirt instance in order to have some
+ 'persistant' authentication through the JSESSIONID cookie
+- Add support for VM pools
+- Various leak/memory-handling related bug fixes
+
 0.3.0 - October 29, 2013
 ========================
 
