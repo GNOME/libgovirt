@@ -863,7 +863,7 @@ static void ovirt_proxy_set_api_from_xml(OvirtProxy *proxy,
  * @proxy: a #OvirtProxy
  * @error: #GError to set on error, or NULL
  *
- * Return value: (transfer full):
+ * Return value: (transfer none):
  */
 OvirtApi *ovirt_proxy_fetch_api(OvirtProxy *proxy, GError **error)
 {

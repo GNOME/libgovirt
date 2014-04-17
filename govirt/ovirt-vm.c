@@ -355,7 +355,7 @@ gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
  * activity, the remote cdrom list must be then be fetched using
  * ovirt_collection_fetch() or ovirt_collection_fetch_async().
  *
- * Return value: (transfer full): a #OvirtCollection representing the list
+ * Return value: (transfer none): a #OvirtCollection representing the list
  * of cdroms associated with @vm.
  */
 OvirtCollection *ovirt_vm_get_cdroms(OvirtVm *vm)

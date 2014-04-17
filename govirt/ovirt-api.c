@@ -115,7 +115,7 @@ OvirtApi *ovirt_api_new(void)
  * ovirt_api_get_vms:
  * @api: a #OvirtApi
  *
- * Return value: (transfer full):
+ * Return value: (transfer none):
  */
 OvirtCollection *ovirt_api_get_vms(OvirtApi *api)
 {
@@ -139,7 +139,7 @@ OvirtCollection *ovirt_api_get_vms(OvirtApi *api)
  * ovirt_api_get_vm_pools:
  * @api: a #OvirtApi
  *
- * Return value: (transfer full):
+ * Return value: (transfer none):
  */
 OvirtCollection *ovirt_api_get_vm_pools(OvirtApi *api)
 {
@@ -164,7 +164,7 @@ OvirtCollection *ovirt_api_get_vm_pools(OvirtApi *api)
  * ovirt_api_get_storage_domains:
  * @api: a #OvirtApi
  *
- * Return value: (transfer full):
+ * Return value: (transfer none):
  */
 OvirtCollection *ovirt_api_get_storage_domains(OvirtApi *api)
 {

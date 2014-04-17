@@ -359,7 +359,7 @@ ovirt_storage_domain_refresh_from_xml(OvirtStorageDomain *domain,
  * activity, the remote file list must be then be fetched using
  * ovirt_collection_fetch() or ovirt_collection_fetch_async().
  *
- * Return value: (transfer full): a #OvirtCollection representing the list
+ * Return value: (transfer none): a #OvirtCollection representing the list
  * of files associated with @domain.
  */
 OvirtCollection *ovirt_storage_domain_get_files(OvirtStorageDomain *domain)
