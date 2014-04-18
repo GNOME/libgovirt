@@ -550,15 +550,21 @@ static gboolean set_ca_cert_from_data(OvirtProxy *proxy,
      * the ca-cert property, we need to create a temporary file in order
      * to be able to keep the ssl-ca-file property synced with it
      */
-    char *ca_file_path;
+    char *ca_file_path = NULL;
     GError *error = NULL;
     gboolean result = FALSE;
 
-    ca_file_path = write_to_tmp_file("govirt-ca-XXXXXX.crt", ca_cert_data, ca_cert_len, &error);
-    if (ca_file_path == NULL) {
-        g_warning("Failed to create temporary file for CA certificate: %s",
-                  error->message);
-        goto end;
+    if (ca_cert_data != NULL) {
+        ca_file_path = write_to_tmp_file("govirt-ca-XXXXXX.crt",
+                                         ca_cert_data, ca_cert_len,
+                                         &error);
+        if (ca_file_path == NULL) {
+            g_warning("Failed to create temporary file for CA certificate: %s",
+                      error->message);
+            goto end;
+        }
+    } else {
+        ca_file_path = NULL;
     }
 
     ovirt_proxy_set_tmp_ca_file(proxy, ca_file_path);
@@ -727,7 +733,11 @@ static void ovirt_proxy_set_property(GObject *object,
     case PROP_CA_CERT: {
         GByteArray *ca_cert;
         ca_cert = g_value_get_boxed(value);
-        set_ca_cert_from_data(proxy, (char *)ca_cert->data, ca_cert->len);
+        if (ca_cert != NULL) {
+            set_ca_cert_from_data(proxy, (char *)ca_cert->data, ca_cert->len);
+        } else {
+            set_ca_cert_from_data(proxy, NULL, 0);
+        }
         break;
     }
 
