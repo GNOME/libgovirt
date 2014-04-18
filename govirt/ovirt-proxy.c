@@ -264,7 +264,7 @@ void ovirt_rest_call_async(OvirtRestCall *call,
                            GDestroyNotify destroy_func)
 {
     OvirtProxy *proxy;
-    GError *error;
+    GError *error = NULL;
     OvirtProxyCallAsyncData *data;
 
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
