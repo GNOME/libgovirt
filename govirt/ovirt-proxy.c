@@ -699,13 +699,19 @@ static void ovirt_proxy_set_session_id(OvirtProxy *proxy, const char *session_id
 {
     SoupCookie *cookie;
     char *url;
+    char *domain;
 
     g_object_get(G_OBJECT(proxy), "url-format", &url, NULL);
     g_return_if_fail(url != NULL);
+    if (g_str_has_prefix(url, "https://")) {
+        domain = url + strlen("https://");
+    } else {
+        domain = url;
+    }
 
     g_free(proxy->priv->jsessionid);
     proxy->priv->jsessionid = g_strdup(session_id);
-    cookie = soup_cookie_new("JSESSIONID", session_id, url, "/api", -1);
+    cookie = soup_cookie_new("JSESSIONID", session_id, domain, "/api", -1);
     g_free(url);
     soup_cookie_jar_add_cookie(proxy->priv->cookie_jar, cookie);
 }
