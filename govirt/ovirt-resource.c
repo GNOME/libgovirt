@@ -696,6 +696,11 @@ parse_action_response(RestProxyCall *call, OvirtResource *resource,
 
     result = FALSE;
     root = ovirt_rest_xml_node_from_call(call);
+    /* We are not guaranteed to get XML out of the call, for example we could
+     * get HTML with a 404 error */
+    if (root == NULL) {
+        return FALSE;
+    }
 
     if (g_strcmp0(root->name, "action") == 0) {
         enum OvirtResponseStatus status;
