@@ -616,7 +616,6 @@ ovirt_resource_action(OvirtResource *resource, OvirtProxy *proxy,
     g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
 
     function = ovirt_resource_get_action(OVIRT_RESOURCE(resource), action);
-    function = ovirt_utils_strip_api_base_dir(function);
     g_return_val_if_fail(function != NULL, FALSE);
 
     call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));

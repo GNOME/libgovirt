@@ -90,15 +90,11 @@ static void ovirt_rest_call_set_property(GObject *object,
         rest_proxy_call_set_method(REST_PROXY_CALL(call),
                                    g_value_get_string(value));
         break;
-    case PROP_HREF: {
-        const char *function;
-
+    case PROP_HREF:
         g_free(call->priv->href);
         call->priv->href = g_value_dup_string(value);
-        function = ovirt_utils_strip_api_base_dir(call->priv->href);
-        rest_proxy_call_set_function(REST_PROXY_CALL(call), function);
+        rest_proxy_call_set_function(REST_PROXY_CALL(call), call->priv->href);
         break;
-    }
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }

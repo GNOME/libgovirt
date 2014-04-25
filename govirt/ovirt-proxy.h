@@ -65,7 +65,7 @@ struct _OvirtProxyClass {
 
 GType ovirt_proxy_get_type(void);
 
-OvirtProxy *ovirt_proxy_new(const char *uri);
+OvirtProxy *ovirt_proxy_new(const char *host);
 
 G_DEPRECATED_FOR(ovirt_collection_lookup_resource)
 OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name);

@@ -172,16 +172,6 @@ ovirt_utils_guint_from_string(const char *value_str, guint *value)
     return TRUE;
 }
 
-G_GNUC_INTERNAL const char *ovirt_utils_strip_api_base_dir(const char *path)
-{
-    if (g_str_has_prefix(path, OVIRT_API_BASE_DIR)) {
-        g_debug("stripping %s from %s", OVIRT_API_BASE_DIR, path);
-        path += strlen(OVIRT_API_BASE_DIR);
-    }
-
-    return path;
-}
-
 
 G_GNUC_INTERNAL gboolean ovirt_utils_gerror_from_xml_fault(RestXmlNode *root, GError **error)
 {

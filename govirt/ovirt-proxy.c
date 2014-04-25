@@ -149,7 +149,6 @@ RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
 
     call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
-    href = ovirt_utils_strip_api_base_dir(href);
     rest_proxy_call_set_function(call, href);
     rest_proxy_call_add_header(call, "All-Content", "true");
 
@@ -247,7 +246,6 @@ OvirtRestCall *ovirt_rest_call_new(OvirtProxy *proxy,
     if (method != NULL) {
         rest_proxy_call_set_method(REST_PROXY_CALL(call), method);
     }
-    href = ovirt_utils_strip_api_base_dir(href);
     rest_proxy_call_set_function(REST_PROXY_CALL(call), href);
     /* FIXME: to set or not to set ?? */
     rest_proxy_call_add_header(REST_PROXY_CALL(call), "All-Content", "true");
@@ -379,19 +377,10 @@ static GFile *get_ca_cert_file(OvirtProxy *proxy)
     gchar *base_uri = NULL;
     gchar *ca_uri = NULL;
     GFile *ca_file = NULL;
-    gsize suffix_len;
 
     g_object_get(G_OBJECT(proxy), "url-format", &base_uri, NULL);
     if (base_uri == NULL)
         goto error;
-    if (g_str_has_suffix(base_uri, OVIRT_API_BASE_DIR))
-        suffix_len = strlen(OVIRT_API_BASE_DIR);
-    else if (g_str_has_suffix(base_uri, "/api"))
-        suffix_len = strlen("/api");
-    else
-        g_return_val_if_reached(NULL);
-
-    base_uri[strlen(base_uri) - suffix_len] = '\0';
 
     ca_uri = g_build_filename(base_uri, CA_CERT_FILENAME, NULL);
     g_debug("CA certificate URI: %s", ca_uri);
@@ -844,15 +833,60 @@ ovirt_proxy_init(OvirtProxy *self)
                                 SOUP_SESSION_FEATURE(self->priv->cookie_jar));
 }
 
-OvirtProxy *ovirt_proxy_new(const char *uri)
+/* FIXME : "uri" should just be a base domain, foo.example.com/some/path
+ * govirt will then prepend https://
+ * /api/ is part of what librest call 'function'
+ * -> get rid of all the /api/ stripping here and there
+ */
+OvirtProxy *ovirt_proxy_new(const char *hostname)
 {
+    char *uri;
+    OvirtProxy *proxy;
+    gsize suffix_len = 0;
+    int i;
+
+    if (!g_str_has_prefix(hostname, "http://") && !g_str_has_prefix(hostname, "https://")) {
+        uri = g_strconcat("https://", hostname, NULL);
+    } else {
+        /* Fallback code for backwards API compat, early libgovirt versions
+         * expected a full fledged URI */
+        g_warning("Passing a full http:// or https:// URI to "
+                  "ovirt_proxy_new() is deprecated");
+        uri = g_strdup(hostname);
+    }
+
+    /* More backwards compat code, strip "/api" from URI */
+    if (g_str_has_suffix(uri, "api")) {
+        suffix_len = strlen("api");
+    } else if (g_str_has_suffix(uri, "/api")) {
+        suffix_len = strlen("/api");
+    } else if (g_str_has_suffix(uri, "/api/")) {
+        suffix_len = strlen("/api/");
+    }
+    if (suffix_len != 0) {
+        g_warning("Passing an URI ending in /api to ovirt_proxy_new() "
+                  "is deprecated");
+        uri[strlen(uri) - suffix_len] = '\0';
+    }
+
+    /* Strip trailing '/' */
+    for (i = strlen(uri)-1; i >= 0; i--) {
+        if (uri[i] != '/') {
+            break;
+        }
+        uri[i] = '\0';
+    }
+
     /* We disable cookies upon OvirtProxy creation as we will be
      * adding our own cookie jar to OvirtProxy
      */
-    return g_object_new(OVIRT_TYPE_PROXY,
-                        "url-format", uri,
-                        "disable-cookies", TRUE,
-                        NULL);
+    proxy =  OVIRT_PROXY(g_object_new(OVIRT_TYPE_PROXY,
+                                      "url-format", uri,
+                                      "disable-cookies", TRUE,
+                                      NULL));
+    g_free(uri);
+
+    return proxy;
 }
 
 
@@ -881,7 +915,7 @@ OvirtApi *ovirt_proxy_fetch_api(OvirtProxy *proxy, GError **error)
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
 
-    api_node = ovirt_proxy_get_collection_xml(proxy, "", error);
+    api_node = ovirt_proxy_get_collection_xml(proxy, "/api", error);
     if (api_node == NULL) {
         return NULL;
     }
@@ -924,7 +958,7 @@ void ovirt_proxy_fetch_api_async(OvirtProxy *proxy,
     result = g_simple_async_result_new (G_OBJECT(proxy), callback,
                                         user_data,
                                         ovirt_proxy_fetch_api_async);
-    ovirt_proxy_get_collection_xml_async(proxy, "", result, cancellable,
+    ovirt_proxy_get_collection_xml_async(proxy, "/api", result, cancellable,
                                          fetch_api_async_cb, NULL, NULL);
 }
 
