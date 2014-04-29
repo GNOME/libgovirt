@@ -601,6 +601,26 @@ static gboolean parse_action_response(RestProxyCall *call, OvirtResource *resour
                                       ActionResponseParser response_parser,
                                       GError **error);
 
+static RestProxyCall *
+ovirt_resource_create_rest_call_for_action(OvirtResource *resource,
+                                           OvirtProxy *proxy,
+                                           const char *action)
+{
+    OvirtActionRestCall *call;
+    const char *function;
+
+    function = ovirt_resource_get_action(resource, action);
+    g_return_val_if_fail(function != NULL, NULL);
+
+    call = ovirt_action_rest_call_new(REST_PROXY(proxy));
+    rest_proxy_call_set_method(REST_PROXY_CALL(call), "POST");
+    rest_proxy_call_set_function(REST_PROXY_CALL(call), function);
+    rest_proxy_call_add_param(REST_PROXY_CALL(call),
+                              "async", "false");
+
+    return REST_PROXY_CALL(call);
+}
+
 gboolean
 ovirt_resource_action(OvirtResource *resource, OvirtProxy *proxy,
                       const char *action,
@@ -608,20 +628,16 @@ ovirt_resource_action(OvirtResource *resource, OvirtProxy *proxy,
                       GError **error)
 {
     RestProxyCall *call;
-    const char *function;
 
     g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
     g_return_val_if_fail(action != NULL, FALSE);
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
     g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
 
-    function = ovirt_resource_get_action(OVIRT_RESOURCE(resource), action);
-    g_return_val_if_fail(function != NULL, FALSE);
-
-    call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
-    rest_proxy_call_set_method(call, "POST");
-    rest_proxy_call_set_function(call, function);
-    rest_proxy_call_add_param(call, "async", "false");
+    call = ovirt_resource_create_rest_call_for_action(resource,
+                                                      proxy,
+						      action);
+    g_return_val_if_fail(call != NULL, FALSE);
 
     if (!rest_proxy_call_sync(call, error)) {
         GError *call_error = NULL;
@@ -777,9 +793,8 @@ ovirt_resource_invoke_action_async(OvirtResource *resource,
                                    GAsyncReadyCallback callback,
                                    gpointer user_data)
 {
-    OvirtRestCall *call;
+    RestProxyCall *call;
     GSimpleAsyncResult *result;
-    const char *function;
     OvirtResourceInvokeActionData *data;
 
     g_return_if_fail(OVIRT_IS_RESOURCE(resource));
@@ -788,8 +803,10 @@ ovirt_resource_invoke_action_async(OvirtResource *resource,
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
     g_debug("invoking '%s' action on %p using %p", action, resource, proxy);
-    function = ovirt_resource_get_action(resource, action);
-    g_return_if_fail(function != NULL);
+    call = ovirt_resource_create_rest_call_for_action(resource,
+                                                      proxy,
+						      action);
+    g_return_if_fail(call != NULL);
 
     result = g_simple_async_result_new(G_OBJECT(resource), callback,
                                        user_data,
@@ -798,9 +815,7 @@ ovirt_resource_invoke_action_async(OvirtResource *resource,
     data->resource = resource;
     data->parser = response_parser;
 
-    call = ovirt_rest_call_new(proxy, "POST", function);
-
-    ovirt_rest_call_async(call, result, cancellable,
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
                           ovirt_resource_invoke_action_async_cb, data,
                           (GDestroyNotify)ovirt_resource_invoke_action_data_free);
 }
