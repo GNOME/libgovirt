@@ -77,10 +77,12 @@ static void ovirt_resource_rest_call_set_property(GObject *object,
         char *href;
 
         call->priv->resource = g_value_dup_object(value);
-        g_object_get(G_OBJECT(call->priv->resource), "href", &href, NULL);
-        g_return_if_fail(href != NULL);
-        g_object_set(object, "href", href, NULL);
-        g_free(href);
+        if (call->priv->resource != NULL) {
+            g_object_get(G_OBJECT(call->priv->resource), "href", &href, NULL);
+            g_return_if_fail(href != NULL);
+            g_object_set(object, "href", href, NULL);
+            g_free(href);
+        }
         break;
     }
     default:

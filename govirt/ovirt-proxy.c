@@ -139,6 +139,26 @@ static void dump_vm(OvirtVm *vm)
 #endif
 
 
+static RestProxyCall *ovirt_rest_call_new(OvirtProxy *proxy,
+                                          const char *method,
+                                          const char *href)
+{
+    RestProxyCall *call;
+
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
+
+    call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
+    if (method != NULL) {
+        rest_proxy_call_set_method(call, method);
+    }
+    rest_proxy_call_set_function(call, href);
+    /* FIXME: to set or not to set ?? */
+    rest_proxy_call_add_header(call, "All-Content", "true");
+
+    return call;
+}
+
+
 RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
                                             const char *href,
                                             GError **error)
@@ -148,9 +168,7 @@ RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
 
-    call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
-    rest_proxy_call_set_function(call, href);
-    rest_proxy_call_add_header(call, "All-Content", "true");
+    call = ovirt_rest_call_new(proxy, "GET", href);
 
     if (!rest_proxy_call_sync(call, error)) {
         if ((error != NULL) && (*error != NULL)) {
@@ -231,26 +249,6 @@ call_async_cb(RestProxyCall *call, const GError *error,
 
     g_simple_async_result_complete (result);
     ovirt_proxy_call_async_data_free(data);
-}
-
-
-OvirtRestCall *ovirt_rest_call_new(OvirtProxy *proxy,
-                                   const char *method,
-                                   const char *href)
-{
-    OvirtRestCall *call;
-
-    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
-
-    call = OVIRT_REST_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
-    if (method != NULL) {
-        rest_proxy_call_set_method(REST_PROXY_CALL(call), method);
-    }
-    rest_proxy_call_set_function(REST_PROXY_CALL(call), href);
-    /* FIXME: to set or not to set ?? */
-    rest_proxy_call_add_header(REST_PROXY_CALL(call), "All-Content", "true");
-
-    return call;
 }
 
 
@@ -356,7 +354,7 @@ void ovirt_proxy_get_collection_xml_async(OvirtProxy *proxy,
                                           GDestroyNotify destroy_func)
 {
     OvirtProxyGetCollectionAsyncData *data;
-    OvirtRestCall *call;
+    RestProxyCall *call;
 
     data = g_slice_new0(OvirtProxyGetCollectionAsyncData);
     data->parser = callback;
@@ -365,7 +363,7 @@ void ovirt_proxy_get_collection_xml_async(OvirtProxy *proxy,
 
     call = ovirt_rest_call_new(proxy, "GET", href);
 
-    ovirt_rest_call_async(call, result, cancellable,
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
                           get_collection_xml_async_cb, data,
                           (GDestroyNotify)ovirt_proxy_get_collection_async_data_destroy);
     g_object_unref(call);

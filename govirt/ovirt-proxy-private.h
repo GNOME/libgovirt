@@ -61,9 +61,6 @@ typedef gboolean (*OvirtProxyCallAsyncCb)(OvirtProxy *proxy,
                                           RestProxyCall *call,
                                           gpointer user_data,
                                           GError **error);
-OvirtRestCall *ovirt_rest_call_new(OvirtProxy *proxy,
-                                   const char *method,
-                                   const char *href);
 void ovirt_rest_call_async(OvirtRestCall *call,
                            GSimpleAsyncResult *result,
                            GCancellable *cancellable,

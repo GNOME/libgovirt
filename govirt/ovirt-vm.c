@@ -314,9 +314,8 @@ void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
                             GAsyncReadyCallback callback,
                             gpointer user_data)
 {
-    OvirtRestCall *call;
+    OvirtResourceRestCall *call;
     GSimpleAsyncResult *result;
-    char *href;
 
     g_return_if_fail(OVIRT_IS_VM(vm));
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
@@ -325,12 +324,15 @@ void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
     result = g_simple_async_result_new(G_OBJECT(vm), callback,
                                        user_data,
                                        ovirt_vm_refresh_async);
-    g_object_get(G_OBJECT(vm), "href", &href, NULL);
-    call = ovirt_rest_call_new(proxy, "GET", href);
-    ovirt_rest_call_async(call, result, cancellable,
+    call = ovirt_resource_rest_call_new(REST_PROXY(proxy),
+                                        OVIRT_RESOURCE(vm));
+    /* FIXME: to set or not to set ?? */
+    rest_proxy_call_add_header(REST_PROXY_CALL(call),
+                               "All-Content", "true");
+    rest_proxy_call_set_method(REST_PROXY_CALL(call), "GET");
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
                           ovirt_vm_refresh_async_cb, vm, NULL);
     g_object_unref(G_OBJECT(call));
-    g_free(href);
 }
 
 gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
