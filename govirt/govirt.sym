@@ -90,6 +90,10 @@ GOVIRT_0.2.1 {
 GOVIRT_0.3.1 {
         ovirt_api_get_vm_pools;
 
+        ovirt_resource_refresh;
+        ovirt_resource_refresh_async;
+        ovirt_resource_refresh_finish;
+
         ovirt_vm_pool_get_type;
         ovirt_vm_pool_new;
         ovirt_vm_pool_allocate_vm;

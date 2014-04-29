@@ -840,3 +840,89 @@ ovirt_resource_action_finish(OvirtResource *resource,
 
     return ovirt_rest_call_finish(result, err);
 }
+
+
+static gboolean ovirt_resource_refresh_async_cb(OvirtProxy *proxy,
+                                                RestProxyCall *call,
+                                                gpointer user_data,
+                                                GError **error)
+{
+    OvirtResource *resource;
+    RestXmlNode *root;
+    gboolean refreshed;
+
+    g_return_val_if_fail(REST_IS_PROXY_CALL(call), FALSE);
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(user_data), FALSE);
+
+    root = ovirt_rest_xml_node_from_call(call);
+    resource = OVIRT_RESOURCE(user_data);
+    refreshed = ovirt_resource_init_from_xml(resource, root, error);
+
+    rest_xml_node_unref(root);
+
+    return refreshed;
+}
+
+void ovirt_resource_refresh_async(OvirtResource *resource,
+                                  OvirtProxy *proxy,
+                                  GCancellable *cancellable,
+                                  GAsyncReadyCallback callback,
+                                  gpointer user_data)
+{
+    OvirtResourceRestCall *call;
+    GSimpleAsyncResult *result;
+
+    g_return_if_fail(OVIRT_IS_RESOURCE(resource));
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
+
+    result = g_simple_async_result_new(G_OBJECT(resource), callback,
+                                       user_data,
+                                       ovirt_resource_refresh_async);
+    call = ovirt_resource_rest_call_new(REST_PROXY(proxy),
+                                        OVIRT_RESOURCE(resource));
+    /* FIXME: to set or not to set ?? */
+    rest_proxy_call_add_header(REST_PROXY_CALL(call),
+                               "All-Content", "true");
+    rest_proxy_call_set_method(REST_PROXY_CALL(call), "GET");
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
+                          ovirt_resource_refresh_async_cb, resource,
+                          NULL);
+    g_object_unref(G_OBJECT(call));
+}
+
+
+gboolean ovirt_resource_refresh_finish(OvirtResource *resource,
+                                       GAsyncResult *result,
+                                       GError **err)
+{
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
+    g_return_val_if_fail(g_simple_async_result_is_valid(result,
+                                                        G_OBJECT(resource),
+                                                        ovirt_resource_refresh_async),
+                         FALSE);
+
+    return ovirt_rest_call_finish(result, err);
+}
+
+
+gboolean ovirt_resource_refresh(OvirtResource *resource,
+                                OvirtProxy *proxy,
+                                GError **error)
+{
+    RestXmlNode *root_node;
+    gboolean success;
+
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
+
+    root_node = ovirt_resource_rest_call(resource, proxy, "GET", error);
+    if (root_node == NULL) {
+        return FALSE;
+    }
+
+    success = ovirt_resource_init_from_xml(resource, root_node, error);
+    rest_xml_node_unref(root_node);
+
+    return success;
+}

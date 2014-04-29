@@ -78,6 +78,18 @@ gboolean ovirt_resource_update_finish(OvirtResource *resource,
                                       GAsyncResult *result,
                                       GError **err);
 
+gboolean ovirt_resource_refresh(OvirtResource *resource,
+                                OvirtProxy *proxy,
+                                GError **error);
+void ovirt_resource_refresh_async(OvirtResource *resource,
+                                  OvirtProxy *proxy,
+                                  GCancellable *cancellable,
+                                  GAsyncReadyCallback callback,
+                                  gpointer user_data);
+gboolean ovirt_resource_refresh_finish(OvirtResource *resource,
+                                       GAsyncResult *result,
+                                       GError **err);
+
 G_END_DECLS
 
 #endif /* __OVIRT_RESOURCE_H__ */
