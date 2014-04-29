@@ -127,8 +127,14 @@ static gboolean ovirt_resource_rest_call_class_serialize_params(RestProxyCall *c
     self = OVIRT_RESOURCE_REST_CALL(call);
 
     *content_type = g_strdup("application/xml");
-    *content = ovirt_resource_to_xml(self->priv->resource);
-    *content_len = strlen(*content);
+    if (g_strcmp0(rest_proxy_call_get_method(call), "PUT") == 0) {
+        g_return_val_if_fail(self->priv->resource != NULL, FALSE);
+        *content = ovirt_resource_to_xml(self->priv->resource);
+        *content_len = strlen(*content);
+    } else {
+        *content = NULL;
+        *content_len = 0;
+    }
 
     params = rest_proxy_call_get_params(call);
     if (!rest_params_are_strings(params)) {
