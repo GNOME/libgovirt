@@ -290,61 +290,26 @@ static gboolean parse_ticket_status(RestXmlNode *root, OvirtResource *resource, 
 }
 
 
-static gboolean ovirt_vm_refresh_async_cb(OvirtProxy *proxy, RestProxyCall *call,
-                                          gpointer user_data, GError **error)
-{
-    OvirtVm *vm;
-    RestXmlNode *root;
-    gboolean refreshed;
-
-    g_return_val_if_fail(REST_IS_PROXY_CALL(call), FALSE);
-    g_return_val_if_fail(OVIRT_IS_VM(user_data), FALSE);
-
-    root = ovirt_rest_xml_node_from_call(call);
-    vm = OVIRT_VM(user_data);
-    refreshed = ovirt_vm_refresh_from_xml(vm, root);
-
-    rest_xml_node_unref(root);
-
-    return refreshed;
-}
-
 void ovirt_vm_refresh_async(OvirtVm *vm, OvirtProxy *proxy,
                             GCancellable *cancellable,
                             GAsyncReadyCallback callback,
                             gpointer user_data)
 {
-    OvirtResourceRestCall *call;
-    GSimpleAsyncResult *result;
-
     g_return_if_fail(OVIRT_IS_VM(vm));
-    g_return_if_fail(OVIRT_IS_PROXY(proxy));
-    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
-    result = g_simple_async_result_new(G_OBJECT(vm), callback,
-                                       user_data,
-                                       ovirt_vm_refresh_async);
-    call = ovirt_resource_rest_call_new(REST_PROXY(proxy),
-                                        OVIRT_RESOURCE(vm));
-    /* FIXME: to set or not to set ?? */
-    rest_proxy_call_add_header(REST_PROXY_CALL(call),
-                               "All-Content", "true");
-    rest_proxy_call_set_method(REST_PROXY_CALL(call), "GET");
-    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
-                          ovirt_vm_refresh_async_cb, vm, NULL);
-    g_object_unref(G_OBJECT(call));
+    ovirt_resource_refresh_async(OVIRT_RESOURCE(vm), proxy,
+                                 cancellable, callback,
+                                 user_data);
 }
+
 
 gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
                                  GAsyncResult *result,
                                  GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_VM(vm), FALSE);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(vm),
-                                                        ovirt_vm_refresh_async),
-                         FALSE);
-
-    return ovirt_rest_call_finish(result, err);
+    return ovirt_resource_refresh_finish(OVIRT_RESOURCE(vm),
+                                         result, err);
 }
 
 
