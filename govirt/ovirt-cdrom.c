@@ -21,7 +21,9 @@
  */
 
 #include <config.h>
+#define GOVIRT_UNSTABLE_API_ABI
 #include "ovirt-cdrom.h"
+#undef GOVIRT_UNSTABLE_API_ABI
 #include "ovirt-proxy.h"
 #include "ovirt-proxy-private.h"
 #include "ovirt-resource-private.h"
@@ -42,6 +44,9 @@ enum {
     PROP_FILE
 };
 
+
+static void ovirt_cdrom_add_rest_params(G_GNUC_UNUSED OvirtResource *resource,
+                                        RestProxyCall *call);
 
 static void ovirt_cdrom_get_property(GObject *object,
                                      guint prop_id,
@@ -166,6 +171,7 @@ static void ovirt_cdrom_class_init(OvirtCdromClass *klass)
 
     resource_class->init_from_xml = ovirt_cdrom_init_from_xml;
     resource_class->to_xml = ovirt_cdrom_to_xml;
+    resource_class->add_rest_params = ovirt_cdrom_add_rest_params;
     object_class->finalize = ovirt_cdrom_finalize;
     object_class->get_property = ovirt_cdrom_get_property;
     object_class->set_property = ovirt_cdrom_set_property;
@@ -257,4 +263,11 @@ gboolean ovirt_cdrom_update_finish(OvirtCdrom *cdrom,
     g_return_val_if_fail((err == NULL) || (*err == NULL), FALSE);
 
     return ovirt_rest_call_finish(result, err);
+}
+
+
+static void ovirt_cdrom_add_rest_params(G_GNUC_UNUSED OvirtResource *resource,
+                                        RestProxyCall *call)
+{
+    rest_proxy_call_add_param(REST_PROXY_CALL(call), "current", NULL);
 }
