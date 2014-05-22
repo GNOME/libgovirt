@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 const char *ovirt_resource_get_action(OvirtResource *resource,
                                       const char *action);
 char *ovirt_resource_to_xml(OvirtResource *resource);
-gboolean ovirt_resource_rest_call_sync(OvirtRestCall *call, GError **error);
+RestXmlNode *ovirt_resource_rest_call_sync(OvirtRestCall *call, GError **error);
 
 typedef gboolean (*ActionResponseParser)(RestXmlNode *node, OvirtResource *resource, GError **error);
 gboolean ovirt_resource_action(OvirtResource *resource, OvirtProxy *proxy,

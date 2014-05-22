@@ -474,11 +474,11 @@ char *ovirt_resource_to_xml(OvirtResource *resource)
 }
 
 
-G_GNUC_INTERNAL gboolean ovirt_resource_rest_call_sync(OvirtRestCall *call,
-                                                       GError **error)
+G_GNUC_INTERNAL RestXmlNode *ovirt_resource_rest_call_sync(OvirtRestCall *call,
+                                                           GError **error)
 {
+    RestXmlNode *root = NULL;
     if (!rest_proxy_call_sync(REST_PROXY_CALL(call), error)) {
-        RestXmlNode *root;
         GError *local_error = NULL;
 
         root = ovirt_rest_xml_node_from_call(REST_PROXY_CALL(call));
@@ -489,31 +489,34 @@ G_GNUC_INTERNAL gboolean ovirt_resource_rest_call_sync(OvirtRestCall *call,
             g_warning("message: %s", local_error->message);
             g_propagate_error(error, local_error);
         }
+        if (root != NULL) {
+            rest_xml_node_unref(root);
+        }
 
-        return FALSE;
+        return NULL;
     }
 
-    return TRUE;
+    return root;
 }
 
 
-static gboolean ovirt_resource_rest_call(OvirtResource *resource,
-                                         OvirtProxy *proxy,
-                                         const char *method,
-                                         GError **error)
+static RestXmlNode *ovirt_resource_rest_call(OvirtResource *resource,
+                                             OvirtProxy *proxy,
+                                             const char *method,
+                                             GError **error)
 {
     OvirtRestCall *call;
-    gboolean success;
+    RestXmlNode *root;
 
     call = OVIRT_REST_CALL(ovirt_resource_rest_call_new(REST_PROXY(proxy),
                                                         resource));
     rest_proxy_call_set_method(REST_PROXY_CALL(call), method);
 
-    success = ovirt_resource_rest_call_sync(call, error);
+    root = ovirt_resource_rest_call_sync(call, error);
 
     g_object_unref(G_OBJECT(call));
 
-    return success;
+    return root;
 }
 
 
@@ -521,16 +524,20 @@ gboolean ovirt_resource_update(OvirtResource *resource,
                                OvirtProxy *proxy,
                                GError **error)
 {
-    gboolean call_successful;
+    RestXmlNode *xml;
 
     g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
     g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
 
-    call_successful = ovirt_resource_rest_call(resource, proxy,
-                                               "PUT", error);
+    xml = ovirt_resource_rest_call(resource, proxy,
+                                   "PUT", error);
+    if (xml != NULL) {
+        rest_xml_node_unref(xml);
+        return TRUE;
+    }
 
-    return call_successful;
+    return FALSE;
 }
 
 static gboolean ovirt_resource_update_async_cb(OvirtProxy *proxy, RestProxyCall *call,

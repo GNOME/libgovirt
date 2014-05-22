@@ -190,7 +190,7 @@ gboolean ovirt_cdrom_update(OvirtCdrom *cdrom,
                             GError **error)
 {
     OvirtRestCall *call;
-    gboolean success;
+    RestXmlNode *root;
 
     call = OVIRT_REST_CALL(ovirt_resource_rest_call_new(REST_PROXY(proxy),
                                                         OVIRT_RESOURCE(cdrom)));
@@ -199,11 +199,16 @@ gboolean ovirt_cdrom_update(OvirtCdrom *cdrom,
     if (current) {
         rest_proxy_call_add_param(REST_PROXY_CALL(call), "current", NULL);
     }
-    success = ovirt_resource_rest_call_sync(call, error);
+    root = ovirt_resource_rest_call_sync(call, error);
 
     g_object_unref(G_OBJECT(call));
 
-    return success;
+    if (root != NULL) {
+        rest_xml_node_unref(root);
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 
