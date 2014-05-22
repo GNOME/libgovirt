@@ -27,10 +27,12 @@
 #include <rest/rest-xml-node.h>
 #include <rest/rest-xml-parser.h>
 
+#define GOVIRT_UNSTABLE_API_ABI
 #include "govirt-private.h"
 #include "ovirt-error.h"
 #include "ovirt-proxy-private.h"
 #include "ovirt-resource.h"
+#undef GOVIRT_UNSTABLE_API_ABI
 
 #define OVIRT_RESOURCE_GET_PRIVATE(obj)                         \
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_RESOURCE, OvirtResourcePrivate))
@@ -925,4 +927,17 @@ gboolean ovirt_resource_refresh(OvirtResource *resource,
     rest_xml_node_unref(root_node);
 
     return success;
+}
+
+void ovirt_resource_add_rest_params(OvirtResource *resource,
+                                    RestProxyCall *call)
+{
+    OvirtResourceClass *klass;
+
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), NULL);
+    g_return_if_fail(OVIRT_IS_RESOURCE_REST_CALL(call));
+
+    klass = OVIRT_RESOURCE_GET_CLASS(resource);
+    if (klass->to_xml != NULL)
+        klass->add_rest_params(resource, call);
 }

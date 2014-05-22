@@ -23,7 +23,7 @@
 #define __OVIRT_RESOURCE_PRIVATE_H__
 
 #include <ovirt-resource.h>
-#include <ovirt-rest-call.h>
+#include <ovirt-resource-rest-call.h>
 
 G_BEGIN_DECLS
 
@@ -48,6 +48,8 @@ void ovirt_resource_invoke_action_async(OvirtResource *resource,
 gboolean ovirt_resource_action_finish(OvirtResource *resource,
                                       GAsyncResult *result,
                                       GError **err);
+void ovirt_resource_add_rest_params(OvirtResource *resource,
+                                    RestProxyCall *call);
 
 G_END_DECLS
 

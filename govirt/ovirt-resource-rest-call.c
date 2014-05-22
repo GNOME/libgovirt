@@ -138,6 +138,7 @@ static gboolean ovirt_resource_rest_call_class_serialize_params(RestProxyCall *c
         *content_len = 0;
     }
 
+    ovirt_resource_add_rest_params(self->priv->resource, self);
     params = rest_proxy_call_get_params(call);
     if (!rest_params_are_strings(params)) {
         g_set_error(error, OVIRT_REST_CALL_ERROR, 0,
