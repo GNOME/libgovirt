@@ -233,7 +233,7 @@ call_async_cb(RestProxyCall *call, const GError *error,
         g_simple_async_result_set_from_error(result, error);
     } else {
         GError *call_error = NULL;
-        gboolean callback_result = FALSE;
+        gboolean callback_result = TRUE;
 
         if (data->call_async_cb != NULL) {
             callback_result = data->call_async_cb(data->proxy, call,
