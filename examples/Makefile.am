@@ -49,3 +49,5 @@ list_vms_async_LDADD = \
 		../govirt/libgovirt.la \
 		$(GLIB_LIBS) \
 		$(REST_LIBS)
+
+-include $(top_srcdir)/git.mk
