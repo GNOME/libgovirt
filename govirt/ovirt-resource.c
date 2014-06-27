@@ -934,7 +934,7 @@ void ovirt_resource_add_rest_params(OvirtResource *resource,
 {
     OvirtResourceClass *klass;
 
-    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), NULL);
+    g_return_if_fail(OVIRT_IS_RESOURCE(resource));
     g_return_if_fail(OVIRT_IS_RESOURCE_REST_CALL(call));
 
     klass = OVIRT_RESOURCE_GET_CLASS(resource);
