@@ -1,11 +1,18 @@
-0.3.1 -
+0.3.1 - September 3rd 2014
+==========================
 
-Changes since 0.3.1:
+Changes since 0.3.0:
 
 - Handle cookies set by the oVirt instance in order to have some
  'persistant' authentication through the JSESSIONID cookie
-- Add support for VM pools
+- Add support for VM pools (Iordan Iordanov)
+- Added ovirt_resource_refresh{_async} in order to refetch a resource content
+  remotely
 - Various leak/memory-handling related bug fixes
+- ovirt_proxy_new now expects a hostname without the https:// and the /api part.
+  hostnames with http/https/api will still work fine but will cause runtime
+  warnings.
+
 
 0.3.0 - October 29, 2013
 ========================
