@@ -65,6 +65,7 @@ ovirt_rest_xml_node_get_content(RestXmlNode *node, ...)
         node = rest_xml_node_find(node, node_name);
         if (node == NULL) {
             g_debug("could not find XML node '%s'", node_name);
+            va_end(args);
             return NULL;
         }
     }
