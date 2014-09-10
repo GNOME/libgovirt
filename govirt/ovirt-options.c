@@ -18,7 +18,9 @@
 # include "config.h"
 #endif
 
+#include <pwd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <glib-object.h>
 
 #include "ovirt-options.h"
@@ -57,6 +59,35 @@ GOptionGroup* ovirt_get_option_group(void)
     return grp;
 }
 
+/* Taken from gnome-vfs-utils.c */
+static gchar *
+expand_initial_tilde(const gchar *path)
+{
+    gchar *slash_after_user_name, *user_name;
+    struct passwd *passwd_file_entry;
+
+    if (path[1] == '/' || path[1] == '\0') {
+        return g_build_filename(g_get_home_dir(), &path[1], NULL);
+    }
+
+    slash_after_user_name = strchr(&path[1], '/');
+    if (slash_after_user_name == NULL) {
+        user_name = g_strdup(&path[1]);
+    } else {
+        user_name = g_strndup(&path[1], slash_after_user_name - &path[1]);
+    }
+    passwd_file_entry = getpwnam(user_name);
+    g_free(user_name);
+
+    if (passwd_file_entry == NULL || passwd_file_entry->pw_dir == NULL) {
+        return g_strdup(path);
+    }
+
+    return g_strconcat(passwd_file_entry->pw_dir,
+                       slash_after_user_name,
+                       NULL);
+}
+
 /**
  * ovirt_set_proxy_options:
  * @proxy: a #OvirtProxy to set options upon
@@ -68,6 +99,21 @@ void ovirt_set_proxy_options(OvirtProxy *proxy)
 {
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
 
-    if (ca_file)
-        g_object_set(G_OBJECT(proxy), "ssl-ca-file", ca_file, NULL);
+    if (ca_file) {
+        gchar *ca_file_absolute_path = NULL;
+
+        /* We have to treat files with non-absolute paths starting
+         * with tilde (eg, ~foo/bar/ca.crt or ~/bar/ca.cert).
+         * Other non-absolute paths will be treated down in the
+         * stack, by libsoup, simply prepending the user's current
+         * dir to the file path */
+        if (ca_file[0] == '~')
+            ca_file_absolute_path = expand_initial_tilde(ca_file);
+
+        g_object_set(G_OBJECT(proxy),
+                     "ssl-ca-file",
+                     ca_file_absolute_path != NULL ? ca_file_absolute_path : ca_file,
+                     NULL);
+        g_free (ca_file_absolute_path);
+    }
 }
