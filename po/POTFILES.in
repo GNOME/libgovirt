@@ -1,0 +1,8 @@
+govirt/ovirt-action-rest-call.c
+govirt/ovirt-collection.c
+govirt/ovirt-options.c
+govirt/ovirt-proxy.c
+govirt/ovirt-resource-rest-call.c
+govirt/ovirt-resource.c
+govirt/ovirt-utils.c
+govirt/ovirt-vm.c

@@ -22,6 +22,8 @@
 
 #include <config.h>
 
+#include <glib/gi18n-lib.h>
+
 #include "ovirt-action-rest-call.h"
 #include "ovirt-proxy.h"
 #include "ovirt-rest-call-error.h"
@@ -52,7 +54,7 @@ static gboolean ovirt_action_rest_call_class_serialize_params(RestProxyCall *cal
     params = rest_proxy_call_get_params(call);
     if (!rest_params_are_strings(params)) {
         g_set_error(error, OVIRT_REST_CALL_ERROR, 0,
-                    "unexpected parameter type in REST call");
+                    _("Unexpected parameter type in REST call"));
         return FALSE;
     }
 

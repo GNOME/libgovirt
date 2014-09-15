@@ -34,6 +34,7 @@
 #include <errno.h>
 #include <string.h>
 #include <glib/gstdio.h>
+#include <glib/gi18n-lib.h>
 #include <libsoup/soup-cookie.h>
 #include <rest/rest-xml-node.h>
 #include <rest/rest-xml-parser.h>
@@ -495,7 +496,7 @@ static char *write_to_tmp_file(const char *template,
             if ((errno != EINTR) || (errno != EAGAIN)) {
                 g_set_error(error, G_FILE_ERROR,
                             g_file_error_from_errno(errno),
-                            "Failed to write to '%s': %s",
+                            _("Failed to write to '%s': %s"),
                             tmp_file, strerror(errno));
                 goto end;
             }
@@ -513,7 +514,7 @@ end:
         if (close_status != 0) {
             g_set_error(error, G_FILE_ERROR,
                         g_file_error_from_errno(errno),
-                        "Failed to close '%s': %s",
+                        _("Failed to close '%s': %s"),
                         result, strerror(errno));
             g_free(result);
             result = NULL;
@@ -578,7 +579,8 @@ gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
 
     source = get_ca_cert_file(proxy);
     if (source == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_BAD_URI, "could not extract ca cert filename from URI");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_BAD_URI,
+                    _("Could not extract ca cert filename from URI"));
         goto error;
     }
 

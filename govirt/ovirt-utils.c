@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include <glib/gi18n-lib.h>
 #include <rest/rest-xml-parser.h>
 
 #include "ovirt-utils.h"
@@ -188,7 +189,8 @@ G_GNUC_INTERNAL gboolean ovirt_utils_gerror_from_xml_fault(RestXmlNode *root, GE
 
     reason_node = g_hash_table_lookup(root->children, reason_key);
     if (reason_node == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'reason' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                    _("Could not find 'reason' node"));
         g_return_val_if_reached(FALSE);
     }
     g_debug("Reason: %s\n", reason_node->content);

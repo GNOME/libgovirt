@@ -24,6 +24,7 @@
 
 #include <string.h>
 
+#include <glib/gi18n-lib.h>
 #include <rest/rest-xml-node.h>
 #include <rest/rest-xml-parser.h>
 
@@ -175,7 +176,7 @@ static gboolean ovirt_resource_initable_init(GInitable *initable,
 
     if (cancellable != NULL) {
         g_set_error_literal (error, OVIRT_ERROR, OVIRT_ERROR_NOT_SUPPORTED,
-                             "Cancellable initialization not supported");
+                             _("Cancellable initialization not supported"));
         return FALSE;
     }
 
@@ -426,14 +427,14 @@ static gboolean ovirt_resource_init_from_xml_real(OvirtResource *resource,
     guid = rest_xml_node_get_attr(node, "id");
     if ((guid == NULL) && !is_api) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
-                    "missing mandatory 'id' attribute");
+                    _("Missing mandatory 'id' attribute"));
         return FALSE;
     }
 
     href = rest_xml_node_get_attr(node, "href");
     if ((href == NULL) && !is_api) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
-                    "missing mandatory 'href' attribute");
+                    _("Missing mandatory 'href' attribute"));
         return FALSE;
     }
 
@@ -685,29 +686,35 @@ static enum OvirtResponseStatus parse_action_status(RestXmlNode *root,
 
     node = g_hash_table_lookup(root->children, status_key);
     if (node == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'status' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                    _("Could not find 'status' node"));
         g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
     }
     node = g_hash_table_lookup(node->children, state_key);
     if (node == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'state' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                    _("Could not find 'state' node"));
         g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
     }
     g_debug("State: %s\n", node->content);
     if (g_strcmp0(node->content, "complete") == 0) {
         return OVIRT_RESPONSE_COMPLETE;
     } else if (g_strcmp0(node->content, "pending") == 0) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action is pending");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED,
+                    _("Action is pending"));
         return OVIRT_RESPONSE_PENDING;
     } else if (g_strcmp0(node->content, "in_progress") == 0) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action is in progress");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED,
+                    _("Action is in progress"));
         return OVIRT_RESPONSE_IN_PROGRESS;
     } else if (g_strcmp0(node->content, "failed") == 0) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED, "action has failed");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_ACTION_FAILED,
+                    _("Action has failed"));
         return OVIRT_RESPONSE_FAILED;
     }
 
-    g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "unknown action failure");
+    g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                _("Unknown action failure"));
     g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
 }
 

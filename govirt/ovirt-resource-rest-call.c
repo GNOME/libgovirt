@@ -24,6 +24,7 @@
 
 #include <string.h>
 
+#include <glib/gi18n-lib.h>
 #include <libsoup/soup.h>
 #include <rest/rest-params.h>
 
@@ -142,7 +143,7 @@ static gboolean ovirt_resource_rest_call_class_serialize_params(RestProxyCall *c
     params = rest_proxy_call_get_params(call);
     if (!rest_params_are_strings(params)) {
         g_set_error(error, OVIRT_REST_CALL_ERROR, 0,
-                    "unexpected parameter type in REST call");
+                    _("Unexpected parameter type in REST call"));
         return FALSE;
     }
     append_params(self, params);

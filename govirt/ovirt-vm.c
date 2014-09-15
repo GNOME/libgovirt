@@ -23,6 +23,7 @@
 #include <config.h>
 
 #include <stdlib.h>
+#include <glib/gi18n-lib.h>
 #include <rest/rest-xml-node.h>
 #include <rest/rest-xml-parser.h>
 
@@ -260,12 +261,14 @@ static gboolean parse_ticket_status(RestXmlNode *root, OvirtResource *resource, 
     vm = OVIRT_VM(resource);
     root = g_hash_table_lookup(root->children, ticket_key);
     if (root == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'ticket' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                    _("Could not find 'ticket' node"));
         g_return_val_if_reached(FALSE);
     }
     node = g_hash_table_lookup(root->children, value_key);
     if (node == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'value' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                    _("Could not find 'value' node"));
         g_return_val_if_reached(FALSE);
     }
 
@@ -277,7 +280,8 @@ static gboolean parse_ticket_status(RestXmlNode *root, OvirtResource *resource, 
 
     node = g_hash_table_lookup(root->children, expiry_key);
     if (node == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED, "could not find 'expiry' node");
+        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                    _("Could not find 'expiry' node"));
         g_object_unref(G_OBJECT(display));
         g_return_val_if_reached(FALSE);
     }

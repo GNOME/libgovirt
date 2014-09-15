@@ -24,6 +24,8 @@
 
 #include <string.h>
 
+#include <glib/gi18n-lib.h>
+
 #include "ovirt-collection.h"
 #include "ovirt-error.h"
 #include "govirt-private.h"
@@ -236,7 +238,7 @@ ovirt_collection_refresh_from_xml(OvirtCollection *collection,
 
     if (strcmp(root_node->name, collection->priv->collection_xml_name) != 0) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
-                    "Got '%s' node, expected '%s'", root_node->name,
+                    _("Got '%s' node, expected '%s'"), root_node->name,
                     collection->priv->collection_xml_name);
         return FALSE;
     }
