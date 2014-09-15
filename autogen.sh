@@ -21,14 +21,9 @@ cd "$srcdir"
 #        exit 1
 #fi
 
-AUTORECONF=`which autoreconf`
-if test -z $AUTORECONF; then
-        echo "*** No autoreconf found, please install it ***"
-        exit 1
-fi
+which gnome-autogen.sh || {
+    echo "You need to install gnome-common from the GNOME git"
+    exit 1
+}
 
-#gtkdocize || exit $?
-AUTOPOINT='intltoolize --automake --copy' autoreconf --force --install --verbose
-
-cd "$olddir"
-test -n "$NOCONFIGURE" || "$srcdir/configure" "$@"
+ACLOCAL_FLAGS="$ACLOCAL_FLAGS" USE_GNOME2_MACROS=1 . gnome-autogen.sh --enable-gtk-doc "$@"

@@ -7,7 +7,9 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/govirt					\
 	-DG_LOG_DOMAIN=\"libgovirt\"				\
 	-DTESTDATADIR=\""$(top_srcdir)/data/tests"\"		\
-	-DPACKAGE_DATA_DIR=\""$(datadir)"\"
+	-DPACKAGE_DATA_DIR=\""$(datadir)"\"			\
+	-DLOCALEDIR="\"$(datadir)/locale\""			\
+	$(NULL)
 
 lib_LTLIBRARIES =						\
 	libgovirt.la

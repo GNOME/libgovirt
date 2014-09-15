@@ -54,6 +54,13 @@ AC_PROG_INSTALL
 LT_PREREQ([2.2])
 LT_INIT
 
+# i18 support
+IT_PROG_INTLTOOL(0.40.0)
+
+GETTEXT_PACKAGE=AC_PACKAGE_NAME
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[The name of the gettext domain])
+
 dnl ---------------------------------------------------------------------------
 dnl - Extra verbose warning switches
 dnl ---------------------------------------------------------------------------
@@ -118,6 +125,7 @@ Makefile
 examples/Makefile
 govirt/govirt-1.0.pc
 govirt/Makefile
+po/Makefile.in
 ])
 AC_OUTPUT
 

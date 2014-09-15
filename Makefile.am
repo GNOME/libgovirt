@@ -1,8 +1,21 @@
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
-SUBDIRS = 						\
+SUBDIRS =						\
 	govirt						\
-	examples
+	examples					\
+	po
+
+INTLTOOL_FILES =					\
+	intltool-extract.in				\
+	intltool-merge.in				\
+	intltool-update.in				\
+	$(NULL)
+
+DISTCLEANFILES =					\
+	intltool-extract				\
+	intltool-merge					\
+	intltool-update					\
+	$(NULL)
 
 EXTRA_DIST =						\
 	COPYING						\
@@ -12,7 +25,9 @@ EXTRA_DIST =						\
 	README						\
 	NEWS						\
 	autogen.sh					\
-	libgovirt.doap
+	libgovirt.doap					\
+	$(INTLTOOL_FILES)				\
+	$(NULL)
 
 MAINTAINERCLEANFILES =					\
 	ChangeLog					\
