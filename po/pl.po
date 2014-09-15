@@ -1,0 +1,134 @@
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# Aviary.pl
+# Jeśli masz jakiekolwiek uwagi odnoszące się do tłumaczenia lub chcesz
+# pomóc w jego rozwijaniu i pielęgnowaniu, napisz do nas:
+# gnomepl@aviary.pl
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# Piotr Drąg <piotrdrag@gmail.com>, 2014.
+# Aviary.pl <gnomepl@aviary.pl>, 2014.
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-09-15 18:07+0200\n"
+"PO-Revision-Date: 2014-09-15 18:08+0200\n"
+"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
+"Language-Team: Polish <gnomepl@aviary.pl>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+"X-Poedit-Language: Polish\n"
+"X-Poedit-Country: Poland\n"
+
+#: ../govirt/ovirt-action-rest-call.c:57
+#: ../govirt/ovirt-resource-rest-call.c:146
+#, c-format
+msgid "Unexpected parameter type in REST call"
+msgstr "Nieoczekiwany typ parametru w wywołaniu REST"
+
+#: ../govirt/ovirt-collection.c:241
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Otrzymano węzeł \"%s\", oczekiwano \"%s\""
+
+#: ../govirt/ovirt-options.c:50
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Plik głównego certyfikatu CA dla bezpiecznych połączeń SSL"
+
+#: ../govirt/ovirt-options.c:50
+msgid "<file>"
+msgstr "<plik>"
+
+#: ../govirt/ovirt-options.c:52
+msgid "Display libgovirt version information"
+msgstr "Wyświetla informacje o wersji biblioteki libgovirt"
+
+#: ../govirt/ovirt-options.c:57
+msgid "oVirt Options:"
+msgstr "Opcje oVirt:"
+
+#: ../govirt/ovirt-options.c:57
+msgid "Show oVirt Options"
+msgstr "Wyświetla opcje oVirt"
+
+#: ../govirt/ovirt-proxy.c:499
+#, c-format
+msgid "Failed to write to '%s': %s"
+msgstr "Zapisanie do \"%s\" się nie powiodło: %s"
+
+#: ../govirt/ovirt-proxy.c:517
+#, c-format
+msgid "Failed to close '%s': %s"
+msgstr "Zamknięcie \"%s\" się nie powiodło: %s"
+
+#: ../govirt/ovirt-proxy.c:583
+#, c-format
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Nie można wydobyć nazwy pliku certyfikatu CA z adresu URI"
+
+#: ../govirt/ovirt-resource.c:179
+msgid "Cancellable initialization not supported"
+msgstr "Inicjacja możliwa do anulowania nie jest obsługiwana"
+
+#: ../govirt/ovirt-resource.c:430
+#, c-format
+msgid "Missing mandatory 'id' attribute"
+msgstr "Brak wymaganego atrybutu \"id\""
+
+#: ../govirt/ovirt-resource.c:437
+#, c-format
+msgid "Missing mandatory 'href' attribute"
+msgstr "Brak wymaganego atrybutu \"href\""
+
+#: ../govirt/ovirt-resource.c:690
+#, c-format
+msgid "Could not find 'status' node"
+msgstr "Nie można odnaleźć węzła \"status\""
+
+#: ../govirt/ovirt-resource.c:696
+#, c-format
+msgid "Could not find 'state' node"
+msgstr "Nie można odnaleźć węzła \"state\""
+
+#: ../govirt/ovirt-resource.c:704
+#, c-format
+msgid "Action is pending"
+msgstr "Działanie jest oczekujące"
+
+#: ../govirt/ovirt-resource.c:708
+#, c-format
+msgid "Action is in progress"
+msgstr "Działanie jest w trakcie"
+
+#: ../govirt/ovirt-resource.c:712
+#, c-format
+msgid "Action has failed"
+msgstr "Działanie się nie powiodło"
+
+#: ../govirt/ovirt-resource.c:717
+#, c-format
+msgid "Unknown action failure"
+msgstr "Nieznane niepowodzenie działania"
+
+#: ../govirt/ovirt-utils.c:193
+#, c-format
+msgid "Could not find 'reason' node"
+msgstr "Nie można odnaleźć węzła \"reason\""
+
+#: ../govirt/ovirt-vm.c:265
+#, c-format
+msgid "Could not find 'ticket' node"
+msgstr "Nie można odnaleźć węzła \"ticket\""
+
+#: ../govirt/ovirt-vm.c:271
+#, c-format
+msgid "Could not find 'value' node"
+msgstr "Nie można odnaleźć węzła \"value\""
+
+#: ../govirt/ovirt-vm.c:284
+#, c-format
+msgid "Could not find 'expiry' node"
+msgstr "Nie można odnaleźć węzła \"expiry\""
