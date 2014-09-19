@@ -101,4 +101,10 @@ GOVIRT_0.3.1 {
         ovirt_vm_pool_allocate_vm_finish;
 } GOVIRT_0.2.1;
 
+GOVIRT_0.3.2 {
+        ovirt_resource_delete;
+        ovirt_resource_delete_async;
+        ovirt_resource_delete_finish;
+} GOVIRT_0.3.1;
+
 # .... define new API here using predicted next version number ....

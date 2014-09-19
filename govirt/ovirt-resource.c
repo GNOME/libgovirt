@@ -950,3 +950,118 @@ void ovirt_resource_add_rest_params(OvirtResource *resource,
     if (klass->to_xml != NULL)
         klass->add_rest_params(resource, call);
 }
+
+
+/**
+ * ovirt_resource_delete:
+ * @resource: an #OvirtResource.
+ * @proxy: an #OvirtProxy.
+ * @error: return location for error or NULL.
+ * Returns: TRUE if the call was successful, FALSE otherwise.
+ *
+ * Sends an HTTP DELETE request to @resource.
+ *
+ * The calling thread is blocked until this request is processed, see
+ * ovirt_resource_delete_async() for the asynchronous version of this method.
+ */
+gboolean ovirt_resource_delete(OvirtResource *resource,
+                               OvirtProxy *proxy,
+                               GError **error)
+{
+    RestXmlNode *xml;
+
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
+    g_return_val_if_fail((error == NULL) || (*error == NULL), FALSE);
+
+    xml = ovirt_resource_rest_call(resource, proxy,
+                                   "DELETE", error);
+    if (xml != NULL) {
+        rest_xml_node_unref(xml);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+
+static gboolean ovirt_resource_delete_async_cb(OvirtProxy *proxy, RestProxyCall *call,
+                                               gpointer user_data, GError **error)
+{
+    OvirtResource *resource;
+    RestXmlNode *xml;
+    gboolean success;
+
+    g_return_val_if_fail(REST_IS_PROXY_CALL(call), FALSE);
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(user_data), FALSE);
+
+    resource = OVIRT_RESOURCE(user_data);
+    xml = ovirt_rest_xml_node_from_call(call);
+    success = parse_action_response(call, resource, NULL, error);
+    rest_xml_node_unref(xml);
+
+    return success;
+}
+
+
+/**
+ * ovirt_resource_delete_async:
+ * @resource: an #OvirtResource.
+ * @proxy: an #OvirtProxy.
+ * @cancellable: a #GCancellable or NULL.
+ * @callback: a #GAsyncReadyCallback to call when the call completes, or NULL
+ * if you don't care about the result of the method invocation.
+ * @user_data: data to pass to @callback.
+ *
+ * Asynchronously send an HTTP DELETE request to @resource.
+ *
+ * When the call is complete, @callback will be invoked. You can then call
+ * ovirt_resource_delete_finish() to get the result of the call.
+ */
+void ovirt_resource_delete_async(OvirtResource *resource,
+                                 OvirtProxy *proxy,
+                                 GCancellable *cancellable,
+                                 GAsyncReadyCallback callback,
+                                 gpointer user_data)
+{
+    GSimpleAsyncResult *result;
+    OvirtResourceRestCall *call;
+
+    g_return_if_fail(OVIRT_IS_RESOURCE(resource));
+    g_return_if_fail(OVIRT_IS_PROXY(proxy));
+    g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
+
+    result = g_simple_async_result_new(G_OBJECT(resource), callback,
+                                       user_data,
+                                       ovirt_resource_delete_async);
+
+    call = ovirt_resource_rest_call_new(REST_PROXY(proxy), resource);
+    rest_proxy_call_set_method(REST_PROXY_CALL(call), "DELETE");
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
+                          ovirt_resource_delete_async_cb,
+                          g_object_ref(resource), g_object_unref);
+    g_object_unref(G_OBJECT(call));
+}
+
+
+/**
+ * ovirt_resource_delete_finish:
+ * @resource: an #OvirtResource.
+ * @result: a #GAsyncResult.
+ * @error: return location for error or NULL.
+ * Returns: TRUE if the call was successful, FALSE otherwise.
+ *
+ * Finishes an asynchronous HTTP DELETE request on @resource.
+ */
+gboolean ovirt_resource_delete_finish(OvirtResource *resource,
+                                      GAsyncResult *result,
+                                      GError **err)
+{
+    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
+    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(resource),
+                                                        ovirt_resource_delete_async),
+                         FALSE);
+    g_return_val_if_fail((err == NULL) || (*err == NULL), FALSE);
+
+    return ovirt_rest_call_finish(result, err);
+}
