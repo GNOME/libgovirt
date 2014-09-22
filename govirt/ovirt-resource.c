@@ -582,6 +582,7 @@ void ovirt_resource_update_async(OvirtResource *resource,
     rest_proxy_call_set_method(REST_PROXY_CALL(call), "PUT");
     ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
                           ovirt_resource_update_async_cb, NULL, NULL);
+    g_object_unref(G_OBJECT(call));
 }
 
 
@@ -834,6 +835,7 @@ ovirt_resource_invoke_action_async(OvirtResource *resource,
     ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
                           ovirt_resource_invoke_action_async_cb, data,
                           (GDestroyNotify)ovirt_resource_invoke_action_data_free);
+    g_object_unref(G_OBJECT(call));
 }
 
 
