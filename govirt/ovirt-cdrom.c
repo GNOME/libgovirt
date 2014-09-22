@@ -151,13 +151,16 @@ static gboolean ovirt_cdrom_init_from_xml(OvirtResource *resource,
 static char *ovirt_cdrom_to_xml(OvirtResource *resource)
 {
     OvirtCdrom *cdrom;
+    const char *file;
 
     g_return_val_if_fail(OVIRT_IS_CDROM(resource), NULL);
     cdrom = OVIRT_CDROM(resource);
-    g_return_val_if_fail(cdrom->priv->file != NULL, NULL);
+    file = cdrom->priv->file;
+    if (file == NULL) {
+        file = "";
+    }
 
-    return g_strdup_printf("<cdrom>\n\t<file id=\"%s\"/>\n</cdrom>",
-                           cdrom->priv->file);
+    return g_strdup_printf("<cdrom>\n\t<file id=\"%s\"/>\n</cdrom>", file);
 }
 
 
