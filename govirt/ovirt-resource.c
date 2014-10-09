@@ -330,7 +330,7 @@ ovirt_resource_set_actions_from_xml(OvirtResource *resource, RestXmlNode *node)
 
         g_warn_if_fail(link_node != NULL);
         g_warn_if_fail(link_node->name != NULL);
-        g_warn_if_fail(strcmp(link_node->name, "link") == 0);
+        g_warn_if_fail(g_strcmp0(link_node->name, "link") == 0);
 
         link_name = rest_xml_node_get_attr(link_node, "rel");
         href = rest_xml_node_get_attr(link_node, "href");
@@ -360,7 +360,7 @@ ovirt_resource_set_sub_collections_from_xml(OvirtResource *resource,
 
         g_warn_if_fail(link_node != NULL);
         g_warn_if_fail(link_node->name != NULL);
-        g_warn_if_fail(strcmp(link_node->name, "link") == 0);
+        g_warn_if_fail(g_strcmp0(link_node->name, "link") == 0);
 
         link_name = rest_xml_node_get_attr(link_node, "rel");
         href = rest_xml_node_get_attr(link_node, "href");
