@@ -697,7 +697,6 @@ static void ovirt_proxy_get_property(GObject *object,
 
 static void ovirt_proxy_set_session_id(OvirtProxy *proxy, const char *session_id)
 {
-    SoupCookie *cookie;
     char *url;
     char *domain;
 
@@ -711,9 +710,12 @@ static void ovirt_proxy_set_session_id(OvirtProxy *proxy, const char *session_id
 
     g_free(proxy->priv->jsessionid);
     proxy->priv->jsessionid = g_strdup(session_id);
-    cookie = soup_cookie_new("JSESSIONID", session_id, domain, "/api", -1);
+    if (proxy->priv->jsessionid != NULL) {
+        SoupCookie *cookie;
+        cookie = soup_cookie_new("JSESSIONID", session_id, domain, "/api", -1);
+        soup_cookie_jar_add_cookie(proxy->priv->cookie_jar, cookie);
+    }
     g_free(url);
-    soup_cookie_jar_add_cookie(proxy->priv->cookie_jar, cookie);
 }
 
 
