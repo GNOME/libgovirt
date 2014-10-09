@@ -1,3 +1,24 @@
+0.3.2 - October 9th 2014
+========================
+
+Changes since 0.3.1:
+
+- Allow empty filenames in OvirtCdrom, this allows to remove the current CD
+  image from a VM
+- Parse leading '~' when handling commandline filenames (Fabiano Fidêncio)
+- Implemented ovirt_resource_delete() and its async variant
+- Add translation support (Fabiano Fidêncio)
+- Translations:
+    * Czech (Marek Černocký)
+    * German (Christian Kirbach)
+    * Indonesian (Andika Triwidada)
+    * Polish (Piotr Drąg)
+    * Serbian (Мирослав Николић)
+    * Slovenian (Matej Urbančič)
+    * Spanish (Daniel Mustieles)
+- Bug fixes
+
+
 0.3.1 - September 3rd 2014
 ==========================
 
