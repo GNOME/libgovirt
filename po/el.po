@@ -1,0 +1,131 @@
+# Greek translation for libgovirt.
+# Copyright (C) 2014 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# Dimitris Spingos <dmtrs32@gmail.com>, 2014.
+# Dimitris Spingos (Δημήτρης Σπίγγος) <dmtrs32@gmail.com>, 2014.
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=libgov"
+"irt&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2014-11-07 22:22+0000\n"
+"PO-Revision-Date: 2014-11-08 12:02+0300\n"
+"Last-Translator: Dimitris Spingos (Δημήτρης Σπίγγος) <dmtrs32@gmail.com>\n"
+"Language-Team: team@lists.gnome.gr\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Project-Style: gnome\n"
+
+#: ../govirt/ovirt-action-rest-call.c:57
+#: ../govirt/ovirt-resource-rest-call.c:146
+#, c-format
+msgid "Unexpected parameter type in REST call"
+msgstr "Απροσδόκητος τύπος παραμέτρου σε κλήση REST"
+
+#: ../govirt/ovirt-collection.c:241
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Ελήφθη κόμβος '%s', αναμενόταν '%s'"
+
+#: ../govirt/ovirt-options.c:50
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Αρχείο ριζικού πιστοποιητικού CA για ασφαλείς συνδέσεις SSL"
+
+#: ../govirt/ovirt-options.c:50
+msgid "<file>"
+msgstr "<file>"
+
+#: ../govirt/ovirt-options.c:52
+msgid "Display libgovirt version information"
+msgstr "Εμφάνιση πληροφοριών έκδοσης libgovirt"
+
+#: ../govirt/ovirt-options.c:57
+msgid "oVirt Options:"
+msgstr "Επιλογές oVirt:"
+
+#: ../govirt/ovirt-options.c:57
+msgid "Show oVirt Options"
+msgstr "Εμφάνιση επιλογών oVirt"
+
+#: ../govirt/ovirt-proxy.c:499
+#, c-format
+msgid "Failed to write to '%s': %s"
+msgstr "Αποτυχία εγγραφής στο '%s': %s"
+
+#: ../govirt/ovirt-proxy.c:517
+#, c-format
+msgid "Failed to close '%s': %s"
+msgstr "Αποτυχία κλεισίματος του '%s': %s"
+
+#: ../govirt/ovirt-proxy.c:583
+#, c-format
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Αδύνατη η εξαγωγή ονόματος αρχείου πιστοποιητικού CA από το URI"
+
+#: ../govirt/ovirt-resource.c:179
+msgid "Cancellable initialization not supported"
+msgstr "Δεν υποστηρίζεται ακύρωση της αρχικοποίησης"
+
+#: ../govirt/ovirt-resource.c:430
+#, c-format
+msgid "Missing mandatory 'id' attribute"
+msgstr "Λείπει το υποχρεωτικό γνώρισμα 'id' (αναγνωριστικό)"
+
+#: ../govirt/ovirt-resource.c:437
+#, c-format
+msgid "Missing mandatory 'href' attribute"
+msgstr "Λείπει το υποχρεωτικό γνώρισμα 'href' (αναφορά υπερκειμένου)"
+
+#: ../govirt/ovirt-resource.c:691
+#, c-format
+msgid "Could not find 'status' node"
+msgstr "Αδύνατη η εύρεση κόμβου 'status' (κατάστασης)"
+
+#: ../govirt/ovirt-resource.c:697
+#, c-format
+msgid "Could not find 'state' node"
+msgstr "Αδύνατη η εύρεση κόμβου 'state' (κατάστασης)"
+
+#: ../govirt/ovirt-resource.c:705
+#, c-format
+msgid "Action is pending"
+msgstr "Εκκρεμεί η ενέργεια"
+
+#: ../govirt/ovirt-resource.c:709
+#, c-format
+msgid "Action is in progress"
+msgstr "Η ενέργεια εξελίσσεται"
+
+#: ../govirt/ovirt-resource.c:713
+#, c-format
+msgid "Action has failed"
+msgstr "Η ενέργεια έχει αποτύχει"
+
+#: ../govirt/ovirt-resource.c:718
+#, c-format
+msgid "Unknown action failure"
+msgstr "Αποτυχία άγνωστης ενέργειας"
+
+#: ../govirt/ovirt-utils.c:193
+#, c-format
+msgid "Could not find 'reason' node"
+msgstr "Αδύνατη η εύρεση κόμβου 'reason' (αιτίας)"
+
+#: ../govirt/ovirt-vm.c:265
+#, c-format
+msgid "Could not find 'ticket' node"
+msgstr "Αδύνατη η εύρεση κόμβου 'ticket' (δελτίου)"
+
+#: ../govirt/ovirt-vm.c:271
+#, c-format
+msgid "Could not find 'value' node"
+msgstr "Αδύνατη η εύρεση κόμβου 'value' (τιμής)"
+
+#: ../govirt/ovirt-vm.c:284
+#, c-format
+msgid "Could not find 'expiry' node"
+msgstr "Αδύνατη η εύρεση κόμβου 'expiry' (λήξης)"
