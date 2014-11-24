@@ -18,7 +18,11 @@
 # include "config.h"
 #endif
 
+#include <glib.h>
+
+#ifndef G_OS_WIN32
 #include <pwd.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <glib-object.h>
@@ -61,6 +65,7 @@ GOptionGroup* ovirt_get_option_group(void)
     return grp;
 }
 
+#ifndef G_OS_WIN32
 /* Taken from gnome-vfs-utils.c */
 static gchar *
 expand_initial_tilde(const gchar *path)
@@ -89,6 +94,7 @@ expand_initial_tilde(const gchar *path)
                        slash_after_user_name,
                        NULL);
 }
+#endif
 
 /**
  * ovirt_set_proxy_options:
@@ -104,6 +110,7 @@ void ovirt_set_proxy_options(OvirtProxy *proxy)
     if (ca_file) {
         gchar *ca_file_absolute_path = NULL;
 
+#ifndef G_OS_WIN32
         /* We have to treat files with non-absolute paths starting
          * with tilde (eg, ~foo/bar/ca.crt or ~/bar/ca.cert).
          * Other non-absolute paths will be treated down in the
@@ -111,6 +118,7 @@ void ovirt_set_proxy_options(OvirtProxy *proxy)
          * dir to the file path */
         if (ca_file[0] == '~')
             ca_file_absolute_path = expand_initial_tilde(ca_file);
+#endif
 
         g_object_set(G_OBJECT(proxy),
                      "ssl-ca-file",
