@@ -1048,7 +1048,7 @@ void ovirt_resource_delete_async(OvirtResource *resource,
  * ovirt_resource_delete_finish:
  * @resource: an #OvirtResource.
  * @result: a #GAsyncResult.
- * @error: return location for error or NULL.
+ * @err: return location for error or NULL.
  * Returns: TRUE if the call was successful, FALSE otherwise.
  *
  * Finishes an asynchronous HTTP DELETE request on @resource.
