@@ -18,9 +18,6 @@ AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz tar-ustar])
 
 AM_SILENT_RULES([yes])
 
-# set up gtk-doc
-# GTK_DOC_CHECK(1.9)
-
 # use this in cd-version.h
 G_OVIRT_MAJOR_VERSION=govirt_major_version
 G_OVIRT_MINOR_VERSION=govirt_minor_version
