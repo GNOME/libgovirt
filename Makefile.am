@@ -34,11 +34,7 @@ MAINTAINERCLEANFILES =					\
 	INSTALL						\
 	aclocal.m4					\
 	build-aux/					\
-	config.h.in					\
-	gtk-doc.make
-
-DISTCHECK_CONFIGURE_FLAGS = 				\
-	--enable-gtk-doc
+	config.h.in
 
 distclean-local:
 	if test $(srdcir) = .; then :; else \
