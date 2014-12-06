@@ -7,9 +7,7 @@
 	<shortdesc xml:lang="en">GObject-based library to access oVirt REST API</shortdesc>
 	<description xml:lang="en">libgovirt is a GObject-based library to
 	access oVirt REST API. It uses GObject and librest to integrate well with
-	GNOME applications.</description> <description>libsoup is an HTTP
-	client/server library for GNOME. It uses GObjects and the glib main loop,
-	to integrate well with GNOME applications.</description>
+	GNOME applications.</description>
 	<download-page rdf:resource="http://people.freedesktop.org/~teuf/govirt/"/>
 	<bug-database rdf:resource="http://bugzilla.gnome.org/browse.cgi?product=libgovirt"/>
 	<maintainer>
