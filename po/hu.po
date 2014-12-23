@@ -1,0 +1,131 @@
+# Hungarian translation for libgovirt.
+# Copyright (C) 2014 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+#
+# Balázs Úr <urbalazs@gmail.com>, 2014.
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=libgovirt&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2014-12-23 10:33+0000\n"
+"PO-Revision-Date: 2014-12-23 18:13+0100\n"
+"Last-Translator: Balázs Úr <urbalazs@gmail.com>\n"
+"Language-Team: Hungarian <gnome-hu-list@gnome.org>\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 1.2\n"
+
+#: ../govirt/ovirt-action-rest-call.c:57
+#: ../govirt/ovirt-resource-rest-call.c:146
+#, c-format
+msgid "Unexpected parameter type in REST call"
+msgstr "Váratlan paramétertípus a REST hívásban"
+
+#: ../govirt/ovirt-collection.c:241
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "„%s” csomópont érkezett, a várt: „%s”"
+
+#: ../govirt/ovirt-options.c:54
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Gyökér CA tanúsítványfájl a biztonságos SSL kapcsolatokhoz"
+
+#: ../govirt/ovirt-options.c:54
+msgid "<file>"
+msgstr "<fájl>"
+
+#: ../govirt/ovirt-options.c:56
+msgid "Display libgovirt version information"
+msgstr "A libgovirt verzióinformációinak megjelenítése"
+
+#: ../govirt/ovirt-options.c:61
+msgid "oVirt Options:"
+msgstr "oVirt beállítások:"
+
+#: ../govirt/ovirt-options.c:61
+msgid "Show oVirt Options"
+msgstr "oVirt beállítások megjelenítése"
+
+#: ../govirt/ovirt-proxy.c:499
+#, c-format
+msgid "Failed to write to '%s': %s"
+msgstr "Nem sikerült a(z) „%s” írása: %s"
+
+#: ../govirt/ovirt-proxy.c:517
+#, c-format
+msgid "Failed to close '%s': %s"
+msgstr "Nem sikerült a(z) „%s” bezárása: %s"
+
+#: ../govirt/ovirt-proxy.c:583
+#, c-format
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Nem sikerült kinyerni a CA tanúsítvány fájlnevét az URI-ból"
+
+#: ../govirt/ovirt-resource.c:179
+msgid "Cancellable initialization not supported"
+msgstr "A megszakítható előkészítés nem támogatott"
+
+#: ../govirt/ovirt-resource.c:430
+#, c-format
+msgid "Missing mandatory 'id' attribute"
+msgstr "Hiányzó kötelező „id” attribútum"
+
+#: ../govirt/ovirt-resource.c:437
+#, c-format
+msgid "Missing mandatory 'href' attribute"
+msgstr "Hiányzó kötelező „href” attribútum"
+
+#: ../govirt/ovirt-resource.c:691
+#, c-format
+msgid "Could not find 'status' node"
+msgstr "Nem található a „status” csomópont"
+
+#: ../govirt/ovirt-resource.c:697
+#, c-format
+msgid "Could not find 'state' node"
+msgstr "Nem található a „state” csomópont"
+
+#: ../govirt/ovirt-resource.c:705
+#, c-format
+msgid "Action is pending"
+msgstr "A művelet függőben"
+
+#: ../govirt/ovirt-resource.c:709
+#, c-format
+msgid "Action is in progress"
+msgstr "A művelet folyamatban"
+
+#: ../govirt/ovirt-resource.c:713
+#, c-format
+msgid "Action has failed"
+msgstr "A művelet meghiúsult"
+
+#: ../govirt/ovirt-resource.c:718
+#, c-format
+msgid "Unknown action failure"
+msgstr "Ismeretlen műveleti hiba"
+
+#: ../govirt/ovirt-utils.c:193
+#, c-format
+msgid "Could not find 'reason' node"
+msgstr "Nem található a „reason” csomópont"
+
+#: ../govirt/ovirt-vm.c:265
+#, c-format
+msgid "Could not find 'ticket' node"
+msgstr "Nem található a „ticket” csomópont"
+
+#: ../govirt/ovirt-vm.c:271
+#, c-format
+msgid "Could not find 'value' node"
+msgstr "Nem található a „value” csomópont"
+
+#: ../govirt/ovirt-vm.c:284
+#, c-format
+msgid "Could not find 'expiry' node"
+msgstr "Nem található az „expiry” csomópont"
+
