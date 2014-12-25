@@ -9,126 +9,124 @@ msgstr ""
 "Project-Id-Version: libgovirt master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=libgovirt&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-09-16 10:59+0000\n"
-"PO-Revision-Date: 2014-09-16 17:58+0100\n"
+"POT-Creation-Date: 2014-12-25 10:31+0000\n"
+"PO-Revision-Date: 2014-12-25 19:44+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian <gnome-si@googlegroups.com>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n%100==4 ? 3 : 0);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
+"%100==4 ? 3 : 0);\n"
 "X-Generator: Poedit 1.5.4\n"
 
 #: ../govirt/ovirt-action-rest-call.c:57
 #: ../govirt/ovirt-resource-rest-call.c:146
 #, c-format
 msgid "Unexpected parameter type in REST call"
-msgstr ""
+msgstr "Nepričakovan parameter vrste klica REST"
 
 #: ../govirt/ovirt-collection.c:241
-#, fuzzy, c-format
+#, c-format
 msgid "Got '%s' node, expected '%s'"
-msgstr "Pričakovan je seznam, pridobljen pa %s"
+msgstr "Pridobljeno vozlišče '%s', pričakovano pa je bilo '%s'"
 
-#: ../govirt/ovirt-options.c:50
+#: ../govirt/ovirt-options.c:54
 msgid "Root CA certificate file for secure SSL connections"
-msgstr ""
+msgstr "Korensko potrdilo CA za varne povezave SSL"
 
-#: ../govirt/ovirt-options.c:50
+#: ../govirt/ovirt-options.c:54
 msgid "<file>"
 msgstr "<datoteka>"
 
-#: ../govirt/ovirt-options.c:52
-#, fuzzy
+#: ../govirt/ovirt-options.c:56
 msgid "Display libgovirt version information"
-msgstr "Pokaži podrobnosti o GNOME različici"
+msgstr "Pokaži podrobnosti o različice libgovirt"
 
-#: ../govirt/ovirt-options.c:57
+#: ../govirt/ovirt-options.c:61
 msgid "oVirt Options:"
 msgstr "Možnosti oVirt:"
 
-#: ../govirt/ovirt-options.c:57
-#, fuzzy
+#: ../govirt/ovirt-options.c:61
 msgid "Show oVirt Options"
-msgstr "Prikaže možnosti Cluttra"
+msgstr "Pokaži možnosti oVirt"
 
 #: ../govirt/ovirt-proxy.c:499
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to write to '%s': %s"
-msgstr "Ni mogoče pisati \"%s\": %s\n"
+msgstr "Zapisovanje je spodletelo '%s': %s"
 
 #: ../govirt/ovirt-proxy.c:517
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to close '%s': %s"
-msgstr "Zapiranje mape je spodletelo: %s"
+msgstr "Zapiranje je spodletelo '%s': %s"
 
 #: ../govirt/ovirt-proxy.c:583
 #, c-format
 msgid "Could not extract CA certificate filename from URI"
-msgstr ""
+msgstr "Ni mogoče pridobiti imena datoteke potrdila CA iz naslova URI"
 
 #: ../govirt/ovirt-resource.c:179
-#, fuzzy
 msgid "Cancellable initialization not supported"
 msgstr "Dejanje preklica začenjanja ni podprto"
 
 #: ../govirt/ovirt-resource.c:430
-#, fuzzy, c-format
+#, c-format
 msgid "Missing mandatory 'id' attribute"
-msgstr "Manjka atribut z imenom 'pot'"
+msgstr "Manjka obvezen atribut 'id'"
 
 #: ../govirt/ovirt-resource.c:437
-#, fuzzy, c-format
+#, c-format
 msgid "Missing mandatory 'href' attribute"
-msgstr "Manjka atribut z imenom 'pot'"
+msgstr "Manjka obvezen atribut 'href'"
 
-#: ../govirt/ovirt-resource.c:690
-#, fuzzy, c-format
+#: ../govirt/ovirt-resource.c:691
+#, c-format
 msgid "Could not find 'status' node"
-msgstr "Ni mogoče pridobiti stanja omrežja:"
+msgstr "Ni mogoče najti vozlišča 'stanje'"
 
-#: ../govirt/ovirt-resource.c:696
-#, fuzzy, c-format
+#: ../govirt/ovirt-resource.c:697
+#, c-format
 msgid "Could not find 'state' node"
-msgstr "%s: ni mogoče najti ključa za %s"
+msgstr "Ni mogoče najti vozlišča 'stanje'"
 
-#: ../govirt/ovirt-resource.c:704
-#, fuzzy, c-format
+#: ../govirt/ovirt-resource.c:705
+#, c-format
 msgid "Action is pending"
-msgstr "%1 opravil je trenutno pridržanih."
+msgstr "Dejanje je zadržano  za izvajanje"
 
-#: ../govirt/ovirt-resource.c:708
-#, fuzzy, c-format
+#: ../govirt/ovirt-resource.c:709
+#, c-format
 msgid "Action is in progress"
-msgstr "Poteka uvažanje ..."
+msgstr "Dejanje se izvaja"
 
-#: ../govirt/ovirt-resource.c:712
-#, fuzzy, c-format
+#: ../govirt/ovirt-resource.c:713
+#, c-format
 msgid "Action has failed"
-msgstr "Ustvarjanje novega projekta ni bila uspešna."
+msgstr "Dejanje je spodletelo"
 
-#: ../govirt/ovirt-resource.c:717
-#, fuzzy, c-format
+#: ../govirt/ovirt-resource.c:718
+#, c-format
 msgid "Unknown action failure"
-msgstr "neznana napaka getaddrinfo"
+msgstr "Neznana napaka dejanja"
 
 #: ../govirt/ovirt-utils.c:193
-#, fuzzy, c-format
+#, c-format
 msgid "Could not find 'reason' node"
-msgstr "Naprave %s (%s) ni mogoče odpreti: vzrok: \"%s\"."
+msgstr "Ni mogoče najti vozlišča 'vzroka'"
 
 #: ../govirt/ovirt-vm.c:265
-#, fuzzy, c-format
+#, c-format
 msgid "Could not find 'ticket' node"
-msgstr "%s: ni mogoče najti ključa za %s"
+msgstr "Ni mogoče najti vozlišča 'kartice'"
 
 #: ../govirt/ovirt-vm.c:271
-#, fuzzy, c-format
+#, c-format
 msgid "Could not find 'value' node"
-msgstr "Ni mogoče pridobiti vrednosti svetlosti luči ozadja"
+msgstr "Ni mogoče najti vozlišča 'vrednosti'"
 
 #: ../govirt/ovirt-vm.c:284
-#, fuzzy, c-format
+#, c-format
 msgid "Could not find 'expiry' node"
-msgstr "%s: ni mogoče najti ključa za %s"
+msgstr "Ni mogoče najti vozlišča 'preteka'"
