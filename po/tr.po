@@ -2,28 +2,30 @@
 # Copyright (C) 2014 libgovirt's COPYRIGHT HOLDER
 # This file is distributed under the same license as the libgovirt package.
 # Muhammet Kara <muhammetk@gmail.com>, 2014.
+# Necdet Yücel <necdetyucel@gmail.com>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: libgovirt master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=libgovirt&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-12-11 10:26+0000\n"
-"PO-Revision-Date: 2014-12-11 17:34+0200\n"
-"Last-Translator: Muhammet Kara <muhammetk@gmail.com>\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=libgovi"
+"rt&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2014-12-11 15:35+0000\n"
+"PO-Revision-Date: 2014-12-22 23:56+0000\n"
+"Last-Translator: Necdet Yücel <necdetyucel@gmail.com>\n"
 "Language-Team: Türkçe <gnome-turk@gnome.org>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Gtranslator 2.91.6\n"
+"X-Generator: Pootle 2.5.1.1\n"
+"X-POOTLE-MTIME: 1419292569.000000\n"
 
 #: ../govirt/ovirt-action-rest-call.c:57
 #: ../govirt/ovirt-resource-rest-call.c:146
 #, c-format
 msgid "Unexpected parameter type in REST call"
-msgstr ""
+msgstr "REST çağrısında beklenmeyen parametre"
 
 #: ../govirt/ovirt-collection.c:241
 #, c-format
@@ -32,7 +34,7 @@ msgstr "'%1$s' beklenirken, '%2$s' alındı"
 
 #: ../govirt/ovirt-options.c:54
 msgid "Root CA certificate file for secure SSL connections"
-msgstr ""
+msgstr "Güvenli SSL bağlantıları için Kök CA sertifika dosyası"
 
 #: ../govirt/ovirt-options.c:54
 msgid "<file>"
@@ -63,21 +65,21 @@ msgstr "'%s'i kapatma başarısız oldu: %s"
 #: ../govirt/ovirt-proxy.c:583
 #, c-format
 msgid "Could not extract CA certificate filename from URI"
-msgstr ""
+msgstr "URI kullanılarak CA sertifika dosya adı çıkartılamadı"
 
 #: ../govirt/ovirt-resource.c:179
 msgid "Cancellable initialization not supported"
-msgstr ""
+msgstr "İptal edilebilir başlatma desteklenmiyor"
 
 #: ../govirt/ovirt-resource.c:430
 #, c-format
 msgid "Missing mandatory 'id' attribute"
-msgstr ""
+msgstr "Zorunlu 'id' özniteliği eksik"
 
 #: ../govirt/ovirt-resource.c:437
 #, c-format
 msgid "Missing mandatory 'href' attribute"
-msgstr ""
+msgstr "Zorunlu 'href' özniteliği eksik"
 
 #: ../govirt/ovirt-resource.c:691
 #, c-format
