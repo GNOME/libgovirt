@@ -44,6 +44,7 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
     const char *certificate_key = g_intern_string("certificate");
     const char *smartcard_key = g_intern_string("smartcard_enabled");
     const char *allow_override_key = g_intern_string("allow_override");
+    const char *proxy_key = g_intern_string("proxy");
 
     if (root == NULL) {
         return FALSE;
@@ -118,6 +119,11 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
                          "host-subject", node->content,
                          NULL);
         }
+    }
+
+    node = g_hash_table_lookup(root->children, proxy_key);
+    if (node != NULL) {
+        g_object_set(G_OBJECT(display), "proxy-url", node->content, NULL);
     }
 
     /* FIXME: this overrides the ticket/expiry which may

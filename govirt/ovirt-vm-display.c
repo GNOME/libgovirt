@@ -39,6 +39,7 @@ struct _OvirtVmDisplayPrivate {
     char *host_subject;
     gboolean smartcard;
     gboolean allow_override;
+    char *proxy_url;
 };
 
 G_DEFINE_TYPE(OvirtVmDisplay, ovirt_vm_display, G_TYPE_OBJECT);
@@ -55,6 +56,7 @@ enum {
     PROP_HOST_SUBJECT,
     PROP_SMARTCARD,
     PROP_ALLOW_OVERRIDE,
+    PROP_PROXY_URL,
 };
 
 static void ovirt_vm_display_get_property(GObject *object,
@@ -94,6 +96,9 @@ static void ovirt_vm_display_get_property(GObject *object,
         break;
     case PROP_ALLOW_OVERRIDE:
         g_value_set_boolean(value, display->priv->allow_override);
+        break;
+    case PROP_PROXY_URL:
+        g_value_set_string(value, display->priv->proxy_url);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -141,6 +146,10 @@ static void ovirt_vm_display_set_property(GObject *object,
     case PROP_ALLOW_OVERRIDE:
         display->priv->allow_override = g_value_get_boolean(value);
         break;
+    case PROP_PROXY_URL:
+        g_free(display->priv->proxy_url);
+        display->priv->proxy_url = g_value_dup_string(value);
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -153,6 +162,7 @@ static void ovirt_vm_display_finalize(GObject *object)
     g_free(display->priv->address);
     g_free(display->priv->ticket);
     g_free(display->priv->host_subject);
+    g_free(display->priv->proxy_url);
 
     G_OBJECT_CLASS(ovirt_vm_display_parent_class)->finalize(object);
 }
@@ -250,6 +260,14 @@ static void ovirt_vm_display_class_init(OvirtVmDisplayClass *klass)
                                                         "Allow override",
                                                         "Allow to override display connection",
                                                         FALSE,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_PROXY_URL,
+                                    g_param_spec_string("proxy-url",
+                                                        "Proxy URL",
+                                                        "URL of the proxy to use to access the VM",
+                                                        NULL,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
 }
