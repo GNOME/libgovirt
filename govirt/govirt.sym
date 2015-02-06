@@ -107,4 +107,9 @@ GOVIRT_0.3.2 {
         ovirt_resource_delete_finish;
 } GOVIRT_0.3.1;
 
+GOVIRT_0.3.3 {
+        ovirt_proxy_add_header;
+        ovirt_proxy_add_headers;
+        ovirt_proxy_add_headers_from_valist;
+} GOVIRT_0.3.2;
 # .... define new API here using predicted next version number ....
