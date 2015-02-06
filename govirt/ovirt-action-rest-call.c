@@ -87,20 +87,7 @@ static void ovirt_action_rest_call_init(G_GNUC_UNUSED OvirtActionRestCall *call)
 
 OvirtActionRestCall *ovirt_action_rest_call_new(RestProxy *proxy)
 {
-    OvirtActionRestCall *call;
-    gboolean admin;
-
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
-    call = OVIRT_ACTION_REST_CALL(g_object_new(OVIRT_TYPE_ACTION_REST_CALL, "proxy", proxy, NULL));
-    g_return_val_if_fail(call != NULL, NULL);
-    g_object_get(G_OBJECT(proxy), "admin", &admin, NULL);
-    if (admin) {
-        rest_proxy_call_add_header(REST_PROXY_CALL(call), "Filter", "false");
-    } else {
-        rest_proxy_call_add_header(REST_PROXY_CALL(call), "Filter", "true");
-    }
-    rest_proxy_call_add_header(REST_PROXY_CALL(call),
-                               "Prefer", "persistent-auth");
-
-    return call;
+    return OVIRT_ACTION_REST_CALL(g_object_new(OVIRT_TYPE_ACTION_REST_CALL,
+                                               "proxy", proxy, NULL));
 }
