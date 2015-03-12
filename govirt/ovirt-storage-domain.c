@@ -295,7 +295,7 @@ ovirt_resource_parse_xml(OvirtResource *resource,
         const char *value_str;
         GValue value = { 0, };
 
-        value_str = ovirt_rest_xml_node_get_content(node, elements->xml_node, NULL);
+        value_str = ovirt_rest_xml_node_get_content_from_path(node, elements->xml_node);
         if (value_str == NULL) {
             g_debug("Could not find node %s", elements->xml_node);
             continue;
@@ -342,7 +342,7 @@ ovirt_storage_domain_refresh_from_xml(OvirtStorageDomain *domain,
         { "used",                   G_TYPE_UINT64,                          "used" },
         { "committed",              G_TYPE_UINT64,                          "committed" },
         { "storage_format",         OVIRT_TYPE_STORAGE_DOMAIN_FORMAT_VERSION, "version" },
-        { "storage_domain_state",   OVIRT_TYPE_STORAGE_DOMAIN_STATE,        "state" },
+        { "status/state",           OVIRT_TYPE_STORAGE_DOMAIN_STATE,        "state" },
         { NULL,                     G_TYPE_INVALID,                         NULL }
     };
 
