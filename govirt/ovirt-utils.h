@@ -29,6 +29,8 @@ G_BEGIN_DECLS
 
 RestXmlNode *ovirt_rest_xml_node_from_call(RestProxyCall *call);
 const char *ovirt_rest_xml_node_get_content(RestXmlNode *node, ...);
+const char *ovirt_rest_xml_node_get_content_from_path(RestXmlNode *node,
+                                                      const char *path);
 gboolean ovirt_utils_gerror_from_xml_fault(RestXmlNode *root, GError **error);
 gboolean g_object_set_guint_property_from_xml(GObject *g_object,
                                                    RestXmlNode *node,
