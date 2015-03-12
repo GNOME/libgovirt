@@ -336,14 +336,14 @@ ovirt_storage_domain_refresh_from_xml(OvirtStorageDomain *domain,
                                       RestXmlNode *node)
 {
     OvirtXmlElement storage_domain_elements[] = {
-        { "type",                   OVIRT_TYPE_STORAGE_DOMAIN_TYPE,         "type" },
-        { "master",                 G_TYPE_BOOLEAN,                         "master" },
-        { "available",              G_TYPE_UINT64,                          "available" },
-        { "used",                   G_TYPE_UINT64,                          "used" },
-        { "committed",              G_TYPE_UINT64,                          "committed" },
-        { "storage_format",         OVIRT_TYPE_STORAGE_DOMAIN_FORMAT_VERSION, "version" },
-        { "status/state",           OVIRT_TYPE_STORAGE_DOMAIN_STATE,        "state" },
-        { NULL,                     G_TYPE_INVALID,                         NULL }
+        { "type",           OVIRT_TYPE_STORAGE_DOMAIN_TYPE,           "type" },
+        { "master",         G_TYPE_BOOLEAN,                           "master" },
+        { "available",      G_TYPE_UINT64,                            "available" },
+        { "used",           G_TYPE_UINT64,                            "used" },
+        { "committed",      G_TYPE_UINT64,                            "committed" },
+        { "storage_format", OVIRT_TYPE_STORAGE_DOMAIN_FORMAT_VERSION, "version" },
+        { "status/state",   OVIRT_TYPE_STORAGE_DOMAIN_STATE,          "state" },
+        { NULL,             G_TYPE_INVALID,                           NULL }
     };
 
     return ovirt_resource_parse_xml(OVIRT_RESOURCE(domain), node, storage_domain_elements);
