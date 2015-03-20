@@ -24,6 +24,7 @@
 #include <config.h>
 
 #include "ovirt-error.h"
+#include "ovirt-rest-call-error.h"
 #include "ovirt-proxy.h"
 #include "ovirt-proxy-private.h"
 #include "ovirt-rest-call.h"
@@ -166,14 +167,21 @@ RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
 {
     RestProxyCall *call;
     RestXmlNode *root;
+    GError *err = NULL;
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
 
     call = ovirt_rest_call_new(proxy, "GET", href);
 
-    if (!rest_proxy_call_sync(call, error)) {
-        if ((error != NULL) && (*error != NULL)) {
-            g_warning("Error while getting collection: %s", (*error)->message);
+    if (!rest_proxy_call_sync(call, &err)) {
+        if (g_error_matches(err, REST_PROXY_ERROR, REST_PROXY_ERROR_CANCELLED)) {
+            g_set_error_literal(error,
+                                OVIRT_REST_CALL_ERROR, OVIRT_REST_CALL_ERROR_CANCELLED,
+                                err->message);
+            g_clear_error(&err);
+        } else if (err != NULL) {
+            g_warning("Error while getting collection: %s", err->message);
+            g_propagate_error(error, err);
         } else {
             g_warning("Error while getting collection");
         }
