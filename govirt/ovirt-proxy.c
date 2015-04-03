@@ -783,6 +783,20 @@ ovirt_proxy_finalize(GObject *obj)
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->finalize(obj);
 }
 
+
+static void ovirt_proxy_constructed(GObject *gobject)
+{
+    if (g_getenv("GOVIRT_NO_SSL_STRICT") != NULL) {
+        g_warning("Disabling strict checking of SSL certificates");
+        g_object_set(OVIRT_PROXY(gobject), "ssl-strict", FALSE, NULL);
+    }
+
+    /* Chain up to the parent class */
+    if (G_OBJECT_CLASS(ovirt_proxy_parent_class)->constructed)
+        G_OBJECT_CLASS(ovirt_proxy_parent_class)->constructed(gobject);
+}
+
+
 static void
 ovirt_proxy_class_init(OvirtProxyClass *klass)
 {
@@ -790,6 +804,7 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
 
     oclass->dispose = ovirt_proxy_dispose;
     oclass->finalize = ovirt_proxy_finalize;
+    oclass->constructed = ovirt_proxy_constructed;
 
     oclass->get_property = ovirt_proxy_get_property;
     oclass->set_property = ovirt_proxy_set_property;
