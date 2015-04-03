@@ -861,7 +861,12 @@ OvirtProxy *ovirt_proxy_new(const char *hostname)
     int i;
 
     if (!g_str_has_prefix(hostname, "http://") && !g_str_has_prefix(hostname, "https://")) {
-        uri = g_strconcat("https://", hostname, NULL);
+        if (g_getenv("GOVIRT_DISABLE_HTTPS") != NULL) {
+            g_warning("Using plain text HTTP connection");
+            uri = g_strconcat("http://", hostname, NULL);
+        } else {
+            uri = g_strconcat("https://", hostname, NULL);
+        }
     } else {
         /* Fallback code for backwards API compat, early libgovirt versions
          * expected a full fledged URI */
