@@ -61,7 +61,7 @@ gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
 
-    vms_node = ovirt_proxy_get_collection_xml(proxy, "/api/vms", error);
+    vms_node = ovirt_proxy_get_collection_xml(proxy, "/ovirt-engine/api/vms", error);
     if (vms_node == NULL)
         return FALSE;
 
@@ -104,7 +104,7 @@ void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
                                          * would trigger a deprecation
                                          * warning */
                                         fetch_vms_async_cb);
-    ovirt_proxy_get_collection_xml_async(proxy, "/api/vms", result, cancellable,
+    ovirt_proxy_get_collection_xml_async(proxy, "/ovirt-engine/api/vms", result, cancellable,
                                          fetch_vms_async_cb, NULL, NULL);
 }
 

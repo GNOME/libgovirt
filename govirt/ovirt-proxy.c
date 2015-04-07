@@ -712,7 +712,7 @@ static void ovirt_proxy_set_session_id(OvirtProxy *proxy, const char *session_id
     proxy->priv->jsessionid = g_strdup(session_id);
     if (proxy->priv->jsessionid != NULL) {
         SoupCookie *cookie;
-        cookie = soup_cookie_new("JSESSIONID", session_id, domain, "/api", -1);
+        cookie = soup_cookie_new("JSESSIONID", session_id, domain, "/ovirt-engine/api", -1);
         soup_cookie_jar_add_cookie(proxy->priv->cookie_jar, cookie);
     }
     g_free(url);
@@ -1015,7 +1015,7 @@ OvirtApi *ovirt_proxy_fetch_api(OvirtProxy *proxy, GError **error)
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
 
-    api_node = ovirt_proxy_get_collection_xml(proxy, "/api", error);
+    api_node = ovirt_proxy_get_collection_xml(proxy, "/ovirt-engine/api", error);
     if (api_node == NULL) {
         return NULL;
     }
@@ -1058,7 +1058,7 @@ void ovirt_proxy_fetch_api_async(OvirtProxy *proxy,
     result = g_simple_async_result_new (G_OBJECT(proxy), callback,
                                         user_data,
                                         ovirt_proxy_fetch_api_async);
-    ovirt_proxy_get_collection_xml_async(proxy, "/api", result, cancellable,
+    ovirt_proxy_get_collection_xml_async(proxy, "/ovirt-engine/api", result, cancellable,
                                          fetch_api_async_cb, NULL, NULL);
 }
 
