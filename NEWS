@@ -1,3 +1,28 @@
+0.3.3 - April 8th 2015
+======================
+
+Changes since 0.3.2:
+
+- Add support for SPICE proxy
+- Don't report REST call cancellations as an unexpected error
+- Access REST API through /ovirt-engine/api rather than /api as the latter is
+  deprecated
+- Parse status of storage domains
+- Add support for GOVIRT_DISABLE_HTTPS and GOVIRT_NO_SSL_STRICT environment
+  variable in order to make it easier to lower security during development/testing
+- Fix compilation with older glibs
+- Fix mingw build
+- Translations:
+    * Basque (Inaki Larranaga Murgoitio)
+    * Bosnian (Samir Ribic)
+    * Brazilian Portuguese (Rafael Ferreira)
+    * Greek (Dimitris Spingos)
+    * Hungarian (Balázs Úr)
+    * Slovenian (Matej Urbančič)
+    * Turkish (Muhammet Kara, Necdet Yücel)
+    * Russian (Yuri Myasoedov)
+
+
 0.3.2 - October 9th 2014
 ========================
 
