@@ -774,9 +774,6 @@ ovirt_proxy_dispose(GObject *obj)
         proxy->priv->cookie_jar = NULL;
     }
 
-    g_warn_if_fail(proxy->priv->additional_headers != NULL);
-    g_hash_table_unref(proxy->priv->additional_headers);
-
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->dispose(obj);
 }
 
@@ -865,10 +862,6 @@ ovirt_proxy_init(OvirtProxy *self)
     self->priv->cookie_jar = soup_cookie_jar_new();
     rest_proxy_add_soup_feature(REST_PROXY(self),
                                 SOUP_SESSION_FEATURE(self->priv->cookie_jar));
-    self->priv->additional_headers = g_hash_table_new_full(g_str_hash,
-                                                           g_str_equal,
-                                                           g_free,
-                                                           g_free);
 }
 
 /* FIXME : "uri" should just be a base domain, foo.example.com/some/path
@@ -932,71 +925,6 @@ OvirtProxy *ovirt_proxy_new(const char *hostname)
     return proxy;
 }
 
-
-/**
- * ovirt_proxy_add_header:
- * @proxy: a #OvirtProxy
- * @header: name of the header to add to each request
- * @value: value of the header to add to each request
- *
- * Add a http header called @header with the value @value to each oVirt REST
- * API call. If a header with this name already exists, the new value will
- * replace the old.
- */
-void ovirt_proxy_add_header(OvirtProxy *proxy, const char *header, const char *value)
-{
-    g_return_if_fail(OVIRT_IS_PROXY(proxy));
-
-    g_hash_table_replace(proxy->priv->additional_headers,
-                         (char *)g_strdup(header),
-                         (char *)g_strdup(value));
-}
-
-
-/**
- * ovirt_proxy_add_headers:
- * @proxy: a #OvirtProxy
- * @...: header name and value pairs, followed by %NULL
- *
- * Add the specified http header and value pairs to @proxy. These headers will
- * be sent with each oVirt REST API call. If a header already exists, the new
- * value will replace the old.
- */
-void ovirt_proxy_add_headers(OvirtProxy *proxy, ...)
-{
-    va_list headers;
-
-    g_return_if_fail(OVIRT_IS_PROXY(proxy));
-
-    va_start(headers, proxy);
-    ovirt_proxy_add_headers_from_valist(proxy, headers);
-    va_end(headers);
-}
-
-
-/**
- * ovirt_proxy_add_headers_from_valist:
- * @proxy: a #OvirtProxy
- * @headers: header name and value pairs
- *
- * Add the specified http header and value pairs to @proxy. These headers will
- * be sent with each oVirt REST API call. If a header already exists, the new
- * value will replace the old.
- */
-void ovirt_proxy_add_headers_from_valist(OvirtProxy *proxy, va_list headers)
-{
-    const char *header = NULL;
-    const char *value;
-
-    g_return_if_fail(OVIRT_IS_PROXY(proxy));
-
-    header = va_arg(headers, const char *);
-    while (header != NULL) {
-        value = va_arg(headers, const char *);
-        ovirt_proxy_add_header(proxy, header, value);
-        header = va_arg(headers, const char *);
-    }
-}
 
 static void ovirt_proxy_set_api_from_xml(OvirtProxy *proxy,
                                          RestXmlNode *node,

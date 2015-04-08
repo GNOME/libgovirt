@@ -38,7 +38,6 @@ struct _OvirtProxyPrivate {
     OvirtApi *api;
     char *jsessionid;
     SoupCookieJar *cookie_jar;
-    GHashTable *additional_headers;
 
     gulong ssl_ca_file_changed_id;
 };
