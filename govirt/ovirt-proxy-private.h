@@ -38,6 +38,7 @@ struct _OvirtProxyPrivate {
     OvirtApi *api;
     char *jsessionid;
     SoupCookieJar *cookie_jar;
+    GHashTable *additional_headers;
 
     gboolean setting_ca_file;
     gulong ssl_ca_file_changed_id;
@@ -72,6 +73,8 @@ gboolean ovirt_rest_call_finish(GAsyncResult *result, GError **err);
 
 /* Work around G_GNUC_DEPRECATED attribute on ovirt_proxy_get_vms() */
 GList *ovirt_proxy_get_vms_internal(OvirtProxy *proxy);
+void ovirt_proxy_append_additional_headers(OvirtProxy *proxy,
+                                           RestProxyCall *call);
 
 G_END_DECLS
 

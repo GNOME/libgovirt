@@ -25,6 +25,7 @@
 #include <rest/rest-params.h>
 
 #include "ovirt-proxy.h"
+#include "ovirt-proxy-private.h"
 #include "ovirt-rest-call.h"
 #include "ovirt-rest-call-error.h"
 #include "ovirt-utils.h"
@@ -128,6 +129,8 @@ static void ovirt_rest_call_constructed(GObject *object)
         }
         rest_proxy_call_add_header(REST_PROXY_CALL(object),
                                    "Prefer", "persistent-auth");
+        ovirt_proxy_append_additional_headers(proxy, REST_PROXY_CALL(object));
+
         g_object_unref(proxy);
     }
 }
