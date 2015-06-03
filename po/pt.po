@@ -1,0 +1,131 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2015	
+# This file is distributed under the same license as the libgovirt package.
+# Pedro Albuquerque <palbuquerque73@openmailbox.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=libgovirt&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2015-05-17 10:14+0000\n"
+"PO-Revision-Date: 2015-05-28 09:12+0100\n"
+"Last-Translator: Pedro Albuquerque <palbuquerque73@openmailbox.com>\n"
+"Language-Team: Português <palbuquerque73@openmailbox.com>\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Gtranslator 2.91.6\n"
+"X-Project-Style: gnome\n"
+
+#: ../govirt/ovirt-action-rest-call.c:57
+#: ../govirt/ovirt-resource-rest-call.c:146
+#, c-format
+msgid "Unexpected parameter type in REST call"
+msgstr "Tipo de parâmetro inesperado na chamada REST"
+
+#: ../govirt/ovirt-collection.c:241
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Obtido nó \"%s\", esperado \"%s\""
+
+#: ../govirt/ovirt-options.c:54
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Ficheiro certificado Root CA para ligações SSL seguras"
+
+#: ../govirt/ovirt-options.c:54
+msgid "<file>"
+msgstr "<ficheiro>"
+
+#: ../govirt/ovirt-options.c:56
+msgid "Display libgovirt version information"
+msgstr "Mostrar informação da versão da libgovirt"
+
+#: ../govirt/ovirt-options.c:61
+msgid "oVirt Options:"
+msgstr "Opções oVirt:"
+
+#: ../govirt/ovirt-options.c:61
+msgid "Show oVirt Options"
+msgstr "Mostrar opções oVirt"
+
+#: ../govirt/ovirt-proxy.c:507
+#, c-format
+msgid "Failed to write to '%s': %s"
+msgstr "Falha ao excrever em \"%s\": %s"
+
+#: ../govirt/ovirt-proxy.c:525
+#, c-format
+msgid "Failed to close '%s': %s"
+msgstr "Falha ao fechar \"%s\": %s"
+
+#: ../govirt/ovirt-proxy.c:591
+#, c-format
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Impossível extrair nome de ficheiro certificado CA do URI"
+
+#: ../govirt/ovirt-resource.c:179
+msgid "Cancellable initialization not supported"
+msgstr "Inicialização cancelável não suportada"
+
+#: ../govirt/ovirt-resource.c:430
+#, c-format
+msgid "Missing mandatory 'id' attribute"
+msgstr "Atributo \"id\" obrigatório em falta"
+
+#: ../govirt/ovirt-resource.c:437
+#, c-format
+msgid "Missing mandatory 'href' attribute"
+msgstr "Atributo \"href\" obrigatório em falta"
+
+#: ../govirt/ovirt-resource.c:691
+#, c-format
+msgid "Could not find 'status' node"
+msgstr "Impossível encontrar o nó \"status\""
+
+#: ../govirt/ovirt-resource.c:697
+#, c-format
+msgid "Could not find 'state' node"
+msgstr "Impossível encontrar o nó \"state\""
+
+#: ../govirt/ovirt-resource.c:705
+#, c-format
+msgid "Action is pending"
+msgstr "A ação está pendente"
+
+#: ../govirt/ovirt-resource.c:709
+#, c-format
+msgid "Action is in progress"
+msgstr "A ação está em curso"
+
+#: ../govirt/ovirt-resource.c:713
+#, c-format
+msgid "Action has failed"
+msgstr "A ação falhou"
+
+#: ../govirt/ovirt-resource.c:718
+#, c-format
+msgid "Unknown action failure"
+msgstr "Falha de ação desconhecida"
+
+#: ../govirt/ovirt-utils.c:224
+#, c-format
+msgid "Could not find 'reason' node"
+msgstr "Impossível encontrar o nó \"reason\""
+
+#: ../govirt/ovirt-vm.c:265
+#, c-format
+msgid "Could not find 'ticket' node"
+msgstr "Impossível encontrar o nó \"ticket\""
+
+#: ../govirt/ovirt-vm.c:271
+#, c-format
+msgid "Could not find 'value' node"
+msgstr "Impossível encontrar o nó \"value\""
+
+#: ../govirt/ovirt-vm.c:284
+#, c-format
+msgid "Could not find 'expiry' node"
+msgstr "Impossível encontrar o nó \"expiry\""
