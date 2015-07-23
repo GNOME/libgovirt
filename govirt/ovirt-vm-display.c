@@ -36,6 +36,7 @@ struct _OvirtVmDisplayPrivate {
     guint monitor_count;
     char *ticket;
     guint expiry;
+    GByteArray *ca_cert;
     char *host_subject;
     gboolean smartcard;
     gboolean allow_override;
@@ -57,6 +58,7 @@ enum {
     PROP_SMARTCARD,
     PROP_ALLOW_OVERRIDE,
     PROP_PROXY_URL,
+    PROP_CA_CERT,
 };
 
 static void ovirt_vm_display_get_property(GObject *object,
@@ -87,6 +89,9 @@ static void ovirt_vm_display_get_property(GObject *object,
         break;
     case PROP_EXPIRY:
         g_value_set_uint(value, display->priv->expiry);
+        break;
+    case PROP_CA_CERT:
+        g_value_set_boxed(value, display->priv->ca_cert);
         break;
     case PROP_HOST_SUBJECT:
         g_value_set_string(value, display->priv->host_subject);
@@ -136,6 +141,12 @@ static void ovirt_vm_display_set_property(GObject *object,
     case PROP_EXPIRY:
         display->priv->expiry = g_value_get_uint(value);
         break;
+    case PROP_CA_CERT:
+        if (display->priv->ca_cert != NULL) {
+            g_byte_array_unref(display->priv->ca_cert);
+        }
+        display->priv->ca_cert = g_value_dup_boxed(value);
+        break;
     case PROP_HOST_SUBJECT:
         g_free(display->priv->host_subject);
         display->priv->host_subject = g_value_dup_string(value);
@@ -163,6 +174,9 @@ static void ovirt_vm_display_finalize(GObject *object)
     g_free(display->priv->ticket);
     g_free(display->priv->host_subject);
     g_free(display->priv->proxy_url);
+    if (display->priv->ca_cert != NULL) {
+        g_byte_array_unref(display->priv->ca_cert);
+    }
 
     G_OBJECT_CLASS(ovirt_vm_display_parent_class)->finalize(object);
 }
@@ -238,6 +252,14 @@ static void ovirt_vm_display_class_init(OvirtVmDisplayClass *klass)
                                                       0,
                                                       G_PARAM_READWRITE |
                                                       G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_CA_CERT,
+                                    g_param_spec_boxed("ca-cert",
+                                                       "ca-cert",
+                                                       "Virt CA certificate to use for TLS SPICE connections",
+                                                        G_TYPE_BYTE_ARRAY,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
     g_object_class_install_property(object_class,
                                     PROP_HOST_SUBJECT,
                                     g_param_spec_string("host-subject",
