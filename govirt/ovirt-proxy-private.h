@@ -69,6 +69,9 @@ void ovirt_rest_call_async(OvirtRestCall *call,
                            GDestroyNotify destroy_func);
 gboolean ovirt_rest_call_finish(GAsyncResult *result, GError **err);
 
+/* Work around G_GNUC_DEPRECATED attribute on ovirt_proxy_get_vms() */
+GList *ovirt_proxy_get_vms_internal(OvirtProxy *proxy);
+
 G_END_DECLS
 
 #endif /* __OVIRT_PROXY_H__ */

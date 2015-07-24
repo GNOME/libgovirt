@@ -1051,3 +1051,27 @@ ovirt_proxy_get_api(OvirtProxy *proxy)
 {
     return proxy->priv->api;
 }
+
+
+GList *ovirt_proxy_get_vms_internal(OvirtProxy *proxy)
+{
+    OvirtApi *api;
+    OvirtCollection *vm_collection;
+    GHashTable *vms;
+
+    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
+
+    api = ovirt_proxy_get_api(proxy);
+    if (api == NULL)
+        return NULL;
+
+    vm_collection = ovirt_api_get_vms(api);
+    if (vm_collection == NULL)
+        return NULL;
+
+    vms = ovirt_collection_get_resources(vm_collection);
+    if (vms == NULL)
+        return NULL;
+
+    return g_hash_table_get_values(vms);
+}
