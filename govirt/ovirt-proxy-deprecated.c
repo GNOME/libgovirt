@@ -113,10 +113,10 @@ void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
  * @proxy: a #OvirtProxy
  * @result: (transfer none): async method result
  *
- * Return value: (transfer none) (element-type OvirtVm): the list of
- * #OvirtVm associated with #OvirtProxy. The returned list should not be
- * freed nor modified, and can become invalid any time a #OvirtProxy call
- * completes.
+ * Return value: (transfer container) (element-type OvirtVm): the list of
+ * #OvirtVm associated with #OvirtProxy.
+ * The returned list should be freed with g_list_free(), and can become
+ * invalid any time a #OvirtProxy call completes.
  */
 GList *
 ovirt_proxy_fetch_vms_finish(OvirtProxy *proxy,
@@ -179,9 +179,9 @@ OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name)
  * must have been fetched with ovirt_proxy_fetch_vms() or
  * ovirt_proxy_fetch_vms_async() before calling this function.
  *
- * Return value: (transfer none) (element-type OvirtVm): the list of
+ * Return value: (transfer container) (element-type OvirtVm): the list of
  * #OvirtVm associated with #OvirtProxy.
- * The returned list should not be freed nor modified, and can become
+ * The returned list should be freed with g_list_free(), and can become
  * invalid any time a #OvirtProxy call completes.
  */
 GList *ovirt_proxy_get_vms(OvirtProxy *proxy)
