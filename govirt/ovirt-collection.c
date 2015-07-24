@@ -51,6 +51,7 @@ enum {
     PROP_RESOURCE_TYPE,
     PROP_COLLECTION_XML_NAME,
     PROP_RESOURCE_XML_NAME,
+    PROP_RESOURCES,
 };
 
 
@@ -67,6 +68,9 @@ static void ovirt_collection_get_property(GObject *object,
         break;
     case PROP_RESOURCE_TYPE:
         g_value_set_gtype(value, collection->priv->resource_type);
+        break;
+    case PROP_RESOURCES:
+        g_value_set_boxed(value, collection->priv->resources);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -94,6 +98,9 @@ static void ovirt_collection_set_property(GObject *object,
         break;
     case PROP_RESOURCE_XML_NAME:
         collection->priv->resource_xml_name = g_value_dup_string(value);
+        break;
+    case PROP_RESOURCES:
+        ovirt_collection_set_resources(collection, g_value_get_boxed(value));
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -171,6 +178,16 @@ static void ovirt_collection_class_init(OvirtCollectionClass *klass)
     g_object_class_install_property(object_class,
                                     PROP_RESOURCE_XML_NAME,
                                     param_spec);
+
+    param_spec = g_param_spec_boxed("resources",
+                                     "Resources",
+                                     "Hash table containing the resources contained in this collection",
+                                     G_TYPE_HASH_TABLE,
+                                     G_PARAM_READWRITE |
+                                     G_PARAM_STATIC_STRINGS);
+    g_object_class_install_property(object_class,
+                                    PROP_RESOURCES,
+                                    param_spec);
 }
 
 
@@ -208,6 +225,8 @@ void ovirt_collection_set_resources(OvirtCollection *collection, GHashTable *res
     } else {
         collection->priv->resources = NULL;
     }
+
+    g_object_notify(G_OBJECT(collection), "resources");
 }
 
 
