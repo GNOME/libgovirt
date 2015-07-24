@@ -115,6 +115,10 @@ OvirtApi *ovirt_api_new(void)
  * ovirt_api_get_vms:
  * @api: a #OvirtApi
  *
+ * This method does not initiate any network activity, the collection
+ * must be fetched with ovirt_collection_fetch() before having up-to-date
+ * content.
+ *
  * Return value: (transfer none):
  */
 OvirtCollection *ovirt_api_get_vms(OvirtApi *api)
@@ -138,6 +142,10 @@ OvirtCollection *ovirt_api_get_vms(OvirtApi *api)
 /**
  * ovirt_api_get_vm_pools:
  * @api: a #OvirtApi
+ *
+ * This method does not initiate any network activity, the collection
+ * must be fetched with ovirt_collection_fetch() before having up-to-date
+ * content.
  *
  * Return value: (transfer none):
  */
@@ -163,6 +171,10 @@ OvirtCollection *ovirt_api_get_vm_pools(OvirtApi *api)
 /**
  * ovirt_api_get_storage_domains:
  * @api: a #OvirtApi
+ *
+ * This method does not initiate any network activity, the collection
+ * must be fetched with ovirt_collection_fetch() before having up-to-date
+ * content.
  *
  * Return value: (transfer none):
  */
