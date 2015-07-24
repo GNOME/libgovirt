@@ -770,11 +770,6 @@ ovirt_proxy_dispose(GObject *obj)
 {
     OvirtProxy *proxy = OVIRT_PROXY(obj);
 
-    if (proxy->priv->vms) {
-        g_hash_table_unref(proxy->priv->vms);
-        proxy->priv->vms = NULL;
-    }
-
     if (proxy->priv->cookie_jar) {
         g_object_unref(G_OBJECT(proxy->priv->cookie_jar));
         proxy->priv->cookie_jar = NULL;

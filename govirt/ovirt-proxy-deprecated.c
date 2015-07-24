@@ -28,57 +28,54 @@
 
 #include <rest/rest-xml-node.h>
 
-
-static gboolean
-ovirt_proxy_parse_vms_xml(OvirtProxy *proxy, RestXmlNode *root, GError **error)
-{
-    OvirtCollection *collection;
-    GHashTable *resources;
-
-    collection = ovirt_collection_new_from_xml(root, OVIRT_TYPE_COLLECTION, "vms",
-                                               OVIRT_TYPE_VM, "vm", error);
-    if (collection == NULL) {
-        return FALSE;
-    }
-
-    resources = ovirt_collection_get_resources(collection);
-
-    if (proxy->priv->vms != NULL) {
-        g_hash_table_unref(proxy->priv->vms);
-        proxy->priv->vms = NULL;
-    }
-    if (resources != NULL) {
-        proxy->priv->vms = g_hash_table_ref(resources);
-    }
-
-    return TRUE;
-}
-
-
 gboolean ovirt_proxy_fetch_vms(OvirtProxy *proxy, GError **error)
 {
-    RestXmlNode *vms_node;
+    OvirtCollection *vms;
+    OvirtApi *api;
 
-    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), FALSE);
-
-    vms_node = ovirt_proxy_get_collection_xml(proxy, "/ovirt-engine/api/vms", error);
-    if (vms_node == NULL)
+    api = ovirt_proxy_fetch_api(proxy, error);
+    if (api == NULL)
         return FALSE;
 
-    ovirt_proxy_parse_vms_xml(proxy, vms_node, error);
+    vms = ovirt_api_get_vms(api);
+    if (vms == NULL)
+        return FALSE;
 
-    rest_xml_node_unref(vms_node);
-
-    return TRUE;
+    return ovirt_collection_fetch(vms, proxy, error);
 }
 
 
-static gboolean fetch_vms_async_cb(OvirtProxy* proxy,
-                                   RestXmlNode *root_node,
-                                   gpointer user_data,
-                                   GError **error)
+typedef struct {
+    GCancellable *cancellable;
+    GAsyncReadyCallback callback;
+    gpointer user_data;
+} ApiAsyncData;
+
+static void fetch_api_async_cb(GObject *source_object,
+                               GAsyncResult *result,
+                               gpointer user_data)
 {
-    return ovirt_proxy_parse_vms_xml(proxy, root_node, error);
+    ApiAsyncData *data = user_data;
+    OvirtProxy *proxy = OVIRT_PROXY(source_object);
+    OvirtApi *api;
+    GError *error = NULL;
+
+    api = ovirt_proxy_fetch_api_finish(proxy, result, &error);
+    if (api == NULL) {
+        g_simple_async_report_error_in_idle(source_object,
+                                            data->callback, data->user_data,
+                                            OVIRT_ERROR, OVIRT_ERROR_FAILED,
+                                            "Could not fetch API endpoint");
+    } else {
+        OvirtCollection *vms;
+
+        vms = ovirt_api_get_vms(api);
+        g_return_if_fail(vms != NULL);
+
+        ovirt_collection_fetch_async(vms, proxy, data->cancellable,
+                                     data->callback, data->user_data);
+    }
+    g_free(data);
 }
 
 /**
@@ -92,21 +89,30 @@ void ovirt_proxy_fetch_vms_async(OvirtProxy *proxy,
                                  GAsyncReadyCallback callback,
                                  gpointer user_data)
 {
-    GSimpleAsyncResult *result;
+    OvirtApi *api;
+    OvirtCollection *vms;
 
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
-    result = g_simple_async_result_new (G_OBJECT(proxy), callback,
-                                        user_data,
-                                        /* Not using the _async function
-                                         * name as is customary as this
-                                         * would trigger a deprecation
-                                         * warning */
-                                        fetch_vms_async_cb);
-    ovirt_proxy_get_collection_xml_async(proxy, "/ovirt-engine/api/vms", result, cancellable,
-                                         fetch_vms_async_cb, NULL, NULL);
+    api = ovirt_proxy_get_api(proxy);
+    if (api == NULL) {
+        ApiAsyncData *data = g_new0(ApiAsyncData, 1);
+        data->cancellable = cancellable;
+        data->callback = callback;
+        data->user_data = user_data;
+        ovirt_proxy_fetch_api_async(proxy, cancellable,
+                                    fetch_api_async_cb, data);
+        return;
+    }
+
+    vms = ovirt_api_get_vms(api);
+    g_return_if_fail(vms != NULL);
+
+    return ovirt_collection_fetch_async(vms, proxy, cancellable,
+                                        callback, user_data);
 }
+
 
 /**
  * ovirt_proxy_fetch_vms_finish:
@@ -124,19 +130,13 @@ ovirt_proxy_fetch_vms_finish(OvirtProxy *proxy,
                              GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(proxy),
-                                                        fetch_vms_async_cb),
-                         NULL);
 
     if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
         return NULL;
 
-    if (proxy->priv->vms != NULL) {
-        return g_hash_table_get_values(proxy->priv->vms);
-    }
-
-    return NULL;
+    return ovirt_proxy_get_vms_internal(proxy);
 }
+
 
 /**
  * ovirt_proxy_lookup_vm:
@@ -152,22 +152,21 @@ ovirt_proxy_fetch_vms_finish(OvirtProxy *proxy,
  */
 OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name)
 {
-    OvirtVm *vm;
+    OvirtApi *api;
+    OvirtCollection *vm_collection;
 
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
     g_return_val_if_fail(vm_name != NULL, NULL);
 
-    if (proxy->priv->vms == NULL) {
+    api = ovirt_proxy_get_api(proxy);
+    if (api == NULL)
         return NULL;
-    }
 
-    vm = g_hash_table_lookup(proxy->priv->vms, vm_name);
-
-    if (vm == NULL) {
+    vm_collection = ovirt_api_get_vms(api);
+    if (vm_collection == NULL)
         return NULL;
-    }
 
-    return g_object_ref(vm);
+    return OVIRT_VM(ovirt_collection_lookup_resource(vm_collection, vm_name));
 }
 
 
@@ -186,11 +185,5 @@ OvirtVm *ovirt_proxy_lookup_vm(OvirtProxy *proxy, const char *vm_name)
  */
 GList *ovirt_proxy_get_vms(OvirtProxy *proxy)
 {
-    g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
-
-    if (proxy->priv->vms != NULL) {
-        return g_hash_table_get_values(proxy->priv->vms);
-    }
-
-    return NULL;
+    return ovirt_proxy_get_vms_internal(proxy);
 }
