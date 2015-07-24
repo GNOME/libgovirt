@@ -104,5 +104,6 @@ void ovirt_proxy_fetch_api_async(OvirtProxy *proxy,
 OvirtApi *ovirt_proxy_fetch_api_finish(OvirtProxy *proxy,
                                        GAsyncResult *result,
                                        GError **err);
+OvirtApi *ovirt_proxy_get_api(OvirtProxy *proxy);
 
 #endif

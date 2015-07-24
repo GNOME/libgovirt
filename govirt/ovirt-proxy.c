@@ -1033,3 +1033,21 @@ ovirt_proxy_fetch_api_finish(OvirtProxy *proxy,
 
     return proxy->priv->api;
 }
+
+
+/**
+ * ovirt_proxy_get_api:
+ *
+ * Gets the api entry point to access remote oVirt resources and collections.
+ * This method does not initiate any network activity, the remote API entry point
+ * must have been fetched with ovirt_proxy_fetch_api() or
+ * ovirt_proxy_fetch_api_async() before calling this function.
+ *
+ * Return value: (transfer none): an #OvirtApi instance used to interact with
+ * oVirt REST API.
+ */
+OvirtApi *
+ovirt_proxy_get_api(OvirtProxy *proxy)
+{
+    return proxy->priv->api;
+}
