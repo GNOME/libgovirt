@@ -984,15 +984,29 @@ OvirtProxy *ovirt_proxy_new(const char *hostname)
 }
 
 
+static void vm_collection_changed(GObject *gobject,
+                                  GParamSpec *pspec,
+                                  gpointer user_data)
+{
+    ovirt_proxy_update_vm_display_ca(OVIRT_PROXY(user_data));
+}
+
+
 static void ovirt_proxy_set_api_from_xml(OvirtProxy *proxy,
                                          RestXmlNode *node,
                                          GError **error)
 {
+    OvirtCollection *vms;
+
     if (proxy->priv->api != NULL) {
         g_object_unref(G_OBJECT(proxy->priv->api));
     }
     proxy->priv->api = ovirt_api_new_from_xml(node, error);
 
+    vms = ovirt_api_get_vms(proxy->priv->api);
+    g_return_if_fail(vms != NULL);
+    g_signal_connect(G_OBJECT(vms), "notify::resources",
+                     (GCallback)vm_collection_changed, proxy);
 }
 
 
