@@ -579,6 +579,50 @@ end:
 }
 
 
+static void ovirt_proxy_update_vm_display_ca(OvirtProxy *proxy)
+{
+    GList *vms;
+    GList *it;
+
+    vms = ovirt_proxy_get_vms_internal(proxy);
+    for (it = vms; it != NULL; it = it->next) {
+        OvirtVm *vm = OVIRT_VM(it->data);
+        OvirtVmDisplay *display;
+
+        g_object_get(G_OBJECT(vm), "display", &display, NULL);
+        g_object_set(G_OBJECT(display),
+                     "ca-cert", proxy->priv->display_ca,
+                     NULL);
+        g_object_unref(display);
+    }
+    g_list_free(vms);
+}
+
+
+static void set_display_ca_cert_from_data(OvirtProxy *proxy,
+                                          char *ca_cert_data,
+                                          gsize ca_cert_len)
+
+{
+    if (proxy->priv->display_ca != NULL)
+        g_byte_array_unref(proxy->priv->display_ca);
+
+    g_byte_array_append(proxy->priv->display_ca,
+                        (guint8 *)ca_cert_data, ca_cert_len);
+
+    /* While the fetched CA certificate has historically been used both as the CA
+     * certificate used during REST API communication and as the one to use for
+     * SPICE communication, this function really fetches the one meant for SPICE
+     * communication. The one used for REST API communication may or may not be
+     * the same.
+     * An OvirtVmDisplay::ca-cert property has been added when this design issue
+     * became apparent, so we need to update this property after fetching the
+     * certificate.
+     */
+    ovirt_proxy_update_vm_display_ca(proxy);
+}
+
+
 gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
 {
     GFile *source = NULL;
@@ -604,6 +648,7 @@ gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
         goto error;
 
     set_ca_cert_from_data(proxy, cert_data, cert_length);
+    set_display_ca_cert_from_data(proxy, cert_data, cert_length);
 
 error:
     if (source != NULL)
@@ -634,6 +679,8 @@ static void ca_file_loaded_cb(GObject *source_object,
     proxy = g_async_result_get_source_object(G_ASYNC_RESULT(fetch_result));
 
     set_ca_cert_from_data(OVIRT_PROXY(proxy), cert_data, cert_length);
+    set_display_ca_cert_from_data(OVIRT_PROXY(proxy),
+                                  cert_data, cert_length);
     g_object_unref(proxy);
     g_simple_async_result_set_op_res_gboolean(fetch_result, TRUE);
 
@@ -778,6 +825,11 @@ ovirt_proxy_dispose(GObject *obj)
     if (proxy->priv->api != NULL) {
         g_object_unref(proxy->priv->api);
         proxy->priv->api = NULL;
+    }
+
+    if (proxy->priv->display_ca != NULL) {
+        g_byte_array_unref(proxy->priv->display_ca);
+        proxy->priv->display_ca = NULL;
     }
 
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->dispose(obj);

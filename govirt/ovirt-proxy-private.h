@@ -33,6 +33,7 @@ G_BEGIN_DECLS
 
 struct _OvirtProxyPrivate {
     char *tmp_ca_file;
+    GByteArray *display_ca;
     gboolean admin_mode;
     OvirtApi *api;
     char *jsessionid;
