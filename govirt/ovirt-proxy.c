@@ -780,6 +780,11 @@ ovirt_proxy_dispose(GObject *obj)
         proxy->priv->cookie_jar = NULL;
     }
 
+    if (proxy->priv->api != NULL) {
+        g_object_unref(proxy->priv->api);
+        proxy->priv->api = NULL;
+    }
+
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->dispose(obj);
 }
 

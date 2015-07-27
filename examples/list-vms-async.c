@@ -203,9 +203,6 @@ int main(int argc, char **argv)
     main_loop = g_main_loop_new(NULL, FALSE);
     g_main_loop_run(main_loop);
 
-    if (data->api != NULL) {
-        g_object_unref(data->api);
-    }
     if (data->proxy != NULL) {
         g_object_unref(data->proxy);
     }
