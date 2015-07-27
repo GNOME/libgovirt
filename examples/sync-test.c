@@ -61,7 +61,8 @@ static void list_storage_domains(OvirtApi *api, OvirtProxy *proxy)
 {
     GError *error = NULL;
     OvirtCollection *collection;
-    GList *storage_domains;
+    GHashTableIter storage_domains;
+    gpointer value;
 
 
     collection = ovirt_api_get_storage_domains(api);
@@ -71,15 +72,15 @@ static void list_storage_domains(OvirtApi *api, OvirtProxy *proxy)
         g_clear_error(&error);
     }
 
-    storage_domains = g_hash_table_get_values(ovirt_collection_get_resources(collection));
-    for (; storage_domains != NULL; storage_domains = storage_domains->next) {
+    g_hash_table_iter_init(&storage_domains, ovirt_collection_get_resources(collection));
+    while (g_hash_table_iter_next(&storage_domains, NULL, &value)) {
         OvirtStorageDomain *domain;
         OvirtCollection *file_collection;
-        GList *files;
+        GHashTableIter files;
         char *name;
         int type;
 
-        domain = OVIRT_STORAGE_DOMAIN(storage_domains->data);
+        domain = OVIRT_STORAGE_DOMAIN(value);
         g_object_get(G_OBJECT(domain), "type", &type, "name", &name, NULL);
         g_print("storage domain: %s (type %s)\n", name,
                 genum_get_nick(OVIRT_TYPE_STORAGE_DOMAIN_TYPE, type));
@@ -94,10 +95,11 @@ static void list_storage_domains(OvirtApi *api, OvirtProxy *proxy)
                     name, error->message);
             g_clear_error(&error);
         }
-        files = g_hash_table_get_values(ovirt_collection_get_resources(file_collection));
-        for (; files != NULL; files = files->next) {
+        g_hash_table_iter_init(&files, ovirt_collection_get_resources(file_collection));
+        while (g_hash_table_iter_next(&files, NULL, &value)) {
             char *filename;
-            g_object_get(G_OBJECT(files->data), "name", &filename, NULL);
+
+            g_object_get(G_OBJECT(value), "name", &filename, NULL);
             g_print("file: %s\n", filename);
             g_free(filename);
         }
@@ -200,12 +202,12 @@ int main(int argc, char **argv)
 
     {
     list_storage_domains(api, proxy);
-
     }
 
 
 error:
     g_free(ticket);
+    g_free(host);
     if (ca_cert != NULL)
         g_byte_array_unref(ca_cert);
     if (error != NULL)
