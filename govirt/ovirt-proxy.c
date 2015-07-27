@@ -628,8 +628,7 @@ static void ca_file_loaded_cb(GObject *source_object,
                                 NULL, &error);
     if (error != NULL) {
         g_simple_async_result_take_error(fetch_result, error);
-        g_simple_async_result_complete (fetch_result);
-        return;
+        goto end;
     }
 
     proxy = g_async_result_get_source_object(G_ASYNC_RESULT(fetch_result));
@@ -637,7 +636,10 @@ static void ca_file_loaded_cb(GObject *source_object,
     set_ca_cert_from_data(OVIRT_PROXY(proxy), cert_data, cert_length);
     g_object_unref(proxy);
     g_simple_async_result_set_op_res_gboolean(fetch_result, TRUE);
+
+end:
     g_simple_async_result_complete (fetch_result);
+    g_object_unref(fetch_result);
 }
 
 void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
