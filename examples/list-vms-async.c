@@ -164,6 +164,7 @@ static void fetched_ca_cert_cb(GObject *source_object,
         return;
     }
     g_print("\tCA certificate: %p\n", ca_cert);
+    g_byte_array_unref(ca_cert);
     ovirt_proxy_fetch_api_async(proxy, NULL, api_fetched_cb, user_data);
 }
 
