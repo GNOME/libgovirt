@@ -39,6 +39,7 @@ struct _OvirtProxyPrivate {
     char *jsessionid;
     SoupCookieJar *cookie_jar;
 
+    gboolean setting_ca_file;
     gulong ssl_ca_file_changed_id;
 };
 
