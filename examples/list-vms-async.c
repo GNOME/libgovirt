@@ -80,6 +80,7 @@ static void pools_fetched_cb(GObject *source_object,
     ovirt_collection_fetch_finish(pools, result, &error);
     if (error != NULL) {
         g_debug("failed to fetch pools: %s", error->message);
+        g_error_free(error);
         g_main_loop_quit(main_loop);
         return;
     }
@@ -103,6 +104,7 @@ static void vms_fetched_cb(GObject *source_object,
     ovirt_collection_fetch_finish(vms, result, &error);
     if (error != NULL) {
         g_debug("failed to fetch VMs: %s", error->message);
+        g_error_free(error);
         g_main_loop_quit(main_loop);
         return;
     }
@@ -128,6 +130,7 @@ static void api_fetched_cb(GObject *source_object,
     data->api = ovirt_proxy_fetch_api_finish(proxy, result, &error);
     if (error != NULL) {
         g_debug("failed to fetch api: %s", error->message);
+        g_error_free(error);
         g_main_loop_quit(main_loop);
         return;
     }
@@ -151,6 +154,7 @@ static void fetched_ca_cert_cb(GObject *source_object,
     ca_cert = ovirt_proxy_fetch_ca_certificate_finish(proxy, result, &error);
     if (error != NULL) {
         g_debug("failed to get CA certificate: %s", error->message);
+        g_error_free(error);
         g_main_loop_quit(main_loop);
         return;
     }

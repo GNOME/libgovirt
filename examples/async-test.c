@@ -58,6 +58,7 @@ static void updated_cdrom_cb(GObject *source_object,
                               result, &error);
     if (error != NULL) {
         g_debug("failed to update cdrom resource: %s", error->message);
+        g_error_free(error);
     }
 
     g_main_loop_quit(main_loop);
@@ -78,6 +79,7 @@ static void cdroms_fetched_cb(GObject *source_object,
     ovirt_collection_fetch_finish(cdroms, result, &error);
     if (error != NULL) {
         g_debug("failed to fetch cdroms collection: %s", error->message);
+        g_error_free(error);
         g_main_loop_quit(main_loop);
         return;
     }
@@ -112,6 +114,7 @@ static void got_ticket_cb(GObject *source_object,
     ovirt_vm_get_ticket_finish(vm, result, &error);
     if (error != NULL) {
         g_debug("failed to fetch ticket for VM: %s", error->message);
+        g_error_free(error);
         g_main_loop_quit(main_loop);
         return;
     }
@@ -157,6 +160,7 @@ static void vm_started_cb(GObject *source_object,
     ovirt_vm_start_finish(vm, result, &error);
     if (error != NULL) {
         g_debug("failed to start VM: %s", error->message);
+        g_error_free(error);
         g_main_loop_quit(main_loop);
         return;
     }
@@ -178,6 +182,7 @@ static void vms_fetched_cb(GObject *source_object,
     ovirt_collection_fetch_finish(vms, result, &error);
     if (error != NULL) {
         g_debug("failed to fetch VMs: %s", error->message);
+        g_error_free(error);
         g_main_loop_quit(main_loop);
         return;
     }
@@ -195,6 +200,7 @@ static void vms_fetched_cb(GObject *source_object,
         ovirt_vm_start_async(vm, data->proxy, NULL, vm_started_cb, data);
         if (error != NULL) {
             g_debug("failed to start VM: %s", error->message);
+            g_error_free(error);
             g_main_loop_quit(main_loop);
             return;
         }
@@ -218,6 +224,7 @@ static void api_fetched_cb(GObject *source_object,
     api = ovirt_proxy_fetch_api_finish(proxy, result, &error);
     if (error != NULL) {
         g_debug("failed to fetch api: %s", error->message);
+        g_error_free(error);
         g_main_loop_quit(main_loop);
         return;
     }
@@ -241,6 +248,7 @@ static void fetched_ca_cert_cb(GObject *source_object,
     ca_cert = ovirt_proxy_fetch_ca_certificate_finish(proxy, result, &error);
     if (error != NULL) {
         g_debug("failed to get CA certificate: %s", error->message);
+        g_error_free(error);
         g_main_loop_quit(main_loop);
         return;
     }

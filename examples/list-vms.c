@@ -66,6 +66,7 @@ static void dump_vms(OvirtApi *api, OvirtProxy *proxy)
     ovirt_collection_fetch(vms, proxy, &error);
     if (error != NULL) {
         g_debug("failed to fetch VMs: %s", error->message);
+        g_error_free(error);
         return;
     }
 
@@ -84,6 +85,7 @@ static void dump_vm_pools(OvirtApi *api, OvirtProxy *proxy)
     ovirt_collection_fetch(pools, proxy, &error);
     if (error != NULL) {
         g_debug("failed to fetch VM pools: %s", error->message);
+        g_error_free(error);
         return;
     }
 
