@@ -457,7 +457,7 @@ static char *write_to_tmp_file(const char *template,
                                GError **error)
 {
     GFile *tmp_file = NULL;
-    GFileIOStream *iostream;
+    GFileIOStream *iostream = NULL;
     GOutputStream *output;
     gboolean write_ok;
     char *result = NULL;
@@ -474,11 +474,14 @@ static char *write_to_tmp_file(const char *template,
         goto end;
     }
 
-    return g_file_get_path(tmp_file);
+    result = g_file_get_path(tmp_file);
 
 end:
     if (tmp_file != NULL) {
         g_object_unref(G_OBJECT(tmp_file));
+    }
+    if (iostream != NULL) {
+        g_object_unref(G_OBJECT(iostream));
     }
 
     return result;
