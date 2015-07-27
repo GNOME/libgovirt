@@ -834,6 +834,10 @@ ovirt_proxy_dispose(GObject *obj)
         proxy->priv->display_ca = NULL;
     }
 
+    if (proxy->priv->api != NULL) {
+        g_object_unref(proxy->priv->api);
+    }
+
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->dispose(obj);
 }
 
