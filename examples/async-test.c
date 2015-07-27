@@ -32,6 +32,8 @@ typedef struct {
     const char *vm_name;
 } AsyncData;
 
+static AsyncData *async_data;
+
 static gboolean
 authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
                 gboolean retrying, gpointer user_data)
@@ -71,8 +73,8 @@ static void cdroms_fetched_cb(GObject *source_object,
 {
     OvirtCollection *cdroms = OVIRT_COLLECTION(source_object);
     GError *error = NULL;
-    GList *it;
-    GHashTable *resources;
+    GHashTableIter resources;
+    gpointer value;
     AsyncData *data = (AsyncData *)user_data;
 
     g_debug("fetched CDROMs");
@@ -84,12 +86,14 @@ static void cdroms_fetched_cb(GObject *source_object,
         return;
     }
     g_debug("updating CDROM");
-    resources = ovirt_collection_get_resources(cdroms);
-    for (it = g_hash_table_get_values(resources); it != NULL; it = it->next) {
-        g_assert(OVIRT_IS_CDROM(it->data));
-        g_object_set(G_OBJECT(it->data), "file", "newimage.iso", NULL);
-        ovirt_cdrom_update_async(OVIRT_CDROM(it->data), FALSE, data->proxy, NULL,
-                                    updated_cdrom_cb, user_data);
+    g_hash_table_iter_init(&resources, ovirt_collection_get_resources(cdroms));
+    while (g_hash_table_iter_next(&resources, NULL, &value)) {
+        OvirtCdrom *cdrom;
+        g_assert(OVIRT_IS_CDROM(value));
+        cdrom = OVIRT_CDROM(value);
+        g_object_set(G_OBJECT(cdrom), "file", "newimage.iso", NULL);
+        ovirt_cdrom_update_async(OVIRT_CDROM(cdrom), FALSE, data->proxy, NULL,
+                                 updated_cdrom_cb, user_data);
 
     }
 }
@@ -133,6 +137,7 @@ static void got_ticket_cb(GObject *source_object,
                  "secure-port", &secure_port,
                  "ticket", &ticket,
                  NULL);
+    g_object_unref(G_OBJECT(display));
     g_print("Connection info for VM:\n");
     g_print("\tConnection type: %s\n",
             (type == OVIRT_VM_DISPLAY_SPICE?"spice":"vnc"));
@@ -140,6 +145,8 @@ static void got_ticket_cb(GObject *source_object,
     g_print("\tPort: %d\n", port);
     g_print("\tSecure port: %d\n", secure_port);
     g_print("\tTicket: %s\n", ticket);
+    g_free(host);
+    g_free(ticket);
 
     cdroms = ovirt_vm_get_cdroms(vm);
     g_assert(cdroms != NULL);
@@ -207,6 +214,7 @@ static void vms_fetched_cb(GObject *source_object,
     } else {
         ovirt_vm_get_ticket_async(vm, data->proxy, NULL, got_ticket_cb, data);
     }
+    g_object_unref(vm);
 }
 
 
@@ -258,6 +266,7 @@ static void fetched_ca_cert_cb(GObject *source_object,
         return;
     }
     g_print("\tCA certificate: %p\n", ca_cert);
+    g_byte_array_unref(ca_cert);
     ovirt_proxy_fetch_api_async(proxy, NULL, api_fetched_cb, user_data);
 }
 
@@ -265,7 +274,6 @@ static gboolean start(gpointer user_data)
 {
     char **argv = (char **)user_data;
     OvirtProxy *proxy = NULL;
-    AsyncData *data;
 
     proxy = ovirt_proxy_new (argv[1]);
     if (proxy == NULL)
@@ -274,12 +282,12 @@ static gboolean start(gpointer user_data)
     g_signal_connect(G_OBJECT(proxy), "authenticate",
                      G_CALLBACK(authenticate_cb), NULL);
 
-    data = g_new0(AsyncData, 1);
-    data->proxy = proxy;
-    data->vm_name = argv[2];
+    async_data = g_new0(AsyncData, 1);
+    async_data->proxy = proxy;
+    async_data->vm_name = argv[2];
     ovirt_proxy_fetch_ca_certificate_async(proxy, NULL,
                                            fetched_ca_cert_cb,
-                                           data);
+                                           async_data);
 
     return G_SOURCE_REMOVE;
 }
@@ -296,22 +304,14 @@ int main(int argc, char **argv)
     g_idle_add(start, argv);
     main_loop = g_main_loop_new(NULL, FALSE);
     g_main_loop_run(main_loop);
+    g_main_loop_unref(main_loop);
+
+    if (async_data != NULL) {
+        if (async_data->proxy != NULL) {
+            g_object_unref(async_data->proxy);
+        }
+        g_free(async_data);
+    }
 
     return 0;
-#if 0
-error:
-    g_free(ticket);
-    if (ca_cert != NULL)
-        g_byte_array_unref(ca_cert);
-    if (error != NULL)
-        g_error_free(error);
-    if (display != NULL)
-        g_object_unref(display);
-    if (vm != NULL)
-        g_object_unref(vm);
-    if (proxy != NULL)
-        g_object_unref(proxy);
-
-    return 0;
-#endif
 }
