@@ -427,7 +427,7 @@ static GByteArray *get_ca_cert_data(OvirtProxy *proxy)
     return g_byte_array_new_take((guchar *)content, length);
 }
 
-static void ovirt_proxy_set_tmp_ca_file(OvirtProxy *proxy, const char *ca_file)
+static void ovirt_proxy_free_tmp_ca_file(OvirtProxy *proxy)
 {
     if (proxy->priv->tmp_ca_file != NULL) {
         int unlink_failed;
@@ -436,7 +436,13 @@ static void ovirt_proxy_set_tmp_ca_file(OvirtProxy *proxy, const char *ca_file)
             g_warning("Failed to unlink '%s'", proxy->priv->tmp_ca_file);
         }
         g_free(proxy->priv->tmp_ca_file);
+        proxy->priv->tmp_ca_file = NULL;
     }
+}
+
+static void ovirt_proxy_set_tmp_ca_file(OvirtProxy *proxy, const char *ca_file)
+{
+    ovirt_proxy_free_tmp_ca_file(proxy);
     proxy->priv->tmp_ca_file = g_strdup(ca_file);
     if (ca_file != NULL) {
         /* Not blocking this signal would cause the callback to call again
@@ -846,7 +852,7 @@ ovirt_proxy_finalize(GObject *obj)
 {
     OvirtProxy *proxy = OVIRT_PROXY(obj);
 
-    ovirt_proxy_set_tmp_ca_file(proxy, NULL);
+    ovirt_proxy_free_tmp_ca_file(proxy);
     g_free(proxy->priv->jsessionid);
 
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->finalize(obj);
