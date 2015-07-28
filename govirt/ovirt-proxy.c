@@ -444,16 +444,14 @@ static void ovirt_proxy_set_tmp_ca_file(OvirtProxy *proxy, const char *ca_file)
 {
     ovirt_proxy_free_tmp_ca_file(proxy);
     proxy->priv->tmp_ca_file = g_strdup(ca_file);
-    if (ca_file != NULL) {
-        /* We block invokations of ssl_ca_file_changed() using the 'setting_ca_file' boolean
-         * g_signal_handler_{un,}block is not working well enough as
-         * ovirt_proxy_set_tmp_ca_file() can be called as part of a g_object_set call,
-         * and unblocking "notify::ssl-ca-file" right after setting its value
-         * is not enough to prevent ssl_ca_file_changed() from running.
-         */
-        proxy->priv->setting_ca_file = TRUE;
-        g_object_set(G_OBJECT(proxy), "ssl-ca-file", ca_file, NULL);
-    }
+    /* We block invokations of ssl_ca_file_changed() using the 'setting_ca_file' boolean
+     * g_signal_handler_{un,}block is not working well enough as
+     * ovirt_proxy_set_tmp_ca_file() can be called as part of a g_object_set call,
+     * and unblocking "notify::ssl-ca-file" right after setting its value
+     * is not enough to prevent ssl_ca_file_changed() from running.
+     */
+    proxy->priv->setting_ca_file = TRUE;
+    g_object_set(G_OBJECT(proxy), "ssl-ca-file", ca_file, NULL);
 }
 
 
