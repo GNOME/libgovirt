@@ -920,7 +920,7 @@ static void ssl_ca_file_changed(GObject *gobject,
         proxy->priv->setting_ca_file = FALSE;
         return;
     }
-    ovirt_proxy_set_tmp_ca_file(OVIRT_PROXY(gobject), NULL);
+    ovirt_proxy_free_tmp_ca_file(OVIRT_PROXY(gobject));
 }
 
 static void
