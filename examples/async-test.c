@@ -55,7 +55,7 @@ static void updated_cdrom_cb(GObject *source_object,
                             gpointer user_data)
 {
     GError *error = NULL;
-    g_warning("updated cdrom cb");
+    g_debug("updated cdrom cb");
     ovirt_cdrom_update_finish(OVIRT_CDROM(source_object),
                               result, &error);
     if (error != NULL) {
