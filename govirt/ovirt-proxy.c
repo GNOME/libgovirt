@@ -283,6 +283,7 @@ void ovirt_rest_call_async(OvirtRestCall *call,
     data->call_user_data = user_data;
     data->destroy_call_data = destroy_func;
     if (cancellable != NULL) {
+        data->cancellable = cancellable;
         data->cancellable_cb_id = g_cancellable_connect(cancellable,
                                                         G_CALLBACK (call_async_cancelled_cb),
                                                         call, NULL);
