@@ -4,14 +4,14 @@
 # pomóc w jego rozwijaniu i pielęgnowaniu, napisz do nas:
 # gnomepl@aviary.pl
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Piotr Drąg <piotrdrag@gmail.com>, 2014.
-# Aviary.pl <gnomepl@aviary.pl>, 2014.
+# Piotr Drąg <piotrdrag@gmail.com>, 2014-2015.
+# Aviary.pl <gnomepl@aviary.pl>, 2014-2015.
 msgid ""
 msgstr ""
 "Project-Id-Version: libgovirt\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-15 18:07+0200\n"
-"PO-Revision-Date: 2014-09-15 18:08+0200\n"
+"POT-Creation-Date: 2015-08-31 01:41+0200\n"
+"PO-Revision-Date: 2015-08-31 01:42+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <gnomepl@aviary.pl>\n"
 "Language: pl\n"
@@ -29,42 +29,42 @@ msgstr ""
 msgid "Unexpected parameter type in REST call"
 msgstr "Nieoczekiwany typ parametru w wywołaniu REST"
 
-#: ../govirt/ovirt-collection.c:241
+#: ../govirt/ovirt-collection.c:260
 #, c-format
 msgid "Got '%s' node, expected '%s'"
-msgstr "Otrzymano węzeł \"%s\", oczekiwano \"%s\""
+msgstr "Otrzymano węzeł „%s”, oczekiwano „%s”"
 
-#: ../govirt/ovirt-options.c:50
+#: ../govirt/ovirt-options.c:54
 msgid "Root CA certificate file for secure SSL connections"
 msgstr "Plik głównego certyfikatu CA dla bezpiecznych połączeń SSL"
 
-#: ../govirt/ovirt-options.c:50
+#: ../govirt/ovirt-options.c:54
 msgid "<file>"
 msgstr "<plik>"
 
-#: ../govirt/ovirt-options.c:52
+#: ../govirt/ovirt-options.c:56
 msgid "Display libgovirt version information"
 msgstr "Wyświetla informacje o wersji biblioteki libgovirt"
 
-#: ../govirt/ovirt-options.c:57
+#: ../govirt/ovirt-options.c:61
 msgid "oVirt Options:"
 msgstr "Opcje oVirt:"
 
-#: ../govirt/ovirt-options.c:57
+#: ../govirt/ovirt-options.c:61
 msgid "Show oVirt Options"
 msgstr "Wyświetla opcje oVirt"
 
-#: ../govirt/ovirt-proxy.c:499
+#: ../govirt/ovirt-proxy.c:516
 #, c-format
 msgid "Failed to write to '%s': %s"
-msgstr "Zapisanie do \"%s\" się nie powiodło: %s"
+msgstr "Zapisanie do „%s” się nie powiodło: %s"
 
-#: ../govirt/ovirt-proxy.c:517
+#: ../govirt/ovirt-proxy.c:534
 #, c-format
 msgid "Failed to close '%s': %s"
-msgstr "Zamknięcie \"%s\" się nie powiodło: %s"
+msgstr "Zamknięcie „%s” się nie powiodło: %s"
 
-#: ../govirt/ovirt-proxy.c:583
+#: ../govirt/ovirt-proxy.c:644
 #, c-format
 msgid "Could not extract CA certificate filename from URI"
 msgstr "Nie można wydobyć nazwy pliku certyfikatu CA z adresu URI"
@@ -76,59 +76,59 @@ msgstr "Inicjacja możliwa do anulowania nie jest obsługiwana"
 #: ../govirt/ovirt-resource.c:430
 #, c-format
 msgid "Missing mandatory 'id' attribute"
-msgstr "Brak wymaganego atrybutu \"id\""
+msgstr "Brak wymaganego atrybutu „id”"
 
 #: ../govirt/ovirt-resource.c:437
 #, c-format
 msgid "Missing mandatory 'href' attribute"
-msgstr "Brak wymaganego atrybutu \"href\""
+msgstr "Brak wymaganego atrybutu „href”"
 
-#: ../govirt/ovirt-resource.c:690
+#: ../govirt/ovirt-resource.c:691
 #, c-format
 msgid "Could not find 'status' node"
-msgstr "Nie można odnaleźć węzła \"status\""
+msgstr "Nie można odnaleźć węzła „status”"
 
-#: ../govirt/ovirt-resource.c:696
+#: ../govirt/ovirt-resource.c:697
 #, c-format
 msgid "Could not find 'state' node"
-msgstr "Nie można odnaleźć węzła \"state\""
+msgstr "Nie można odnaleźć węzła „state”"
 
-#: ../govirt/ovirt-resource.c:704
+#: ../govirt/ovirt-resource.c:705
 #, c-format
 msgid "Action is pending"
 msgstr "Działanie jest oczekujące"
 
-#: ../govirt/ovirt-resource.c:708
+#: ../govirt/ovirt-resource.c:709
 #, c-format
 msgid "Action is in progress"
 msgstr "Działanie jest w trakcie"
 
-#: ../govirt/ovirt-resource.c:712
+#: ../govirt/ovirt-resource.c:713
 #, c-format
 msgid "Action has failed"
 msgstr "Działanie się nie powiodło"
 
-#: ../govirt/ovirt-resource.c:717
+#: ../govirt/ovirt-resource.c:718
 #, c-format
 msgid "Unknown action failure"
 msgstr "Nieznane niepowodzenie działania"
 
-#: ../govirt/ovirt-utils.c:193
+#: ../govirt/ovirt-utils.c:224
 #, c-format
 msgid "Could not find 'reason' node"
-msgstr "Nie można odnaleźć węzła \"reason\""
+msgstr "Nie można odnaleźć węzła „reason”"
 
 #: ../govirt/ovirt-vm.c:265
 #, c-format
 msgid "Could not find 'ticket' node"
-msgstr "Nie można odnaleźć węzła \"ticket\""
+msgstr "Nie można odnaleźć węzła „ticket”"
 
 #: ../govirt/ovirt-vm.c:271
 #, c-format
 msgid "Could not find 'value' node"
-msgstr "Nie można odnaleźć węzła \"value\""
+msgstr "Nie można odnaleźć węzła „value”"
 
 #: ../govirt/ovirt-vm.c:284
 #, c-format
 msgid "Could not find 'expiry' node"
-msgstr "Nie można odnaleźć węzła \"expiry\""
+msgstr "Nie można odnaleźć węzła „expiry”"
