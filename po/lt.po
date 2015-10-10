@@ -1,0 +1,131 @@
+# Lithuanian translation for libgovirt.
+# Copyright (C) 2015 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# Aurimas Černius <aurisc4@gmail.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=libgovirt&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2015-10-10 11:05+0000\n"
+"PO-Revision-Date: 2015-10-10 21:41+0300\n"
+"Last-Translator: Aurimas Černius <aurisc4@gmail.com>\n"
+"Language-Team: Lietuvių <gnome-lt@lists.akl.lt>\n"
+"Language: lt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
+"%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Gtranslator 2.91.7\n"
+
+#: ../govirt/ovirt-action-rest-call.c:57
+#: ../govirt/ovirt-resource-rest-call.c:146
+#, c-format
+msgid "Unexpected parameter type in REST call"
+msgstr "Netikėtas parametro tipas REST kvietime"
+
+#: ../govirt/ovirt-collection.c:260
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Gauta viršūnė „%s“, tikėtasi „%s“"
+
+#: ../govirt/ovirt-options.c:54
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Šakninis LĮ liudijimo failas saugiems SSL ryšiams"
+
+#: ../govirt/ovirt-options.c:54
+msgid "<file>"
+msgstr "<failas>"
+
+#: ../govirt/ovirt-options.c:56
+msgid "Display libgovirt version information"
+msgstr "Rodyti libgovirt versijos informaciją"
+
+#: ../govirt/ovirt-options.c:61
+msgid "oVirt Options:"
+msgstr "oVirt parametrai:"
+
+#: ../govirt/ovirt-options.c:61
+msgid "Show oVirt Options"
+msgstr "Rodyti oVirt parametrus"
+
+#: ../govirt/ovirt-proxy.c:516
+#, c-format
+msgid "Failed to write to '%s': %s"
+msgstr "Nepavyko įrašyti į „%s“: %s"
+
+#: ../govirt/ovirt-proxy.c:534
+#, c-format
+msgid "Failed to close '%s': %s"
+msgstr "Nepavyko užverti „%s“: %s"
+
+#: ../govirt/ovirt-proxy.c:644
+#, c-format
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Nepavyko gauti LĮ liudijimo failo ir URI"
+
+#: ../govirt/ovirt-resource.c:179
+msgid "Cancellable initialization not supported"
+msgstr "Atšaukiamo veiksmo inicijavimas nepalaikomas"
+
+#: ../govirt/ovirt-resource.c:430
+#, c-format
+msgid "Missing mandatory 'id' attribute"
+msgstr "Trūksta būtino atributo „id“"
+
+#: ../govirt/ovirt-resource.c:437
+#, c-format
+msgid "Missing mandatory 'href' attribute"
+msgstr "Trūksta būtino atributo „href“"
+
+#: ../govirt/ovirt-resource.c:691
+#, c-format
+msgid "Could not find 'status' node"
+msgstr "Nepavyko rasti „status“ viršūnės"
+
+#: ../govirt/ovirt-resource.c:697
+#, c-format
+msgid "Could not find 'state' node"
+msgstr "Nepavyko rasti „state“ viršūnės"
+
+#: ../govirt/ovirt-resource.c:705
+#, c-format
+msgid "Action is pending"
+msgstr "Yra neįvykdytas veiksmas"
+
+#: ../govirt/ovirt-resource.c:709
+#, c-format
+msgid "Action is in progress"
+msgstr "Yra vykdomas veiksmas"
+
+#: ../govirt/ovirt-resource.c:713
+#, c-format
+msgid "Action has failed"
+msgstr "Klaida vykdant veiksmą"
+
+#: ../govirt/ovirt-resource.c:718
+#, c-format
+msgid "Unknown action failure"
+msgstr "Nežinoma veiksmo klaida"
+
+#: ../govirt/ovirt-utils.c:224
+#, c-format
+msgid "Could not find 'reason' node"
+msgstr "Nepavyko rasti „reason“ viršūnės"
+
+#: ../govirt/ovirt-vm.c:265
+#, c-format
+msgid "Could not find 'ticket' node"
+msgstr "Nepavyko rasti „ticket“ viršūnės"
+
+#: ../govirt/ovirt-vm.c:271
+#, c-format
+msgid "Could not find 'value' node"
+msgstr "Nepavyko rasti „value“ viršūnės"
+
+#: ../govirt/ovirt-vm.c:284
+#, c-format
+msgid "Could not find 'expiry' node"
+msgstr "Nepavyko rasti „expiry“ virtūnės"
