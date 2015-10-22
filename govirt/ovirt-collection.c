@@ -292,7 +292,7 @@ ovirt_collection_refresh_from_xml(OvirtCollection *collection,
         if (g_hash_table_lookup(resources, name) != NULL) {
             g_message("'%s' resource with the same name ('%s') already exists",
                       collection->priv->resource_xml_name, name);
-            g_object_unref(resources);
+            g_object_unref(G_OBJECT(resource));
             continue;
         }
         g_hash_table_insert(resources, name, resource);
