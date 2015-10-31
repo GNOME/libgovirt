@@ -1,22 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) 2015	
 # This file is distributed under the same license as the libgovirt package.
-# Pedro Albuquerque <palbuquerque73@openmailbox.com>, 2015.
+# Pedro Albuquerque <palbuquerque73@gmail.com>, 2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: libgovirt\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=libgovirt&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-05-17 10:14+0000\n"
-"PO-Revision-Date: 2015-05-28 09:12+0100\n"
-"Last-Translator: Pedro Albuquerque <palbuquerque73@openmailbox.com>\n"
-"Language-Team: Português <palbuquerque73@openmailbox.com>\n"
+"POT-Creation-Date: 2015-06-03 23:17+0000\n"
+"PO-Revision-Date: 2015-10-31 10:55+0000\n"
+"Last-Translator: Pedro Albuquerque <palbuquerque73@gmail.com>\n"
+"Language-Team: Português <palbuquerque73@gmail.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\\n\n"
 "X-Generator: Gtranslator 2.91.6\n"
 "X-Project-Style: gnome\n"
 
@@ -54,7 +54,7 @@ msgstr "Mostrar opções oVirt"
 #: ../govirt/ovirt-proxy.c:507
 #, c-format
 msgid "Failed to write to '%s': %s"
-msgstr "Falha ao excrever em \"%s\": %s"
+msgstr "Falha ao escrever em \"%s\": %s"
 
 #: ../govirt/ovirt-proxy.c:525
 #, c-format
@@ -64,7 +64,7 @@ msgstr "Falha ao fechar \"%s\": %s"
 #: ../govirt/ovirt-proxy.c:591
 #, c-format
 msgid "Could not extract CA certificate filename from URI"
-msgstr "Impossível extrair nome de ficheiro certificado CA do URI"
+msgstr "Impossível extrair nome de ficheiro de certificado CA do URI"
 
 #: ../govirt/ovirt-resource.c:179
 msgid "Cancellable initialization not supported"
