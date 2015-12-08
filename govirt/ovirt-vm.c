@@ -276,8 +276,6 @@ static gboolean parse_ticket_status(RestXmlNode *root, OvirtResource *resource, 
     g_return_val_if_fail(display != NULL, FALSE);
     g_object_set(G_OBJECT(display), "ticket", node->content, NULL);
 
-    g_debug("Ticket: %s\n", node->content);
-
     node = g_hash_table_lookup(root->children, expiry_key);
     if (node == NULL) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
