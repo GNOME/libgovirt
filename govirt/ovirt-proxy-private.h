@@ -37,6 +37,8 @@ struct _OvirtProxyPrivate {
     gboolean admin_mode;
     OvirtApi *api;
     char *jsessionid;
+    char *sso_token;
+
     SoupCookieJar *cookie_jar;
     GHashTable *additional_headers;
 

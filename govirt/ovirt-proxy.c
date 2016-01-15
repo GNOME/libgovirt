@@ -48,7 +48,8 @@ enum {
     PROP_0,
     PROP_CA_CERT,
     PROP_ADMIN,
-    PROP_SESSION_ID
+    PROP_SESSION_ID,
+    PROP_SSO_TOKEN
 };
 
 #define CA_CERT_FILENAME "ca.crt"
@@ -758,6 +759,9 @@ static void ovirt_proxy_get_property(GObject *object,
     case PROP_SESSION_ID:
         g_value_set_string(value, proxy->priv->jsessionid);
         break;
+    case PROP_SSO_TOKEN:
+        g_value_set_string(value, proxy->priv->sso_token);
+        break;
 
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -788,6 +792,18 @@ static void ovirt_proxy_set_session_id(OvirtProxy *proxy, const char *session_id
     g_free(url);
 }
 
+static void ovirt_proxy_set_sso_token(OvirtProxy *proxy, const char *sso_token)
+{
+    char *header_value;
+
+    g_free(proxy->priv->sso_token);
+    proxy->priv->sso_token = g_strdup(sso_token);
+
+    header_value = g_strdup_printf("Bearer %s", sso_token);
+    ovirt_proxy_add_header(proxy, "Authorization", header_value);
+    g_free(header_value);
+}
+
 
 static void ovirt_proxy_set_property(GObject *object,
                                      guint prop_id,
@@ -814,6 +830,10 @@ static void ovirt_proxy_set_property(GObject *object,
 
     case PROP_SESSION_ID:
         ovirt_proxy_set_session_id(proxy, g_value_get_string(value));
+        break;
+
+    case PROP_SSO_TOKEN:
+        ovirt_proxy_set_sso_token(proxy, g_value_get_string(value));
         break;
 
     default:
@@ -855,6 +875,7 @@ ovirt_proxy_finalize(GObject *obj)
 
     ovirt_proxy_free_tmp_ca_file(proxy);
     g_free(proxy->priv->jsessionid);
+    g_free(proxy->priv->sso_token);
 
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->finalize(obj);
 }
@@ -932,6 +953,23 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
                                     g_param_spec_string("session-id",
                                                         "session-id",
                                                         "oVirt/RHEV JSESSIONID",
+                                                        NULL,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
+
+    /**
+     * OvirtProxy:sso-token:
+     *
+     * Token to use for SSO. This allows to use the REST API without
+     * authenticating first. This is used starting with oVirt 4.0.
+     *
+     * Since: 0.3.4
+     */
+    g_object_class_install_property(oclass,
+                                    PROP_SSO_TOKEN,
+                                    g_param_spec_string("sso-token",
+                                                        "sso-token",
+                                                        "oVirt/RHEV SSO token",
                                                         NULL,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
