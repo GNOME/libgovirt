@@ -881,14 +881,31 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
     oclass->get_property = ovirt_proxy_get_property;
     oclass->set_property = ovirt_proxy_set_property;
 
+    /**
+     * OvirtProxy:ca-cert;
+     *
+     * Path to a file containing the CA certificates to use for the HTTPS
+     * REST API communication with the oVirt instance
+     */
     g_object_class_install_property(oclass,
                                     PROP_CA_CERT,
                                     g_param_spec_boxed("ca-cert",
                                                        "ca-cert",
-                                                       "Virt CA certificate to use when connecting to remote VM",
+                                                       "Virt CA certificate to use for HTTPS REST communication",
                                                         G_TYPE_BYTE_ARRAY,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
+
+    /**
+     * OvirtProxy:admin:
+     *
+     * Indicates whether to connect to the REST API as an admin, or as a regular user.
+     * Different content will be shown for the same user depending on if they connect as
+     * an admin or not. Connecting as an admin requires to have admin priviledges on the
+     * oVirt instance.
+     *
+     * Since: 0.0.2
+     */
     g_object_class_install_property(oclass,
                                     PROP_ADMIN,
                                     g_param_spec_boolean("admin",
@@ -897,6 +914,15 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
                                                          FALSE,
                                                          G_PARAM_READWRITE |
                                                          G_PARAM_STATIC_STRINGS));
+    /**
+     * OvirtProxy:session-id:
+     *
+     * jsessionid cookie value. This allows to use the REST API without
+     * authenticating first. This was used by oVirt 3.6 and is now replaced
+     * by OvirtProxy:sso-token.
+     *
+     * Since: 0.3.1
+     */
     g_object_class_install_property(oclass,
                                     PROP_SESSION_ID,
                                     g_param_spec_string("session-id",
