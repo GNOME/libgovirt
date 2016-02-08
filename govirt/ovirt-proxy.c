@@ -782,12 +782,18 @@ static void ovirt_proxy_set_session_id(OvirtProxy *proxy, const char *session_id
         domain = url;
     }
 
+    if (proxy->priv->jsessionid_cookie != NULL) {
+        soup_cookie_jar_delete_cookie(proxy->priv->cookie_jar,
+                proxy->priv->jsessionid_cookie);
+        proxy->priv->jsessionid_cookie = NULL;
+    }
     g_free(proxy->priv->jsessionid);
     proxy->priv->jsessionid = g_strdup(session_id);
     if (proxy->priv->jsessionid != NULL) {
         SoupCookie *cookie;
         cookie = soup_cookie_new("JSESSIONID", session_id, domain, "/ovirt-engine/api", -1);
         soup_cookie_jar_add_cookie(proxy->priv->cookie_jar, cookie);
+        proxy->priv->jsessionid_cookie = cookie;
     }
     g_free(url);
 }
