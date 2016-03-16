@@ -1,0 +1,131 @@
+# Occitan translation for libgovirt.
+# Copyright (C) 2015 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=libgovirt&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2015-09-21 13:45+0000\n"
+"PO-Revision-Date: 2015-09-20 19:02+0200\n"
+"Last-Translator: Erwan Georget <dremor@dremor.info>\n"
+"Language-Team: French <gnomefr@traduc.org>\n"
+"Language: oc\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 1.8.4\n"
+
+#: ../govirt/ovirt-action-rest-call.c:57
+#: ../govirt/ovirt-resource-rest-call.c:146
+#, c-format
+msgid "Unexpected parameter type in REST call"
+msgstr "Tipe de paramètre inesperat dins l'appel REST"
+
+#: ../govirt/ovirt-collection.c:260
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Nosèl « %s » reçus, « %s » esperat"
+
+#: ../govirt/ovirt-options.c:54
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Fichièr de certificat CA raiç per connexion SSL securizada"
+
+#: ../govirt/ovirt-options.c:54
+msgid "<file>"
+msgstr "<fichièr>"
+
+#: ../govirt/ovirt-options.c:56
+msgid "Display libgovirt version information"
+msgstr "Afichar las informacions de version de libgovirt"
+
+#: ../govirt/ovirt-options.c:61
+msgid "oVirt Options:"
+msgstr "Opcions oVirt :"
+
+#: ../govirt/ovirt-options.c:61
+msgid "Show oVirt Options"
+msgstr "Afichar las opcions oVirt"
+
+#: ../govirt/ovirt-proxy.c:516
+#, c-format
+msgid "Failed to write to '%s': %s"
+msgstr "Fracàs de l'escritura cap a « %s » : %s"
+
+#: ../govirt/ovirt-proxy.c:534
+#, c-format
+msgid "Failed to close '%s': %s"
+msgstr "Fracàs de la tampadura de « %s » : %s"
+
+#: ../govirt/ovirt-proxy.c:644
+#, c-format
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Fracàs de l'extraction del certificat CA dempuèi l'URI"
+
+#: ../govirt/ovirt-resource.c:179
+msgid "Cancellable initialization not supported"
+msgstr "Inicializacion annulable pas presa en carga"
+
+#: ../govirt/ovirt-resource.c:430
+#, c-format
+msgid "Missing mandatory 'id' attribute"
+msgstr "Atribut obligatòri « id » mancant"
+
+#: ../govirt/ovirt-resource.c:437
+#, c-format
+msgid "Missing mandatory 'href' attribute"
+msgstr "Atribut obligatòri « href » mancant"
+
+#: ../govirt/ovirt-resource.c:691
+#, c-format
+msgid "Could not find 'status' node"
+msgstr "Impossible de trobar lo nosèl « status »"
+
+#: ../govirt/ovirt-resource.c:697
+#, c-format
+msgid "Could not find 'state' node"
+msgstr "Impossible de trobar lo nosèl « state »"
+
+#: ../govirt/ovirt-resource.c:705
+#, c-format
+msgid "Action is pending"
+msgstr "L'accion es en attente"
+
+#: ../govirt/ovirt-resource.c:709
+#, c-format
+msgid "Action is in progress"
+msgstr "L'accion es en cors"
+
+#: ../govirt/ovirt-resource.c:713
+#, c-format
+msgid "Action has failed"
+msgstr "L'accion a fracassat"
+
+#: ../govirt/ovirt-resource.c:718
+#, c-format
+msgid "Unknown action failure"
+msgstr "Fracàs d'accion desconegut"
+
+#: ../govirt/ovirt-utils.c:224
+#, c-format
+msgid "Could not find 'reason' node"
+msgstr "Impossible de trobar lo nosèl « reason »"
+
+#: ../govirt/ovirt-vm.c:265
+#, c-format
+msgid "Could not find 'ticket' node"
+msgstr "Impossible de trobar lo nosèl « ticket »"
+
+#: ../govirt/ovirt-vm.c:271
+#, c-format
+msgid "Could not find 'value' node"
+msgstr "Impossible de trobar lo nosèl « value »"
+
+#: ../govirt/ovirt-vm.c:284
+#, c-format
+msgid "Could not find 'expiry' node"
+msgstr "Impossible de trobar lo nosèl « expiry »"
+
