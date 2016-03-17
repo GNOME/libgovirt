@@ -297,7 +297,6 @@ ovirt_resource_parse_xml(OvirtResource *resource,
 
         value_str = ovirt_rest_xml_node_get_content_from_path(node, elements->xml_node);
         if (value_str == NULL) {
-            g_debug("Could not find node %s", elements->xml_node);
             continue;
         }
         g_value_init(&value, elements->type);
