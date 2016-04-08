@@ -1,3 +1,29 @@
+0.3.4 -
+======================
+
+Changes since 0.3.3
+
+- API additions:
+        - ovirt_proxy_get_api()
+        - OvirtVmDisplay::ca-cert
+        - OvirtCollection::resources
+        - OvirtProxy::sso-token
+- Fixes to CA certificate handling
+- Fix crash when a REST API call returned multiple elements with the same
+  'name' attribute
+- Various leak fixes
+- Improved API documentation
+- Fix GCancellable disconnection after async calls
+- Translations:
+        * Chinese (Simplified) (Aron Xu)
+        * French (Erwan Georget)
+        * Lithuanian (Aurimas Černius)
+        * Occitan (Cédric Valmary)
+        * Polish (Piotr Drąg)
+        * Portuguese (Pedro Albuquerque)
+        * Swedish (Anders Jonsson)
+
+
 0.3.3 - April 8th 2015
 ======================
 
