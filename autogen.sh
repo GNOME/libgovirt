@@ -1,6 +1,5 @@
 #!/bin/sh
 
-PKG_NAME="govirt"
 srcdir=`dirname "$0"`
 
 which gnome-autogen.sh || {
