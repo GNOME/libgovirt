@@ -598,10 +598,17 @@ static void ovirt_proxy_update_vm_display_ca(OvirtProxy *proxy)
         OvirtVmDisplay *display;
 
         g_object_get(G_OBJECT(vm), "display", &display, NULL);
-        g_object_set(G_OBJECT(display),
-                     "ca-cert", proxy->priv->display_ca,
-                     NULL);
-        g_object_unref(display);
+        if (display != NULL) {
+            g_object_set(G_OBJECT(display),
+                         "ca-cert", proxy->priv->display_ca,
+                         NULL);
+            g_object_unref(display);
+        } else {
+            char *name;
+            g_object_get(vm, "name", &name, NULL);
+            g_debug("Not setting display CA for '%s' since it has no display",  name);
+            g_free(name);
+        }
     }
     g_list_free(vms);
 }
