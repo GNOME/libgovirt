@@ -1,0 +1,17 @@
+noinst_PROGRAMS = $(TESTS)
+
+AM_LDFLAGS =					\
+	$(top_builddir)/govirt/libgovirt.la	\
+	$(GLIB_LIBS)
+
+
+AM_CFLAGS =					\
+	$(WARNINGFLAGS_C)			\
+	$(GLIB_CFLAGS)				\
+	$(REST_CFLAGS)				\
+	-Dabs_srcdir="\"$(abs_srcdir)\""	\
+	-I$(top_srcdir)				\
+	-I$(top_srcdir)/govirt
+
+noinst_LTLIBRARIES = libmock-httpd.la
+libmock_httpd_la_SOURCES = mock-httpd.c mock-httpd.h
