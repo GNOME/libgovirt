@@ -916,7 +916,7 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
     oclass->set_property = ovirt_proxy_set_property;
 
     /**
-     * OvirtProxy:ca-cert;
+     * OvirtProxy:ca-cert:
      *
      * Path to a file containing the CA certificates to use for the HTTPS
      * REST API communication with the oVirt instance
