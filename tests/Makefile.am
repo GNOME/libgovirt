@@ -1,3 +1,4 @@
+TESTS = test-govirt
 noinst_PROGRAMS = $(TESTS)
 
 AM_LDFLAGS =					\
@@ -15,3 +16,5 @@ AM_CFLAGS =					\
 
 noinst_LTLIBRARIES = libmock-httpd.la
 libmock_httpd_la_SOURCES = mock-httpd.c mock-httpd.h
+
+test_govirt_LDADD = $(AM_LDFLAGS) libmock-httpd.la
