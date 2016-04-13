@@ -50,7 +50,10 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
         return FALSE;
     }
     root = g_hash_table_lookup(root->children, display_key);
-    g_return_val_if_fail(root != NULL, FALSE);
+    if (root == NULL) {
+        g_debug("Could not find 'display' node");
+        return FALSE;
+    }
     display = ovirt_vm_display_new();
 
     node = g_hash_table_lookup(root->children, type_key);
@@ -140,6 +143,10 @@ static gboolean vm_set_state_from_xml(OvirtVm *vm, RestXmlNode *node)
     RestXmlNode *state_node;
 
     state_node = rest_xml_node_find(node, "status");
+    if (state_node == NULL) {
+        g_debug("Could not find 'status' node");
+        return FALSE;
+    }
     state_node = rest_xml_node_find(state_node, "state");
     if (state_node != NULL) {
         int state;
