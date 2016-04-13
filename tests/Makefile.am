@@ -1,6 +1,14 @@
 TESTS = test-govirt
 noinst_PROGRAMS = $(TESTS)
 
+EXTRA_DIST =				\
+	https-cert/ca-cert.pem		\
+	https-cert/ca-key.pem		\
+	https-cert/server-cert.pem	\
+	https-cert/server-key.csr	\
+	https-cert/server-key.pem	\
+	$(NULL)
+
 AM_LDFLAGS =					\
 	$(top_builddir)/govirt/libgovirt.la	\
 	$(GLIB_LIBS)
