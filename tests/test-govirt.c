@@ -119,6 +119,41 @@ static void test_govirt_http(void)
     govirt_mock_httpd_stop(httpd);
 }
 
+static void check_vm_display(OvirtVm *vm)
+{
+    OvirtVmDisplay *display;
+    gint type;
+    char *address;
+    char *proxy_url;
+    guint port;
+    guint secure_port;
+    guint monitor_count;
+    gboolean smartcard;
+
+    g_object_get(vm, "display", &display, NULL);
+    g_assert_nonnull(display);
+    g_object_get(display,
+                 "type", &type,
+                 "address", &address,
+                 "port", &port,
+                 "secure-port", &secure_port,
+                 "monitor-count", &monitor_count,
+                 "smartcard", &smartcard,
+                 "proxy-url", &proxy_url,
+                 NULL);
+
+    g_assert_cmpuint(type, ==, OVIRT_VM_DISPLAY_SPICE);
+    g_assert_cmpstr(address, ==, "10.0.0.123");
+    g_assert_cmpuint(port, ==, 0);
+    g_assert_cmpuint(secure_port, ==, 5900);
+    g_assert_cmpuint(monitor_count, ==, 1);
+    g_assert_false(smartcard);
+    g_assert_cmpstr(proxy_url, ==, "10.0.0.10");
+
+    g_object_unref(display);
+    g_free(address);
+    g_free(proxy_url);
+}
 
 static void test_govirt_list_vms(void)
 {
@@ -174,8 +209,10 @@ static void test_govirt_list_vms(void)
 
     vm = ovirt_collection_lookup_resource(vms, "vm1");
     g_assert_nonnull(vm);
-    g_object_unref(vm);
 
+    check_vm_display(OVIRT_VM(vm));
+
+    g_object_unref(vm);
     g_object_unref(proxy);
 
     govirt_mock_httpd_stop(httpd);
