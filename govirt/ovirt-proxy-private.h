@@ -78,6 +78,9 @@ gboolean ovirt_rest_call_finish(GAsyncResult *result, GError **err);
 GList *ovirt_proxy_get_vms_internal(OvirtProxy *proxy);
 void ovirt_proxy_append_additional_headers(OvirtProxy *proxy,
                                            RestProxyCall *call);
+void ovirt_proxy_add_header(OvirtProxy *proxy, const char *header, const char *value);
+void ovirt_proxy_add_headers(OvirtProxy *proxy, ...);
+void ovirt_proxy_add_headers_from_valist(OvirtProxy *proxy, va_list headers);
 
 G_END_DECLS
 
