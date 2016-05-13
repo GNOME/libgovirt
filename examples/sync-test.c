@@ -23,7 +23,6 @@
 #include <stdlib.h>
 
 #include <govirt/govirt.h>
-#include "govirt/glib-compat.h"
 
 static const char *
 genum_get_nick (GType enum_type, gint value)
@@ -127,8 +126,6 @@ int main(int argc, char **argv)
     OvirtVmDisplayType type;
     gchar *ticket = NULL;
     GByteArray *ca_cert = NULL;
-
-    g_type_init();
 
     if (argc != 3) {
         g_print("Usage: %s URI VM-NAME\n", argv[0]);
