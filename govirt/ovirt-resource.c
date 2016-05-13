@@ -575,20 +575,21 @@ void ovirt_resource_update_async(OvirtResource *resource,
                                  GAsyncReadyCallback callback,
                                  gpointer user_data)
 {
-    GSimpleAsyncResult *result;
+    GTask *task;
     OvirtResourceRestCall *call;
 
     g_return_if_fail(OVIRT_IS_RESOURCE(resource));
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
-    result = g_simple_async_result_new(G_OBJECT(resource), callback,
-                                       user_data,
-                                       ovirt_resource_update_async);
+    task = g_task_new(G_OBJECT(resource),
+                      cancellable,
+                      callback,
+                      user_data);
 
     call = ovirt_resource_rest_call_new(REST_PROXY(proxy), resource);
     rest_proxy_call_set_method(REST_PROXY_CALL(call), "PUT");
-    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), task, cancellable,
                           ovirt_resource_update_async_cb, NULL, NULL);
     g_object_unref(G_OBJECT(call));
 }
@@ -599,8 +600,7 @@ gboolean ovirt_resource_update_finish(OvirtResource *resource,
                                       GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(resource),
-                                                        ovirt_resource_update_async),
+    g_return_val_if_fail(g_task_is_valid(G_TASK(result), G_OBJECT(resource)),
                          FALSE);
     g_return_val_if_fail((err == NULL) || (*err == NULL), FALSE);
 
@@ -819,7 +819,7 @@ ovirt_resource_invoke_action_async(OvirtResource *resource,
                                    gpointer user_data)
 {
     RestProxyCall *call;
-    GSimpleAsyncResult *result;
+    GTask *task;
     OvirtResourceInvokeActionData *data;
 
     g_return_if_fail(OVIRT_IS_RESOURCE(resource));
@@ -833,14 +833,15 @@ ovirt_resource_invoke_action_async(OvirtResource *resource,
 						      action);
     g_return_if_fail(call != NULL);
 
-    result = g_simple_async_result_new(G_OBJECT(resource), callback,
-                                       user_data,
-                                       ovirt_resource_invoke_action_async);
+    task = g_task_new(G_OBJECT(resource),
+                      cancellable,
+                      callback,
+                      user_data);
     data = g_slice_new(OvirtResourceInvokeActionData);
     data->resource = resource;
     data->parser = response_parser;
 
-    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), task, cancellable,
                           ovirt_resource_invoke_action_async_cb, data,
                           (GDestroyNotify)ovirt_resource_invoke_action_data_free);
     g_object_unref(G_OBJECT(call));
@@ -853,8 +854,7 @@ ovirt_resource_action_finish(OvirtResource *resource,
                              GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(resource),
-                                                        ovirt_resource_invoke_action_async),
+    g_return_val_if_fail(g_task_is_valid(G_TASK(result), G_OBJECT(resource)),
                          FALSE);
 
     return ovirt_rest_call_finish(result, err);
@@ -889,22 +889,23 @@ void ovirt_resource_refresh_async(OvirtResource *resource,
                                   gpointer user_data)
 {
     OvirtResourceRestCall *call;
-    GSimpleAsyncResult *result;
+    GTask *task;
 
     g_return_if_fail(OVIRT_IS_RESOURCE(resource));
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
-    result = g_simple_async_result_new(G_OBJECT(resource), callback,
-                                       user_data,
-                                       ovirt_resource_refresh_async);
+    task = g_task_new(G_OBJECT(resource),
+                      cancellable,
+                      callback,
+                      user_data);
     call = ovirt_resource_rest_call_new(REST_PROXY(proxy),
                                         OVIRT_RESOURCE(resource));
     /* FIXME: to set or not to set ?? */
     rest_proxy_call_add_header(REST_PROXY_CALL(call),
                                "All-Content", "true");
     rest_proxy_call_set_method(REST_PROXY_CALL(call), "GET");
-    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), task, cancellable,
                           ovirt_resource_refresh_async_cb, resource,
                           NULL);
     g_object_unref(G_OBJECT(call));
@@ -916,9 +917,7 @@ gboolean ovirt_resource_refresh_finish(OvirtResource *resource,
                                        GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result,
-                                                        G_OBJECT(resource),
-                                                        ovirt_resource_refresh_async),
+    g_return_val_if_fail(g_task_is_valid(G_TASK(result), G_OBJECT(resource)),
                          FALSE);
 
     return ovirt_rest_call_finish(result, err);
@@ -1032,20 +1031,21 @@ void ovirt_resource_delete_async(OvirtResource *resource,
                                  GAsyncReadyCallback callback,
                                  gpointer user_data)
 {
-    GSimpleAsyncResult *result;
+    GTask *task;
     OvirtResourceRestCall *call;
 
     g_return_if_fail(OVIRT_IS_RESOURCE(resource));
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
-    result = g_simple_async_result_new(G_OBJECT(resource), callback,
-                                       user_data,
-                                       ovirt_resource_delete_async);
+    task = g_task_new(G_OBJECT(resource),
+                      cancellable,
+                      callback,
+                      user_data);
 
     call = ovirt_resource_rest_call_new(REST_PROXY(proxy), resource);
     rest_proxy_call_set_method(REST_PROXY_CALL(call), "DELETE");
-    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), task, cancellable,
                           ovirt_resource_delete_async_cb,
                           g_object_ref(resource), g_object_unref);
     g_object_unref(G_OBJECT(call));
@@ -1066,8 +1066,7 @@ gboolean ovirt_resource_delete_finish(OvirtResource *resource,
                                       GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(resource),
-                                                        ovirt_resource_delete_async),
+    g_return_val_if_fail(g_task_is_valid(G_TASK(result), G_OBJECT(resource)),
                          FALSE);
     g_return_val_if_fail((err == NULL) || (*err == NULL), FALSE);
 

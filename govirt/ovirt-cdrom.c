@@ -219,23 +219,24 @@ void ovirt_cdrom_update_async(OvirtCdrom *cdrom,
                               gpointer user_data)
 {
 
-    GSimpleAsyncResult *result;
+    GTask *task;
     OvirtResourceRestCall *call;
 
     g_return_if_fail(OVIRT_IS_CDROM(cdrom));
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
-    result = g_simple_async_result_new(G_OBJECT(cdrom), callback,
-                                       user_data,
-                                       ovirt_cdrom_update_async);
+    task = g_task_new(G_OBJECT(cdrom),
+                      cancellable,
+                      callback,
+                      user_data);
 
     call = ovirt_resource_rest_call_new(REST_PROXY(proxy), OVIRT_RESOURCE(cdrom));
     rest_proxy_call_set_method(REST_PROXY_CALL(call), "PUT");
     if (current) {
         rest_proxy_call_add_param(REST_PROXY_CALL(call), "current", NULL);
     }
-    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), task, cancellable,
                           NULL, NULL, NULL);
     g_object_unref(G_OBJECT(call));
 }
@@ -246,9 +247,7 @@ gboolean ovirt_cdrom_update_finish(OvirtCdrom *cdrom,
                                    GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_CDROM(cdrom), FALSE);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(cdrom),
-                                                        ovirt_cdrom_update_async),
-                         FALSE);
+    g_return_val_if_fail(g_task_is_valid(G_TASK(result), cdrom), FALSE);
     g_return_val_if_fail((err == NULL) || (*err == NULL), FALSE);
 
     return ovirt_rest_call_finish(result, err);
