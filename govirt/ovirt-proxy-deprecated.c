@@ -62,10 +62,11 @@ static void fetch_api_async_cb(GObject *source_object,
 
     api = ovirt_proxy_fetch_api_finish(proxy, result, &error);
     if (api == NULL) {
-        g_simple_async_report_error_in_idle(source_object,
-                                            data->callback, data->user_data,
-                                            OVIRT_ERROR, OVIRT_ERROR_FAILED,
-                                            "Could not fetch API endpoint");
+        g_task_report_new_error(source_object,
+                                data->callback, data->user_data,
+                                fetch_api_async_cb,
+                                OVIRT_ERROR, OVIRT_ERROR_FAILED,
+                                "Could not fetch API endpoint");
     } else {
         OvirtCollection *vms;
 
@@ -131,7 +132,7 @@ ovirt_proxy_fetch_vms_finish(OvirtProxy *proxy,
 {
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
 
-    if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
+    if (g_task_had_error(G_TASK(result)))
         return NULL;
 
     return ovirt_proxy_get_vms_internal(proxy);
