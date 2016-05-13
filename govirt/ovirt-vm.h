@@ -30,10 +30,6 @@
 
 G_BEGIN_DECLS
 
-#if !GLIB_CHECK_VERSION(2,32,0)
-#define G_DEPRECATED_FOR(name) G_GNUC_DEPRECATED_FOR(name)
-#endif
-
 #define OVIRT_TYPE_VM            (ovirt_vm_get_type ())
 #define OVIRT_VM(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OVIRT_TYPE_VM, OvirtVm))
 #define OVIRT_VM_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), OVIRT_TYPE_VM, OvirtVmClass))

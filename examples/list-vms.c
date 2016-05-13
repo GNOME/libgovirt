@@ -23,7 +23,6 @@
 #include <stdlib.h>
 
 #include <govirt/govirt.h>
-#include "govirt/glib-compat.h"
 
 static gboolean
 authenticate_cb(RestProxy *proxy, G_GNUC_UNUSED RestProxyAuth *auth,
@@ -99,8 +98,6 @@ int main(int argc, char **argv)
     OvirtApi *api;
     OvirtProxy *proxy = NULL;
     GError *error = NULL;
-
-    g_type_init();
 
     if (argc != 2) {
         g_print("Usage: %s URI\n", argv[0]);
