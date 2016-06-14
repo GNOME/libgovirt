@@ -801,9 +801,6 @@ static void ovirt_proxy_set_session_id(OvirtProxy *proxy, const char *session_id
         cookie = soup_cookie_new("JSESSIONID", session_id, domain, "/ovirt-engine/api", -1);
         soup_cookie_jar_add_cookie(proxy->priv->cookie_jar, cookie);
         proxy->priv->jsessionid_cookie = cookie;
-        ovirt_proxy_add_header(proxy, "Prefer", "persistent-auth");
-    } else {
-        ovirt_proxy_add_header(proxy, "Prefer", NULL);
     }
     g_free(url);
 }
@@ -815,6 +812,7 @@ static void ovirt_proxy_set_sso_token(OvirtProxy *proxy, const char *sso_token)
     g_free(proxy->priv->sso_token);
     proxy->priv->sso_token = g_strdup(sso_token);
 
+    ovirt_proxy_add_header(proxy, "Prefer", NULL);
     header_value = g_strdup_printf("Bearer %s", sso_token);
     ovirt_proxy_add_header(proxy, "Authorization", header_value);
     g_free(header_value);
@@ -903,6 +901,7 @@ static void ovirt_proxy_constructed(GObject *gobject)
         g_warning("Disabling strict checking of SSL certificates");
         g_object_set(OVIRT_PROXY(gobject), "ssl-strict", FALSE, NULL);
     }
+    ovirt_proxy_add_header(OVIRT_PROXY(gobject), "Prefer", "persistent-auth");
 
     /* Chain up to the parent class */
     if (G_OBJECT_CLASS(ovirt_proxy_parent_class)->constructed)
