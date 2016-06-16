@@ -155,8 +155,6 @@ static RestProxyCall *ovirt_rest_call_new(OvirtProxy *proxy,
         rest_proxy_call_set_method(call, method);
     }
     rest_proxy_call_set_function(call, href);
-    /* FIXME: to set or not to set ?? */
-    rest_proxy_call_add_header(call, "All-Content", "true");
 
     return call;
 }
@@ -901,6 +899,8 @@ static void ovirt_proxy_constructed(GObject *gobject)
         g_warning("Disabling strict checking of SSL certificates");
         g_object_set(OVIRT_PROXY(gobject), "ssl-strict", FALSE, NULL);
     }
+    /* FIXME: to set or not to set ?? */
+    ovirt_proxy_add_header(OVIRT_PROXY(gobject), "All-Content", "true");
     ovirt_proxy_add_header(OVIRT_PROXY(gobject), "Prefer", "persistent-auth");
     ovirt_proxy_add_header(OVIRT_PROXY(gobject), "Version", "3");
 
