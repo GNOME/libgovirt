@@ -902,6 +902,7 @@ static void ovirt_proxy_constructed(GObject *gobject)
         g_object_set(OVIRT_PROXY(gobject), "ssl-strict", FALSE, NULL);
     }
     ovirt_proxy_add_header(OVIRT_PROXY(gobject), "Prefer", "persistent-auth");
+    ovirt_proxy_add_header(OVIRT_PROXY(gobject), "Version", "3");
 
     /* Chain up to the parent class */
     if (G_OBJECT_CLASS(ovirt_proxy_parent_class)->constructed)
