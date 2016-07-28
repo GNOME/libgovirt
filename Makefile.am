@@ -6,18 +6,6 @@ SUBDIRS =						\
 	po						\
 	tests
 
-INTLTOOL_FILES =					\
-	intltool-extract.in				\
-	intltool-merge.in				\
-	intltool-update.in				\
-	$(NULL)
-
-DISTCLEANFILES =					\
-	intltool-extract				\
-	intltool-merge					\
-	intltool-update					\
-	$(NULL)
-
 EXTRA_DIST =						\
 	COPYING						\
 	MAINTAINERS					\
@@ -27,7 +15,6 @@ EXTRA_DIST =						\
 	NEWS						\
 	autogen.sh					\
 	libgovirt.doap					\
-	$(INTLTOOL_FILES)				\
 	$(NULL)
 
 MAINTAINERCLEANFILES =					\
