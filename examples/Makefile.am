@@ -1,6 +1,6 @@
 noinst_PROGRAMS = async-test sync-test list-vms list-vms-async
 
-EXTRA_DIST =
+EXTRA_DIST = meson.build
 
 sync_test_CFLAGS = \
 		$(WARNINGFLAGS_C) \
