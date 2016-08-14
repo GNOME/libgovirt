@@ -129,6 +129,7 @@ BUILT_SOURCES =							\
 	$(NULL)
 
 EXTRA_DIST =							\
+	meson.build						\
 	govirt-1.0.pc.in					\
 	govirt.sym						\
 	ovirt-enum-types.h.template				\
