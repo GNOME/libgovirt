@@ -15,6 +15,8 @@ EXTRA_DIST =						\
 	NEWS						\
 	autogen.sh					\
 	libgovirt.doap					\
+	meson.build					\
+	po/meson.build					\
 	$(NULL)
 
 MAINTAINERCLEANFILES =					\
