@@ -24,8 +24,8 @@
 
 #include <gio/gio.h>
 #include <glib-object.h>
-#include <ovirt-collection.h>
-#include <ovirt-resource.h>
+#include <govirt/ovirt-collection.h>
+#include <govirt/ovirt-resource.h>
 #include <rest/rest-xml-node.h>
 
 G_BEGIN_DECLS
