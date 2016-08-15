@@ -22,7 +22,7 @@
 #ifndef __OVIRT_HOST_PRIVATE_H__
 #define __OVIRT_HOST_PRIVATE_H__
 
-#include <ovirt-host.h>
+#include <govirt/ovirt-host.h>
 #include <rest/rest-xml-node.h>
 
 G_BEGIN_DECLS

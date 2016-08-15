@@ -22,7 +22,7 @@
 #ifndef __OVIRT_DATA_CENTER_PRIVATE_H__
 #define __OVIRT_DATA_CENTER_PRIVATE_H__
 
-#include <ovirt-data-center.h>
+#include <govirt/ovirt-data-center.h>
 #include <rest/rest-xml-node.h>
 
 G_BEGIN_DECLS

@@ -22,7 +22,7 @@
 #ifndef __OVIRT_CLUSTER_PRIVATE_H__
 #define __OVIRT_CLUSTER_PRIVATE_H__
 
-#include <ovirt-cluster.h>
+#include <govirt/ovirt-cluster.h>
 #include <rest/rest-xml-node.h>
 
 G_BEGIN_DECLS
