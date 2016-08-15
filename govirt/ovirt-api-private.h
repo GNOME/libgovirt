@@ -23,7 +23,7 @@
 #ifndef __OVIRT_API_PRIVATE_H__
 #define __OVIRT_API_PRIVATE_H__
 
-#include <ovirt-api.h>
+#include <govirt/ovirt-api.h>
 #include <rest/rest-xml-node.h>
 
 G_BEGIN_DECLS

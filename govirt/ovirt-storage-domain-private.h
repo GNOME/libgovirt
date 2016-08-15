@@ -22,7 +22,7 @@
 #ifndef __OVIRT_STORAGE_DOMAIN_PRIVATE_H__
 #define __OVIRT_STORAGE_DOMAIN_PRIVATE_H__
 
-#include <ovirt-storage-domain.h>
+#include <govirt/ovirt-storage-domain.h>
 #include <rest/rest-xml-node.h>
 
 G_BEGIN_DECLS
