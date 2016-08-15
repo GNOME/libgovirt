@@ -23,7 +23,7 @@
 #ifndef __OVIRT_VM_PRIVATE_H__
 #define __OVIRT_VM_PRIVATE_H__
 
-#include <ovirt-vm.h>
+#include <govirt/ovirt-vm.h>
 #include <rest/rest-xml-node.h>
 
 G_BEGIN_DECLS

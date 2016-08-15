@@ -22,8 +22,8 @@
 #ifndef __OVIRT_RESOURCE_PRIVATE_H__
 #define __OVIRT_RESOURCE_PRIVATE_H__
 
-#include <ovirt-resource.h>
-#include <ovirt-resource-rest-call.h>
+#include <govirt/ovirt-resource.h>
+#include <govirt/ovirt-resource-rest-call.h>
 
 G_BEGIN_DECLS
 
