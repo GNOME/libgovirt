@@ -22,7 +22,7 @@
 #ifndef __OVIRT_ACTION_REST_CALL_H__
 #define __OVIRT_ACTION_REST_CALL_H__
 
-#include <ovirt-rest-call.h>
+#include <govirt/ovirt-rest-call.h>
 
 G_BEGIN_DECLS
 
