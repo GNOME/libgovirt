@@ -1,33 +1,29 @@
-# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Aviary.pl
-# Jeśli masz jakiekolwiek uwagi odnoszące się do tłumaczenia lub chcesz
-# pomóc w jego rozwijaniu i pielęgnowaniu, napisz do nas:
-# gnomepl@aviary.pl
-# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Piotr Drąg <piotrdrag@gmail.com>, 2014-2015.
-# Aviary.pl <gnomepl@aviary.pl>, 2014-2015.
+# Polish translation for libgovirt.
+# Copyright © 2014-2016 the libgovirt authors.
+# This file is distributed under the same license as the libgovirt package.
+# Piotr Drąg <piotrdrag@gmail.com>, 2014-2016.
+# Aviary.pl <community-poland@mozilla.org>, 2014-2016.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: libgovirt\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-31 01:41+0200\n"
-"PO-Revision-Date: 2015-08-31 01:42+0200\n"
+"POT-Creation-Date: 2016-08-21 15:39+0200\n"
+"PO-Revision-Date: 2016-08-21 15:40+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
-"Language-Team: Polish <gnomepl@aviary.pl>\n"
+"Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-"X-Poedit-Language: Polish\n"
-"X-Poedit-Country: Poland\n"
 
 #: ../govirt/ovirt-action-rest-call.c:57
 #: ../govirt/ovirt-resource-rest-call.c:146
 #, c-format
 msgid "Unexpected parameter type in REST call"
-msgstr "Nieoczekiwany typ parametru w wywołaniu REST"
+msgstr "Nieoczekiwany typ parametru w wywołaniu REST"
 
 #: ../govirt/ovirt-collection.c:260
 #, c-format
@@ -44,7 +40,7 @@ msgstr "<plik>"
 
 #: ../govirt/ovirt-options.c:56
 msgid "Display libgovirt version information"
-msgstr "Wyświetla informacje o wersji biblioteki libgovirt"
+msgstr "Wyświetla informacje o wersji biblioteki libgovirt"
 
 #: ../govirt/ovirt-options.c:61
 msgid "oVirt Options:"
@@ -54,20 +50,20 @@ msgstr "Opcje oVirt:"
 msgid "Show oVirt Options"
 msgstr "Wyświetla opcje oVirt"
 
-#: ../govirt/ovirt-proxy.c:516
+#: ../govirt/ovirt-proxy.c:517
 #, c-format
 msgid "Failed to write to '%s': %s"
 msgstr "Zapisanie do „%s” się nie powiodło: %s"
 
-#: ../govirt/ovirt-proxy.c:534
+#: ../govirt/ovirt-proxy.c:535
 #, c-format
 msgid "Failed to close '%s': %s"
 msgstr "Zamknięcie „%s” się nie powiodło: %s"
 
-#: ../govirt/ovirt-proxy.c:644
+#: ../govirt/ovirt-proxy.c:652
 #, c-format
 msgid "Could not extract CA certificate filename from URI"
-msgstr "Nie można wydobyć nazwy pliku certyfikatu CA z adresu URI"
+msgstr "Nie można wydobyć nazwy pliku certyfikatu CA z adresu URI"
 
 #: ../govirt/ovirt-resource.c:179
 msgid "Cancellable initialization not supported"
@@ -101,7 +97,7 @@ msgstr "Działanie jest oczekujące"
 #: ../govirt/ovirt-resource.c:709
 #, c-format
 msgid "Action is in progress"
-msgstr "Działanie jest w trakcie"
+msgstr "Działanie jest w trakcie"
 
 #: ../govirt/ovirt-resource.c:713
 #, c-format
@@ -128,7 +124,7 @@ msgstr "Nie można odnaleźć węzła „ticket”"
 msgid "Could not find 'value' node"
 msgstr "Nie można odnaleźć węzła „value”"
 
-#: ../govirt/ovirt-vm.c:284
+#: ../govirt/ovirt-vm.c:282
 #, c-format
 msgid "Could not find 'expiry' node"
 msgstr "Nie można odnaleźć węzła „expiry”"
