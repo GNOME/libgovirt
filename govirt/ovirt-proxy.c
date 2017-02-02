@@ -218,6 +218,7 @@ static void ovirt_proxy_call_async_data_free(OvirtProxyCallAsyncData *data)
         if ((data->cancellable != NULL) && (data->cancellable_cb_id != 0)) {
             g_cancellable_disconnect(data->cancellable, data->cancellable_cb_id);
         }
+        g_clear_object(&data->cancellable);
         g_slice_free(OvirtProxyCallAsyncData, data);
 }
 
@@ -282,7 +283,7 @@ void ovirt_rest_call_async(OvirtRestCall *call,
     data->call_user_data = user_data;
     data->destroy_call_data = destroy_func;
     if (cancellable != NULL) {
-        data->cancellable = cancellable;
+        data->cancellable = g_object_ref(cancellable);
         data->cancellable_cb_id = g_cancellable_connect(cancellable,
                                                         G_CALLBACK (call_async_cancelled_cb),
                                                         call, NULL);
