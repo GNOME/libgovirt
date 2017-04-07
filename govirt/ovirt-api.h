@@ -62,8 +62,11 @@ GType ovirt_api_get_type(void);
 OvirtApi *ovirt_api_new(void);
 
 OvirtCollection *ovirt_api_get_storage_domains(OvirtApi *api);
+OvirtCollection *ovirt_api_search_storage_domains(OvirtApi *api, const char *query);
 OvirtCollection *ovirt_api_get_vms(OvirtApi *api);
+OvirtCollection *ovirt_api_search_vms(OvirtApi *api, const char *query);
 OvirtCollection *ovirt_api_get_vm_pools(OvirtApi *api);
+OvirtCollection *ovirt_api_search_vm_pools(OvirtApi *api, const char *query);
 
 G_END_DECLS
 

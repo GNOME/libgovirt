@@ -136,6 +136,26 @@ OvirtCollection *ovirt_api_get_vms(OvirtApi *api)
 }
 
 /**
+ * ovirt_api_search_vms:
+ * @api: a #OvirtApi
+ * @query: search query
+ *
+ * Return value: (transfer full):
+ */
+OvirtCollection *ovirt_api_search_vms(OvirtApi *api, const char *query)
+{
+    g_return_val_if_fail(OVIRT_IS_API(api), NULL);
+
+    return ovirt_sub_collection_new_from_resource_search(OVIRT_RESOURCE(api),
+                                                         "vms/search",
+                                                         "vms",
+                                                         OVIRT_TYPE_VM,
+                                                         "vm",
+                                                         query);
+}
+
+
+/**
  * ovirt_api_get_vm_pools:
  * @api: a #OvirtApi
  *
@@ -161,6 +181,26 @@ OvirtCollection *ovirt_api_get_vm_pools(OvirtApi *api)
 
 
 /**
+ * ovirt_api_search_vm_pools:
+ * @api: a #OvirtApi
+ * @query: search query
+ *
+ * Return value: (transfer full):
+ */
+OvirtCollection *ovirt_api_search_vm_pools(OvirtApi *api, const char *query)
+{
+    g_return_val_if_fail(OVIRT_IS_API(api), NULL);
+
+    return ovirt_sub_collection_new_from_resource_search(OVIRT_RESOURCE(api),
+                                                         "vmpools/search",
+                                                         "vmpools",
+                                                         OVIRT_TYPE_VM_POOL,
+                                                         "vmpool",
+                                                         query);
+}
+
+
+/**
  * ovirt_api_get_storage_domains:
  * @api: a #OvirtApi
  *
@@ -182,4 +222,24 @@ OvirtCollection *ovirt_api_get_storage_domains(OvirtApi *api)
                                                                             "storage_domain");
 
     return api->priv->storage_domains;
+}
+
+
+/**
+ * ovirt_api_search_storage_domains:
+ * @api: a #OvirtApi
+ * @query: search query
+ *
+ * Return value: (transfer full):
+ */
+OvirtCollection *ovirt_api_search_storage_domains(OvirtApi *api, const char *query)
+{
+    g_return_val_if_fail(OVIRT_IS_API(api), NULL);
+
+    return ovirt_sub_collection_new_from_resource_search(OVIRT_RESOURCE(api),
+                                                         "storagedomains/search",
+                                                         "storage_domains",
+                                                         OVIRT_TYPE_STORAGE_DOMAIN,
+                                                         "storage_domain",
+                                                         query);
 }

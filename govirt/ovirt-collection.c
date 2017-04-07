@@ -358,6 +358,37 @@ OvirtCollection *ovirt_sub_collection_new_from_resource(OvirtResource *resource,
     return ovirt_collection_new(link, collection_name, resource_type, resource_name);
 }
 
+OvirtCollection *ovirt_sub_collection_new_from_resource_search(OvirtResource *resource,
+                                                               const char *href,
+                                                               const char *collection_name,
+                                                               GType resource_type,
+                                                               const char *resource_name,
+                                                               const char *query)
+{
+    const char *link;
+    char *substr;
+    gchar *link_query, *escaped_query;
+    OvirtCollection *collection;
+
+    link = ovirt_resource_get_sub_collection(resource, href);
+    if (link == NULL)
+        return NULL;
+
+    /* link is will be something like "/ovirt-engine/api/vms?search={query}", so
+     * we need to strip out {query} substring.
+     */
+    substr = g_strrstr(link, "{query}");
+    if (substr != NULL)
+        *substr = '\0';
+
+    escaped_query = g_uri_escape_string(query, NULL, FALSE);
+    link_query = g_strconcat(link, escaped_query, NULL);
+    collection = ovirt_collection_new(link_query, collection_name, resource_type, resource_name);
+    g_free(escaped_query);
+    g_free(link_query);
+
+    return collection;
+}
 
 /**
  * ovirt_collection_fetch:

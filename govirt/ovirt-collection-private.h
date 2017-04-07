@@ -46,6 +46,12 @@ OvirtCollection *ovirt_sub_collection_new_from_resource(OvirtResource *resource,
                                                         const char *collection_name,
                                                         GType resource_type,
                                                         const char *resource_name);
+OvirtCollection *ovirt_sub_collection_new_from_resource_search(OvirtResource *resource,
+                                                               const char *href,
+                                                               const char *collection_name,
+                                                               GType resource_type,
+                                                               const char *resource_name,
+                                                               const char *query);
 
 G_END_DECLS
 
