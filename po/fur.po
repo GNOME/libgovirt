@@ -1,0 +1,114 @@
+# Friulian translation for libgovirt.
+# Copyright (C) 2017 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# Fabio Tomat <f.t.public@gmail.com>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=libgovirt&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2017-03-01 14:01+0000\n"
+"PO-Revision-Date: 2017-04-08 16:21+0200\n"
+"Language-Team: Friulian <fur@li.org>\n"
+"Language: fur\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: Fabio Tomat <f.t.public@gmail.com>\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#: govirt/ovirt-action-rest-call.c:57 govirt/ovirt-resource-rest-call.c:146
+msgid "Unexpected parameter type in REST call"
+msgstr "Gjenar di parametri inspietât te clamade REST"
+
+#: govirt/ovirt-collection.c:260
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Vût grop '%s', spietât '%s'"
+
+#: govirt/ovirt-options.c:54
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "File dal certificât CA root pes conessions siguris SSL"
+
+#: govirt/ovirt-options.c:54
+msgid "<file>"
+msgstr "<file>"
+
+#: govirt/ovirt-options.c:56
+msgid "Display libgovirt version information"
+msgstr "Mostre informazion di version di libgovirt"
+
+#: govirt/ovirt-options.c:61
+msgid "oVirt Options:"
+msgstr "Opzions oVirt:"
+
+#: govirt/ovirt-options.c:61
+msgid "Show oVirt Options"
+msgstr "Mostre opzions oVirt"
+
+#: govirt/ovirt-proxy.c:526
+#, c-format
+msgid "Failed to write to '%s': %s"
+msgstr "No si è rivâts a scrivi su '%s': %s"
+
+#: govirt/ovirt-proxy.c:544
+#, c-format
+msgid "Failed to close '%s': %s"
+msgstr "No si è rivâts a sierâ '%s': %s"
+
+#: govirt/ovirt-proxy.c:661
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Impussibil tirâ fûr dal URI il non dal file dal certificât CA"
+
+#: govirt/ovirt-resource.c:179
+msgid "Cancellable initialization not supported"
+msgstr "Inizializazion anulabile no supuartade"
+
+#: govirt/ovirt-resource.c:430
+msgid "Missing mandatory 'id' attribute"
+msgstr "Al mancje l'atribût obligatori 'id'"
+
+#: govirt/ovirt-resource.c:437
+msgid "Missing mandatory 'href' attribute"
+msgstr "Al mancje l'atribût obligatori 'href'"
+
+#: govirt/ovirt-resource.c:691
+msgid "Could not find 'status' node"
+msgstr "Impussibil cjatâ il grop 'status'"
+
+#: govirt/ovirt-resource.c:697
+msgid "Could not find 'state' node"
+msgstr "Impussibil cjatâ il grop 'state'"
+
+#: govirt/ovirt-resource.c:705
+msgid "Action is pending"
+msgstr "La azione e je vierte"
+
+#: govirt/ovirt-resource.c:709
+msgid "Action is in progress"
+msgstr "La azion e je in cors"
+
+#: govirt/ovirt-resource.c:713
+msgid "Action has failed"
+msgstr "La azion e à falît"
+
+#: govirt/ovirt-resource.c:718
+msgid "Unknown action failure"
+msgstr "Faliment azion no cognossût"
+
+#: govirt/ovirt-utils.c:224
+msgid "Could not find 'reason' node"
+msgstr "Impussibil cjatâ il grop 'reason'"
+
+#: govirt/ovirt-vm.c:265
+msgid "Could not find 'ticket' node"
+msgstr "Impussibil cjatâ il grop 'ticket'"
+
+#: govirt/ovirt-vm.c:271
+msgid "Could not find 'value' node"
+msgstr "Impussibil cjatâ il grop 'value'"
+
+#: govirt/ovirt-vm.c:282
+msgid "Could not find 'expiry' node"
+msgstr "Impussibil cjatâ il grop 'expiry'"
