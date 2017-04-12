@@ -41,6 +41,7 @@
 
 
 struct _OvirtApiPrivate {
+    OvirtCollection *hosts;
     OvirtCollection *storage_domains;
     OvirtCollection *vms;
     OvirtCollection *vm_pools;
@@ -73,6 +74,7 @@ static void ovirt_api_dispose(GObject *object)
 {
     OvirtApi *api = OVIRT_API(object);
 
+    g_clear_object(&api->priv->hosts);
     g_clear_object(&api->priv->storage_domains);
     g_clear_object(&api->priv->vms);
     g_clear_object(&api->priv->vm_pools);
@@ -243,5 +245,50 @@ OvirtCollection *ovirt_api_search_storage_domains(OvirtApi *api, const char *que
                                                          "storage_domains",
                                                          OVIRT_TYPE_STORAGE_DOMAIN,
                                                          "storage_domain",
+                                                         query);
+}
+
+
+/**
+ * ovirt_api_get_hosts:
+ * @api: a #OvirtApi
+ *
+ * This method does not initiate any network activity, the collection
+ * must be fetched with ovirt_collection_fetch() before having up-to-date
+ * content.
+ *
+ * Return value: (transfer none):
+ */
+OvirtCollection *ovirt_api_get_hosts(OvirtApi *api)
+{
+    g_return_val_if_fail(OVIRT_IS_API(api), NULL);
+
+    if (api->priv->hosts == NULL)
+        api->priv->hosts = ovirt_sub_collection_new_from_resource(OVIRT_RESOURCE(api),
+                                                                  "hosts",
+                                                                  "hosts",
+                                                                  OVIRT_TYPE_HOST,
+                                                                  "host");
+
+    return api->priv->hosts;
+}
+
+
+/**
+ * ovirt_api_search_hosts:
+ * @api: a #OvirtApi
+ * @query: search query
+ *
+ * Return value: (transfer none):
+ */
+OvirtCollection *ovirt_api_search_hosts(OvirtApi *api, const char *query)
+{
+    g_return_val_if_fail(OVIRT_IS_API(api), NULL);
+
+    return ovirt_sub_collection_new_from_resource_search(OVIRT_RESOURCE(api),
+                                                         "hosts",
+                                                         "hosts",
+                                                         OVIRT_TYPE_HOST,
+                                                         "host",
                                                          query);
 }

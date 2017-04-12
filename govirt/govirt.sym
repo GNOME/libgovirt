@@ -112,8 +112,15 @@ GOVIRT_0.3.4 {
 } GOVIRT_0.3.2;
 
 GOVIRT_0.4.0 {
+        ovirt_api_get_hosts;
+
+        ovirt_api_search_hosts;
         ovirt_api_search_storage_domains;
         ovirt_api_search_vms;
         ovirt_api_search_vm_pools;
+
+        ovirt_host_get_type;
+        ovirt_host_get_vms;
+        ovirt_host_new;
 } GOVIRT_0.3.4;
 # .... define new API here using predicted next version number ....

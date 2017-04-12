@@ -26,6 +26,7 @@
 #include <govirt/ovirt-api-private.h>
 #include <govirt/ovirt-collection-private.h>
 #include <govirt/ovirt-enum-types-private.h>
+#include <govirt/ovirt-host-private.h>
 #include <govirt/ovirt-proxy-private.h>
 #include <govirt/ovirt-resource-private.h>
 #include <govirt/ovirt-resource-rest-call.h>
