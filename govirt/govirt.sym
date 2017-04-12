@@ -113,9 +113,11 @@ GOVIRT_0.3.4 {
 
 GOVIRT_0.4.0 {
         ovirt_api_get_clusters;
+        ovirt_api_get_data_centers;
         ovirt_api_get_hosts;
 
         ovirt_api_search_clusters;
+        ovirt_api_search_data_centers;
         ovirt_api_search_hosts;
         ovirt_api_search_storage_domains;
         ovirt_api_search_vms;
@@ -124,6 +126,11 @@ GOVIRT_0.4.0 {
         ovirt_cluster_get_type;
         ovirt_cluster_get_hosts;
         ovirt_cluster_new;
+
+        ovirt_data_center_get_clusters;
+        ovirt_data_center_get_storage_domains;
+        ovirt_data_center_get_type;
+        ovirt_data_center_new;
 
         ovirt_host_get_type;
         ovirt_host_get_vms;

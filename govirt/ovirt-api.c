@@ -42,6 +42,7 @@
 
 struct _OvirtApiPrivate {
     OvirtCollection *clusters;
+    OvirtCollection *data_centers;
     OvirtCollection *hosts;
     OvirtCollection *storage_domains;
     OvirtCollection *vms;
@@ -76,6 +77,7 @@ static void ovirt_api_dispose(GObject *object)
     OvirtApi *api = OVIRT_API(object);
 
     g_clear_object(&api->priv->clusters);
+    g_clear_object(&api->priv->data_centers);
     g_clear_object(&api->priv->hosts);
     g_clear_object(&api->priv->storage_domains);
     g_clear_object(&api->priv->vms);
@@ -337,5 +339,50 @@ OvirtCollection *ovirt_api_search_clusters(OvirtApi *api, const char *query)
                                                          "clusters",
                                                          OVIRT_TYPE_CLUSTER,
                                                          "cluster",
+                                                         query);
+}
+
+
+/**
+ * ovirt_api_get_data_centers:
+ * @api: a #OvirtApi
+ *
+ * This method does not initiate any network activity, the collection
+ * must be fetched with ovirt_collection_fetch() before having up-to-date
+ * content.
+ *
+ * Return value: (transfer none):
+ */
+OvirtCollection *ovirt_api_get_data_centers(OvirtApi *api)
+{
+    g_return_val_if_fail(OVIRT_IS_API(api), NULL);
+
+    if (api->priv->data_centers == NULL)
+        api->priv->data_centers = ovirt_sub_collection_new_from_resource(OVIRT_RESOURCE(api),
+                                                                         "datacenters",
+                                                                         "data_centers",
+                                                                         OVIRT_TYPE_DATA_CENTER,
+                                                                         "data_center");
+
+    return api->priv->data_centers;
+}
+
+
+/**
+ * ovirt_api_search_data_centers:
+ * @api: a #OvirtApi
+ * @query: search query
+ *
+ * Return value: (transfer none):
+ */
+OvirtCollection *ovirt_api_search_data_centers(OvirtApi *api, const char *query)
+{
+    g_return_val_if_fail(OVIRT_IS_API(api), NULL);
+
+    return ovirt_sub_collection_new_from_resource_search(OVIRT_RESOURCE(api),
+                                                         "datacenters/search",
+                                                         "data_centers",
+                                                         OVIRT_TYPE_DATA_CENTER,
+                                                         "data_center",
                                                          query);
 }

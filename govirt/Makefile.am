@@ -21,6 +21,7 @@ libgovirt_la_HEADERS =						\
 	ovirt-cdrom.h						\
 	ovirt-cluster.h						\
 	ovirt-collection.h					\
+	ovirt-data-center.h					\
 	ovirt-error.h						\
 	ovirt-host.h						\
 	ovirt-options.h						\
@@ -41,6 +42,7 @@ noinst_HEADERS =						\
 	ovirt-api-private.h					\
 	ovirt-cluster-private.h					\
 	ovirt-collection-private.h				\
+	ovirt-data-center-private.h				\
 	ovirt-host-private.h					\
 	ovirt-proxy-private.h					\
 	ovirt-resource-private.h				\
@@ -58,6 +60,7 @@ libgovirt_la_SOURCES =						\
 	ovirt-cdrom.c						\
 	ovirt-cluster.c						\
 	ovirt-collection.c					\
+	ovirt-data-center.c					\
 	ovirt-error.c						\
 	ovirt-host.c						\
 	ovirt-options.c						\

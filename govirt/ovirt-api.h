@@ -62,6 +62,8 @@ OvirtApi *ovirt_api_new(void);
 
 OvirtCollection *ovirt_api_get_clusters(OvirtApi *api);
 OvirtCollection *ovirt_api_search_clusters(OvirtApi *api, const char *query);
+OvirtCollection *ovirt_api_get_data_centers(OvirtApi *api);
+OvirtCollection *ovirt_api_search_data_centers(OvirtApi *api, const char *query);
 OvirtCollection *ovirt_api_get_hosts(OvirtApi *api);
 OvirtCollection *ovirt_api_search_hosts(OvirtApi *api, const char *query);
 OvirtCollection *ovirt_api_get_storage_domains(OvirtApi *api);

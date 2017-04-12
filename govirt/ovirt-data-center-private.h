@@ -1,8 +1,7 @@
-
 /*
- * ovirt-types.h: base oVirt types
+ * ovirt-data_center-private.h: oVirt data center resource
  *
- * Copyright (C) 2012 Red Hat, Inc.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,25 +17,21 @@
  * License along with this library. If not, see
  * <http://www.gnu.org/licenses/>.
  *
- * Author: Christophe Fergeau <cfergeau@redhat.com>
+ * Author: Eduardo Lima (Etrunko) <etrunko@redhat.com>
  */
-#ifndef __OVIRT_TYPES_H__
-#define __OVIRT_TYPES_H__
+#ifndef __OVIRT_DATA_CENTER_PRIVATE_H__
+#define __OVIRT_DATA_CENTER_PRIVATE_H__
+
+#include <ovirt-data-center.h>
+#include <rest/rest-xml-node.h>
 
 G_BEGIN_DECLS
 
-typedef struct _OvirtApi OvirtApi;
-typedef struct _OvirtCdrom OvirtCdrom;
-typedef struct _OvirtCluster OvirtCluster;
-typedef struct _OvirtCollection OvirtCollection;
-typedef struct _OvirtDataCenter OvirtDataCenter;
-typedef struct _OvirtHost OvirtHost;
-typedef struct _OvirtProxy OvirtProxy;
-typedef struct _OvirtStorageDomain OvirtStorageDomain;
-typedef struct _OvirtVmDisplay OvirtVmDisplay;
-typedef struct _OvirtVmPool OvirtVmPool;
-typedef struct _OvirtVm OvirtVm;
+OvirtDataCenter *ovirt_data_center_new_from_id(const char *id,
+                                               const char *href);
+OvirtDataCenter *ovirt_data_center_new_from_xml(RestXmlNode *node,
+                                                GError **error);
 
 G_END_DECLS
 
-#endif /* __OVIRT_TYPES_H__ */
+#endif /* __OVIRT_DATA_CENTER_PRIVATE_H__ */
