@@ -30,6 +30,7 @@
 
 struct _OvirtStorageDomainPrivate {
     OvirtCollection *files;
+    GStrv data_center_ids;
 
     OvirtStorageDomainType type;
     gboolean is_master;
@@ -50,7 +51,8 @@ enum {
     PROP_USED,
     PROP_COMMITTED,
     PROP_VERSION,
-    PROP_STATE
+    PROP_STATE,
+    PROP_DATA_CENTER_IDS,
 };
 
 static void ovirt_storage_domain_get_property(GObject *object,
@@ -81,6 +83,9 @@ static void ovirt_storage_domain_get_property(GObject *object,
         break;
     case PROP_STATE:
         g_value_set_enum(value, domain->priv->state);
+        break;
+    case PROP_DATA_CENTER_IDS:
+        g_value_set_boxed(value, domain->priv->data_center_ids);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -117,6 +122,10 @@ static void ovirt_storage_domain_set_property(GObject *object,
     case PROP_STATE:
         domain->priv->state = g_value_get_enum(value);
         break;
+     case PROP_DATA_CENTER_IDS:
+        g_strfreev(domain->priv->data_center_ids);
+        domain->priv->data_center_ids = g_value_dup_boxed(value);
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
         break;
@@ -130,6 +139,7 @@ ovirt_storage_domain_dispose(GObject *obj)
     OvirtStorageDomain *domain = OVIRT_STORAGE_DOMAIN(obj);
 
     g_clear_object(&domain->priv->files);
+    g_clear_pointer(&domain->priv->data_center_ids, g_strfreev);
 
     G_OBJECT_CLASS(ovirt_storage_domain_parent_class)->dispose(obj);
 }
@@ -169,6 +179,11 @@ static gboolean ovirt_storage_domain_init_from_xml(OvirtResource *resource,
         { .prop_name = "state",
           .type = OVIRT_TYPE_STORAGE_DOMAIN_STATE,
           .xml_path = "status/state",
+        },
+        { .prop_name = "data-center-ids",
+          .type = G_TYPE_STRV,
+          .xml_path = "data_centers",
+          .xml_attr = "id",
         },
         { NULL , }
     };
@@ -273,6 +288,16 @@ static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
                                    G_PARAM_STATIC_STRINGS);
     g_object_class_install_property(object_class,
                                     PROP_STATE,
+                                    param_spec);
+
+    param_spec = g_param_spec_boxed("data-center-ids",
+                                    "Data Center Ids",
+                                    "Ids of Data Centers for this Storage Domain",
+                                    G_TYPE_STRV,
+                                    G_PARAM_READWRITE |
+                                    G_PARAM_STATIC_STRINGS);
+    g_object_class_install_property(object_class,
+                                    PROP_DATA_CENTER_IDS,
                                     param_spec);
 }
 
