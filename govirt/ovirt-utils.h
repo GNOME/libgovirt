@@ -36,7 +36,6 @@ struct _OvirtXmlElement
 };
 
 RestXmlNode *ovirt_rest_xml_node_from_call(RestProxyCall *call);
-const char *ovirt_rest_xml_node_get_content(RestXmlNode *node, ...);
 gboolean ovirt_rest_xml_node_parse(RestXmlNode *node,
                                    GObject *object,
                                    OvirtXmlElement *elements);

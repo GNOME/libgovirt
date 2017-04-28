@@ -91,25 +91,6 @@ ovirt_rest_xml_node_get_content_from_path(RestXmlNode *node, const char *path)
     return content;
 }
 
-G_GNUC_INTERNAL const char *
-ovirt_rest_xml_node_get_content(RestXmlNode *node, ...)
-{
-    va_list args;
-    const char *content;
-
-    g_return_val_if_fail(node != NULL, NULL);
-
-    va_start(args, node);
-
-    content = ovirt_rest_xml_node_get_content_va(node, &args, NULL);
-
-    va_end(args);
-
-    g_warn_if_fail(node != NULL);
-
-    return content;
-}
-
 static gboolean
 _set_property_value_from_type(GValue *value,
                               GType type,
