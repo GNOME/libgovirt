@@ -28,6 +28,7 @@
 #include "ovirt-proxy-private.h"
 #include "ovirt-resource-private.h"
 #include "ovirt-resource-rest-call.h"
+#include "ovirt-utils.h"
 
 #define OVIRT_CDROM_GET_PRIVATE(obj)                         \
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_CDROM, OvirtCdromPrivate))
@@ -95,25 +96,29 @@ static void ovirt_cdrom_finalize(GObject *object)
 }
 
 
-static gboolean ovirt_cdrom_refresh_from_xml(OvirtCdrom *cdrom,
-                                             RestXmlNode *node)
+static gboolean ovirt_cdrom_init_from_xml(OvirtResource *resource,
+                                          RestXmlNode *node,
+                                          GError **error)
 {
-    RestXmlNode *file_node;
-    const char *file;
-    const char *file_key = g_intern_string("file");
+    gboolean ret = FALSE;
     char *name;
+    OvirtResourceClass *parent_class;
+    OvirtXmlElement cdrom_elements[] = {
+        { .prop_name = "file",
+          .xml_path = "file",
+          .xml_attr = "id",
+        },
+        { NULL , },
+    };
 
-    file_node = g_hash_table_lookup(node->children, file_key);
-    if (file_node != NULL) {
-        file = rest_xml_node_get_attr(file_node, "id");
-        if (g_strcmp0(file, cdrom->priv->file) != 0) {
-            g_free(cdrom->priv->file);
-            cdrom->priv->file = g_strdup(file);
-            g_object_notify(G_OBJECT(cdrom), "file");
-        }
-    }
+    parent_class = OVIRT_RESOURCE_CLASS(ovirt_cdrom_parent_class);
 
-    g_object_get(G_OBJECT(cdrom), "name", &name, NULL);
+    if (!parent_class->init_from_xml(resource, node, error))
+        return FALSE;
+
+    ovirt_rest_xml_node_parse(node, G_OBJECT(resource), cdrom_elements);
+
+    g_object_get(G_OBJECT(resource), "name", &name, NULL);
     if (name == NULL) {
         /* Build up fake name as ovirt_collection_refresh_from_xml()
          * expects it to be set (it uses it as a hash table key), but
@@ -122,29 +127,11 @@ static gboolean ovirt_cdrom_refresh_from_xml(OvirtCdrom *cdrom,
          * enough for now
          */
         g_debug("Setting fake 'name' for cdrom resource");
-        g_object_set(G_OBJECT(cdrom), "name", "cdrom0", NULL);
-    } else {
-        g_free(name);
+        g_object_set(G_OBJECT(resource), "name", "cdrom0", NULL);
     }
 
+    g_free(name);
     return TRUE;
-}
-
-
-static gboolean ovirt_cdrom_init_from_xml(OvirtResource *resource,
-                                          RestXmlNode *node,
-                                          GError **error)
-{
-    gboolean parsed_ok;
-    OvirtResourceClass *parent_class;
-
-    parsed_ok = ovirt_cdrom_refresh_from_xml(OVIRT_CDROM(resource), node);
-    if (!parsed_ok) {
-        return FALSE;
-    }
-    parent_class = OVIRT_RESOURCE_CLASS(ovirt_cdrom_parent_class);
-
-    return parent_class->init_from_xml(resource, node, error);
 }
 
 
