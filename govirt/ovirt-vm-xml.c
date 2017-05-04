@@ -138,35 +138,7 @@ static gboolean vm_set_display_from_xml(OvirtVm *vm,
     return TRUE;
 }
 
-static gboolean vm_set_state_from_xml(OvirtVm *vm, RestXmlNode *node)
-{
-    RestXmlNode *state_node;
-
-    state_node = rest_xml_node_find(node, "status");
-    if (state_node == NULL) {
-        g_debug("Could not find 'status' node");
-        return FALSE;
-    }
-    state_node = rest_xml_node_find(state_node, "state");
-    if (state_node != NULL) {
-        int state;
-
-        g_return_val_if_fail(state_node->content != NULL, FALSE);
-        state = ovirt_utils_genum_get_value(OVIRT_TYPE_VM_STATE,
-                                            state_node->content,
-                                            OVIRT_VM_STATE_UNKNOWN);
-        g_object_set(G_OBJECT(vm), "state", state, NULL);
-
-        return TRUE;
-    }
-
-    return FALSE;
-}
-
 G_GNUC_INTERNAL gboolean ovirt_vm_refresh_from_xml(OvirtVm *vm, RestXmlNode *node)
 {
-    vm_set_state_from_xml(vm, node);
-    vm_set_display_from_xml(vm, node);
-
-    return TRUE;
+    return vm_set_display_from_xml(vm, node);
 }

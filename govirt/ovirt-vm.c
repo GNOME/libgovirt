@@ -199,6 +199,9 @@ static gboolean ovirt_vm_init_from_xml(OvirtResource *resource,
           .xml_path = "cluster",
           .xml_attr = "id",
         },
+        { .prop_name = "state",
+          .xml_path = "status/state",
+        },
         { NULL, },
     };
 
@@ -233,7 +236,7 @@ static void ovirt_vm_class_init(OvirtVmClass *klass)
                                                       "State",
                                                       "Virtual Machine State",
                                                       OVIRT_TYPE_VM_STATE,
-                                                      OVIRT_VM_STATE_DOWN,
+                                                      OVIRT_VM_STATE_UNKNOWN,
                                                       G_PARAM_READWRITE |
                                                       G_PARAM_STATIC_STRINGS));
     g_object_class_install_property(object_class,
