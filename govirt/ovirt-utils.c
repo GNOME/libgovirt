@@ -23,6 +23,7 @@
 #include <config.h>
 
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <glib/gi18n-lib.h>
@@ -180,6 +181,11 @@ _set_property_value_from_type(GValue *value,
     }
     case G_TYPE_STRING: {
         g_value_set_string(value, value_str);
+        break;
+    }
+    case G_TYPE_UINT: {
+        guint uint_value = strtoul(value_str, NULL, 0);
+        g_value_set_uint(value, uint_value);
         break;
     }
     case G_TYPE_UINT64: {
