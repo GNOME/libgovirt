@@ -124,6 +124,10 @@ _set_property_value_from_type(GValue *value,
         g_value_set_boolean(value, bool_value);
         break;
     }
+    case G_TYPE_STRING: {
+        g_value_set_string(value, value_str);
+        break;
+    }
     case G_TYPE_UINT64: {
         guint64 int64_value = g_ascii_strtoull(value_str, NULL, 0);
         g_value_set_uint64(value, int64_value);
