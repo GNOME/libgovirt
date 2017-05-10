@@ -323,9 +323,9 @@ end:
 }
 
 typedef struct {
-    const char *xml_node;
-    GType type;
     const char *prop_name;
+    GType type;
+    const char *xml_path;
 } OvirtXmlElement;
 
 static gboolean
@@ -336,11 +336,11 @@ ovirt_resource_parse_xml(OvirtResource *resource,
     g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
     g_return_val_if_fail(elements != NULL, FALSE);
 
-    for (;elements->xml_node != NULL; elements++) {
+    for (;elements->xml_path != NULL; elements++) {
         const char *value_str;
         GValue value = { 0, };
 
-        value_str = ovirt_rest_xml_node_get_content_from_path(node, elements->xml_node);
+        value_str = ovirt_rest_xml_node_get_content_from_path(node, elements->xml_path);
 
         g_value_init(&value, elements->type);
         if (_set_property_value_from_type(&value, elements->type, value_str, node))
@@ -356,14 +356,35 @@ ovirt_storage_domain_refresh_from_xml(OvirtStorageDomain *domain,
                                       RestXmlNode *node)
 {
     OvirtXmlElement storage_domain_elements[] = {
-        { "type",           OVIRT_TYPE_STORAGE_DOMAIN_TYPE,           "type" },
-        { "master",         G_TYPE_BOOLEAN,                           "master" },
-        { "available",      G_TYPE_UINT64,                            "available" },
-        { "used",           G_TYPE_UINT64,                            "used" },
-        { "committed",      G_TYPE_UINT64,                            "committed" },
-        { "storage_format", OVIRT_TYPE_STORAGE_DOMAIN_FORMAT_VERSION, "version" },
-        { "status/state",   OVIRT_TYPE_STORAGE_DOMAIN_STATE,          "state" },
-        { NULL,             G_TYPE_INVALID,                           NULL }
+        { .prop_name = "type",
+          .type = OVIRT_TYPE_STORAGE_DOMAIN_TYPE,
+          .xml_path = "type",
+        },
+        { .prop_name = "master",
+          .type = G_TYPE_BOOLEAN,
+          .xml_path = "master",
+        },
+        { .prop_name = "available",
+          .type = G_TYPE_UINT64,
+          .xml_path = "available",
+        },
+        { .prop_name = "used",
+          .type = G_TYPE_UINT64,
+          .xml_path = "used",
+        },
+        { .prop_name = "committed",
+          .type = G_TYPE_UINT64,
+          .xml_path = "committed",
+        },
+        { .prop_name = "version",
+          .type = OVIRT_TYPE_STORAGE_DOMAIN_FORMAT_VERSION,
+          .xml_path = "storage_format",
+        },
+        { .prop_name = "state",
+          .type = OVIRT_TYPE_STORAGE_DOMAIN_STATE,
+          .xml_path = "status/state",
+        },
+        { NULL , }
     };
 
     return ovirt_resource_parse_xml(OVIRT_RESOURCE(domain), node, storage_domain_elements);
