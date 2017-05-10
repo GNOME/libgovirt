@@ -277,6 +277,51 @@ OvirtStorageDomain *ovirt_storage_domain_new(void)
     return OVIRT_STORAGE_DOMAIN(domain);
 }
 
+static gboolean
+_set_property_value_from_type(GValue *value,
+                              GType type,
+                              const char *value_str,
+                              RestXmlNode *node)
+{
+    gboolean ret = TRUE;
+
+    if (g_type_is_a(type, OVIRT_TYPE_RESOURCE)) {
+        GObject *resource_value = g_initable_new(type, NULL, NULL, "xml-node", node, NULL);
+        g_value_set_object(value, resource_value);
+        goto end;
+    }
+
+    /* All other types require valid value_str */
+    if (value_str == NULL)
+        return FALSE;
+
+    if (G_TYPE_IS_ENUM(type)) {
+        int enum_value = ovirt_utils_genum_get_value(type, value_str, 0);
+        g_value_set_enum(value, enum_value);
+        goto end;
+    }
+
+    switch(type) {
+    case G_TYPE_BOOLEAN: {
+        gboolean bool_value = ovirt_utils_boolean_from_string(value_str);
+        g_value_set_boolean(value, bool_value);
+        break;
+    }
+    case G_TYPE_UINT64: {
+        guint64 int64_value = g_ascii_strtoull(value_str, NULL, 0);
+        g_value_set_uint64(value, int64_value);
+        break;
+    }
+    default: {
+        g_warning("Unexpected type '%s' with value '%s'", g_type_name(type), value_str);
+        ret = FALSE;
+    }
+    }
+
+end:
+    return ret;
+}
+
 typedef struct {
     const char *xml_node;
     GType type;
@@ -296,34 +341,10 @@ ovirt_resource_parse_xml(OvirtResource *resource,
         GValue value = { 0, };
 
         value_str = ovirt_rest_xml_node_get_content_from_path(node, elements->xml_node);
-        if (value_str == NULL) {
-            continue;
-        }
+
         g_value_init(&value, elements->type);
-
-        if (G_TYPE_IS_ENUM(elements->type)) {
-            int enum_value;
-            enum_value = ovirt_utils_genum_get_value(elements->type,
-                                                     value_str, 0);
-            g_value_set_enum(&value, enum_value);
-        } else if (elements->type == G_TYPE_BOOLEAN) {
-            gboolean bool_value;
-
-            bool_value = ovirt_utils_boolean_from_string(value_str);
-            g_value_set_boolean(&value, bool_value);
-        } else if (elements->type == G_TYPE_UINT64) {
-            guint64 int64_value;
-
-            int64_value = g_ascii_strtoull(value_str, NULL, 0);
-            g_value_set_uint64(&value, int64_value);
-        } else if (g_type_is_a(elements->type, OVIRT_TYPE_RESOURCE)) {
-            GObject *resource_value;
-
-            resource_value = g_initable_new(elements->type, NULL, NULL,
-                                            "xml-node", node, NULL);
-            g_value_set_object(&value, resource_value);
-        }
-        g_object_set_property(G_OBJECT(resource), elements->prop_name, &value);
+        if (_set_property_value_from_type(&value, elements->type, value_str, node))
+            g_object_set_property(G_OBJECT(resource), elements->prop_name, &value);
         g_value_unset(&value);
     }
 
