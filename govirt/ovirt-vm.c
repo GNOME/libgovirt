@@ -381,48 +381,56 @@ gboolean ovirt_vm_stop(OvirtVm *vm, OvirtProxy *proxy, GError **error)
 
 static gboolean parse_ticket_status(RestXmlNode *root, OvirtResource *resource, GError **error)
 {
-    OvirtVm *vm;
-    RestXmlNode *node;
-    const char *ticket_key = g_intern_string("ticket");
-    const char *value_key = g_intern_string("value");
-    const char *expiry_key = g_intern_string("expiry");
     OvirtVmDisplay *display;
+    gchar *ticket = NULL;
+    guint expiry = 0;
+    gboolean ret = FALSE;
+    OvirtXmlElement ticket_elements[] = {
+        { .prop_name = "ticket",
+          .xml_path = "value",
+        },
+        { .prop_name = "expiry",
+          .xml_path = "expiry",
+        },
+        { NULL, },
+    };
 
     g_return_val_if_fail(root != NULL, FALSE);
     g_return_val_if_fail(OVIRT_IS_VM(resource), FALSE);
     g_return_val_if_fail(error == NULL || *error == NULL, FALSE);
 
-    vm = OVIRT_VM(resource);
-    root = g_hash_table_lookup(root->children, ticket_key);
+    g_object_get(G_OBJECT(resource), "display", &display, NULL);
+    g_return_val_if_fail(display != NULL, FALSE);
+
+    root = rest_xml_node_find(root, "ticket");
     if (root == NULL) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
                     _("Could not find 'ticket' node"));
-        g_return_val_if_reached(FALSE);
+        goto end;
     }
-    node = g_hash_table_lookup(root->children, value_key);
-    if (node == NULL) {
+
+    ovirt_rest_xml_node_parse(root, G_OBJECT(display), ticket_elements);
+
+    g_object_get(G_OBJECT(display), "ticket", &ticket, "expiry", &expiry, NULL);
+
+    if (ticket == NULL) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
                     _("Could not find 'value' node"));
-        g_return_val_if_reached(FALSE);
+        goto end;
     }
+    g_free(ticket);
 
-    g_object_get(G_OBJECT(vm), "display", &display, NULL);
-    g_return_val_if_fail(display != NULL, FALSE);
-    g_object_set(G_OBJECT(display), "ticket", node->content, NULL);
-
-    node = g_hash_table_lookup(root->children, expiry_key);
-    if (node == NULL) {
+    if (expiry == 0) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
                     _("Could not find 'expiry' node"));
-        g_object_unref(G_OBJECT(display));
-        g_return_val_if_reached(FALSE);
+        goto end;
     }
-    g_object_set(G_OBJECT(display),
-                 "expiry", strtoul(node->content, NULL, 0),
-                 NULL);
-    g_object_unref(G_OBJECT(display));
 
-    return TRUE;
+    ret = TRUE;
+
+end:
+    g_object_unref(G_OBJECT(display));
+    return ret;
 }
 
 
