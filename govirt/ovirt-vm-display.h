@@ -55,7 +55,8 @@ struct _OvirtVmDisplayClass
 
 typedef enum {
     OVIRT_VM_DISPLAY_SPICE,
-    OVIRT_VM_DISPLAY_VNC
+    OVIRT_VM_DISPLAY_VNC,
+    OVIRT_VM_DISPLAY_INVALID,
 } OvirtVmDisplayType;
 
 GType ovirt_vm_display_get_type(void);

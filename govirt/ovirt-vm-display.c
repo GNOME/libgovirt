@@ -197,7 +197,7 @@ static void ovirt_vm_display_class_init(OvirtVmDisplayClass *klass)
                                                         "Type",
                                                         "Display Type",
                                                         OVIRT_TYPE_VM_DISPLAY_TYPE,
-                                                        OVIRT_VM_DISPLAY_SPICE,
+                                                        OVIRT_VM_DISPLAY_INVALID,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
     g_object_class_install_property(object_class,
