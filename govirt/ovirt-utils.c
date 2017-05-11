@@ -94,19 +94,72 @@ ovirt_rest_xml_node_get_attr_from_path(RestXmlNode *node, const char *path, cons
     return rest_xml_node_get_attr(node, attr);
 }
 
+static GStrv
+ovirt_rest_xml_node_get_str_array_from_path(RestXmlNode *node, const char *path, const char *attr)
+{
+    GArray *array;
+    GHashTableIter iter;
+    gpointer sub_node;
+
+    node = ovirt_rest_xml_node_find(node, path);
+    if (node == NULL)
+        return NULL;
+
+    array = g_array_new(TRUE, FALSE, sizeof(gchar *));
+
+    g_hash_table_iter_init(&iter, node->children);
+    while (g_hash_table_iter_next(&iter, NULL, &sub_node)) {
+        const char *value;
+        char *array_value;
+
+        node = (RestXmlNode *) sub_node;
+
+        if (attr != NULL)
+            value = rest_xml_node_get_attr(node, attr);
+        else
+            value = node->content;
+
+        if (value == NULL) {
+            g_warning("node %s%s is NULL", attr ? "attribute:" : "content",  attr ? attr : "" );
+            continue;
+        }
+
+        array_value = g_strdup(value);
+        g_array_append_val(array, array_value);
+    }
+
+    return (GStrv) g_array_free(array, FALSE);
+}
+
 static gboolean
 _set_property_value_from_type(GValue *value,
                               GType type,
-                              const char *value_str,
+                              const char *path,
+                              const char *attr,
                               RestXmlNode *node)
 {
     gboolean ret = TRUE;
+    const char *value_str;
 
     if (g_type_is_a(type, OVIRT_TYPE_RESOURCE)) {
         GObject *resource_value = g_initable_new(type, NULL, NULL, "xml-node", node, NULL);
         g_value_set_object(value, resource_value);
         goto end;
+    } else if (g_type_is_a(type, G_TYPE_STRV)) {
+        GStrv strv_value = ovirt_rest_xml_node_get_str_array_from_path(node, path, attr);
+        if (strv_value == NULL) {
+            ret = FALSE;
+            goto end;
+        }
+
+        g_value_take_boxed(value, strv_value);
+        goto end;
     }
+
+    if (attr != NULL)
+        value_str = ovirt_rest_xml_node_get_attr_from_path(node, path, attr);
+    else
+        value_str = ovirt_rest_xml_node_get_content_from_path(node, path);
 
     /* All other types require valid value_str */
     if (value_str == NULL)
@@ -152,16 +205,10 @@ ovirt_rest_xml_node_parse(RestXmlNode *node,
     g_return_val_if_fail(elements != NULL, FALSE);
 
     for (;elements->xml_path != NULL; elements++) {
-        const char *value_str;
         GValue value = { 0, };
 
-        if (elements->xml_attr != NULL)
-            value_str = ovirt_rest_xml_node_get_attr_from_path(node, elements->xml_path, elements->xml_attr);
-        else
-            value_str = ovirt_rest_xml_node_get_content_from_path(node, elements->xml_path);
-
         g_value_init(&value, elements->type);
-        if (_set_property_value_from_type(&value, elements->type, value_str, node))
+        if (_set_property_value_from_type(&value, elements->type, elements->xml_path, elements->xml_attr, node))
             g_object_set_property(object, elements->prop_name, &value);
         g_value_unset(&value);
     }
