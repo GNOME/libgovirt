@@ -207,9 +207,13 @@ ovirt_rest_xml_node_parse(RestXmlNode *node,
 
     for (;elements->xml_path != NULL; elements++) {
         GValue value = { 0, };
+        GParamSpec *prop;
 
-        g_value_init(&value, elements->type);
-        if (_set_property_value_from_type(&value, elements->type, elements->xml_path, elements->xml_attr, node))
+        prop = g_object_class_find_property(G_OBJECT_GET_CLASS(object), elements->prop_name);
+        g_return_val_if_fail(prop != NULL, FALSE);
+
+        g_value_init(&value, prop->value_type);
+        if (_set_property_value_from_type(&value, prop->value_type, elements->xml_path, elements->xml_attr, node))
             g_object_set_property(object, elements->prop_name, &value);
         g_value_unset(&value);
     }

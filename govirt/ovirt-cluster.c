@@ -115,12 +115,10 @@ static gboolean ovirt_cluster_init_from_xml(OvirtResource *resource,
     OvirtResourceClass *parent_class;
     OvirtXmlElement cluster_elements[] = {
         { .prop_name = "data-center-href",
-          .type = G_TYPE_STRING,
           .xml_path = "data_center",
           .xml_attr = "href",
         },
         { .prop_name = "data-center-id",
-          .type = G_TYPE_STRING,
           .xml_path = "data_center",
           .xml_attr = "id",
         },

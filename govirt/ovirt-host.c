@@ -116,12 +116,10 @@ static gboolean ovirt_host_init_from_xml(OvirtResource *resource,
     OvirtResourceClass *parent_class;
     OvirtXmlElement host_elements[] = {
         { .prop_name = "cluster-href",
-          .type = G_TYPE_STRING,
           .xml_path = "cluster",
           .xml_attr = "href",
         },
         { .prop_name = "cluster-id",
-          .type = G_TYPE_STRING,
           .xml_path = "cluster",
           .xml_attr = "id",
         },

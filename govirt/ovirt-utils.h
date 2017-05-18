@@ -31,7 +31,6 @@ typedef struct _OvirtXmlElement OvirtXmlElement;
 struct _OvirtXmlElement
 {
     const char *prop_name;
-    GType type;
     const char *xml_path;
     const char *xml_attr; /* if NULL, retrieve node content instead of attribute */
 };
