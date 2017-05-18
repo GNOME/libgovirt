@@ -33,6 +33,7 @@ struct _OvirtXmlElement
     const char *prop_name;
     GType type;
     const char *xml_path;
+    const char *xml_attr; /* if NULL, retrieve node content instead of attribute */
 };
 
 RestXmlNode *ovirt_rest_xml_node_from_call(RestProxyCall *call);
