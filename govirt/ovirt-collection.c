@@ -344,6 +344,21 @@ OvirtCollection *ovirt_collection_new_from_xml(RestXmlNode *root_node,
 }
 
 
+OvirtCollection *ovirt_sub_collection_new_from_resource(OvirtResource *resource,
+                                                        const char *href,
+                                                        const char *collection_name,
+                                                        GType resource_type,
+                                                        const char *resource_name)
+{
+    const char *link = ovirt_resource_get_sub_collection(resource, href);
+
+    if (link == NULL)
+        return NULL;
+
+    return ovirt_collection_new(link, collection_name, resource_type, resource_name);
+}
+
+
 /**
  * ovirt_collection_fetch:
  * @collection: a #OvirtCollection

@@ -41,6 +41,11 @@ OvirtCollection *ovirt_collection_new_from_xml(RestXmlNode *root_node,
                                                GType resource_type,
                                                const char *resource_name,
                                                GError **error);
+OvirtCollection *ovirt_sub_collection_new_from_resource(OvirtResource *resource,
+                                                        const char *href,
+                                                        const char *collection_name,
+                                                        GType resource_type,
+                                                        const char *resource_name);
 
 G_END_DECLS
 

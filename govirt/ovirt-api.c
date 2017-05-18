@@ -123,18 +123,14 @@ OvirtApi *ovirt_api_new(void)
  */
 OvirtCollection *ovirt_api_get_vms(OvirtApi *api)
 {
-    const char *href;
-
     g_return_val_if_fail(OVIRT_IS_API(api), NULL);
 
-    if (api->priv->vms != NULL)
-        return api->priv->vms;
-
-    href = ovirt_resource_get_sub_collection(OVIRT_RESOURCE(api), "vms");
-    if (href == NULL)
-        return NULL;
-
-    api->priv->vms = ovirt_collection_new(href, "vms", OVIRT_TYPE_VM, "vm");
+    if (api->priv->vms == NULL)
+        api->priv->vms = ovirt_sub_collection_new_from_resource(OVIRT_RESOURCE(api),
+                                                                "vms",
+                                                                "vms",
+                                                                OVIRT_TYPE_VM,
+                                                                "vm");
 
     return api->priv->vms;
 }
@@ -151,18 +147,14 @@ OvirtCollection *ovirt_api_get_vms(OvirtApi *api)
  */
 OvirtCollection *ovirt_api_get_vm_pools(OvirtApi *api)
 {
-    const char *href;
-
     g_return_val_if_fail(OVIRT_IS_API(api), NULL);
 
-    if (api->priv->vm_pools != NULL)
-        return api->priv->vm_pools;
-
-    href = ovirt_resource_get_sub_collection(OVIRT_RESOURCE(api), "vmpools");
-    if (href == NULL)
-        return NULL;
-
-    api->priv->vm_pools = ovirt_collection_new(href, "vmpools", OVIRT_TYPE_VM_POOL, "vmpool");
+    if (api->priv->vm_pools == NULL)
+        api->priv->vm_pools = ovirt_sub_collection_new_from_resource(OVIRT_RESOURCE(api),
+                                                                     "vmpools",
+                                                                     "vmpools",
+                                                                     OVIRT_TYPE_VM_POOL,
+                                                                     "vmpool");
 
     return api->priv->vm_pools;
 }
@@ -180,20 +172,14 @@ OvirtCollection *ovirt_api_get_vm_pools(OvirtApi *api)
  */
 OvirtCollection *ovirt_api_get_storage_domains(OvirtApi *api)
 {
-    const char *href;
-
     g_return_val_if_fail(OVIRT_IS_API(api), NULL);
 
-    if (api->priv->storage_domains != NULL)
-        return api->priv->storage_domains;
-
-    href = ovirt_resource_get_sub_collection(OVIRT_RESOURCE(api), "storagedomains");
-    if (href == NULL)
-        return NULL;
-
-    api->priv->storage_domains = ovirt_collection_new(href, "storage_domains",
-                                                      OVIRT_TYPE_STORAGE_DOMAIN,
-                                                      "storage_domain");
+    if (api->priv->storage_domains == NULL)
+        api->priv->storage_domains = ovirt_sub_collection_new_from_resource(OVIRT_RESOURCE(api),
+                                                                            "storagedomains",
+                                                                            "storage_domains",
+                                                                            OVIRT_TYPE_STORAGE_DOMAIN,
+                                                                            "storage_domain");
 
     return api->priv->storage_domains;
 }

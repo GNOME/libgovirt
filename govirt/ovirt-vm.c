@@ -329,20 +329,14 @@ gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
  */
 OvirtCollection *ovirt_vm_get_cdroms(OvirtVm *vm)
 {
-    const char *href;
-
     g_return_val_if_fail(OVIRT_IS_VM(vm), NULL);
 
-    if (vm->priv->cdroms != NULL)
-        return vm->priv->cdroms;
-
-    href = ovirt_resource_get_sub_collection(OVIRT_RESOURCE(vm), "cdroms");
-    if (href == NULL)
-        return NULL;
-
-    vm->priv->cdroms =  ovirt_collection_new(href, "cdroms",
-                                             OVIRT_TYPE_CDROM,
-                                             "cdrom");
+    if (vm->priv->cdroms == NULL)
+        vm->priv->cdroms = ovirt_sub_collection_new_from_resource(OVIRT_RESOURCE(vm),
+                                                                  "cdroms",
+                                                                  "cdroms",
+                                                                  OVIRT_TYPE_CDROM,
+                                                                  "cdrom");
 
     return vm->priv->cdroms;
 }

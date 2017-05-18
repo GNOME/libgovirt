@@ -317,20 +317,14 @@ OvirtStorageDomain *ovirt_storage_domain_new(void)
  */
 OvirtCollection *ovirt_storage_domain_get_files(OvirtStorageDomain *domain)
 {
-    const char *href;
-
     g_return_val_if_fail(OVIRT_IS_STORAGE_DOMAIN(domain), NULL);
 
-    if (domain->priv->files != NULL)
-        return domain->priv->files;
-
-    href = ovirt_resource_get_sub_collection(OVIRT_RESOURCE(domain), "files");
-    if (href == NULL)
-        return NULL;
-
-    domain->priv->files = ovirt_collection_new(href, "files",
-                                               OVIRT_TYPE_RESOURCE,
-                                               "file");
+    if (domain->priv->files == NULL)
+        domain->priv->files = ovirt_sub_collection_new_from_resource(OVIRT_RESOURCE(domain),
+                                                                     "files",
+                                                                     "files",
+                                                                     OVIRT_TYPE_RESOURCE,
+                                                                     "file");
 
     return domain->priv->files;
 }
