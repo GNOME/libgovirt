@@ -50,45 +50,38 @@ ovirt_rest_xml_node_from_call(RestProxyCall *call)
     return node;
 }
 
-static const char *
-ovirt_rest_xml_node_get_content_va(RestXmlNode *node,
-                                   va_list *args,
-                                   GStrv str_array)
+static RestXmlNode *
+ovirt_rest_xml_node_find(RestXmlNode *node, const char *path)
 {
-    g_return_val_if_fail((args != NULL) || (str_array != NULL), NULL);
+    guint i;
+    GStrv pathv;
 
-    while (TRUE) {
-        const char *node_name;
+    g_return_val_if_fail((path != NULL), NULL);
 
-        if (args != NULL) {
-            node_name = va_arg(*args, const char *);
-        } else {
-            node_name = *str_array;
-            str_array++;
-        }
-        if (node_name == NULL)
-            break;
-        node = rest_xml_node_find(node, node_name);
+    pathv = g_strsplit(path, "/", -1);
+
+    for (i = 0; i < g_strv_length(pathv); ++i) {
+        node = rest_xml_node_find(node, pathv[i]);
         if (node == NULL) {
-            g_debug("could not find XML node '%s'", node_name);
-            return NULL;
+            g_debug("could not find XML node '%s'", pathv[i]);
+            break;
         }
     }
 
-    return node->content;
+    g_strfreev(pathv);
+
+    return node;
 }
 
 static const char *
 ovirt_rest_xml_node_get_content_from_path(RestXmlNode *node, const char *path)
 {
-    GStrv pathv;
-    const char *content;
+    node = ovirt_rest_xml_node_find(node, path);
 
-    pathv = g_strsplit(path, "/", -1);
-    content = ovirt_rest_xml_node_get_content_va(node, NULL, pathv);
-    g_strfreev(pathv);
+    if (node == NULL)
+        return NULL;
 
-    return content;
+    return node->content;
 }
 
 static gboolean
