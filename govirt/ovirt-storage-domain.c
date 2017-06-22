@@ -53,10 +53,6 @@ enum {
     PROP_STATE
 };
 
-static gboolean
-ovirt_storage_domain_refresh_from_xml(OvirtStorageDomain *domain,
-                                      RestXmlNode *node);
-
 static void ovirt_storage_domain_get_property(GObject *object,
                                               guint prop_id,
                                               GValue *value,
@@ -145,10 +141,39 @@ static gboolean ovirt_storage_domain_init_from_xml(OvirtResource *resource,
 {
     gboolean parsed_ok;
     OvirtResourceClass *parent_class;
-    OvirtStorageDomain *domain;
+    OvirtXmlElement storage_domain_elements[] = {
+        { .prop_name = "type",
+          .type = OVIRT_TYPE_STORAGE_DOMAIN_TYPE,
+          .xml_path = "type",
+        },
+        { .prop_name = "master",
+          .type = G_TYPE_BOOLEAN,
+          .xml_path = "master",
+        },
+        { .prop_name = "available",
+          .type = G_TYPE_UINT64,
+          .xml_path = "available",
+        },
+        { .prop_name = "used",
+          .type = G_TYPE_UINT64,
+          .xml_path = "used",
+        },
+        { .prop_name = "committed",
+          .type = G_TYPE_UINT64,
+          .xml_path = "committed",
+        },
+        { .prop_name = "version",
+          .type = OVIRT_TYPE_STORAGE_DOMAIN_FORMAT_VERSION,
+          .xml_path = "storage_format",
+        },
+        { .prop_name = "state",
+          .type = OVIRT_TYPE_STORAGE_DOMAIN_STATE,
+          .xml_path = "status/state",
+        },
+        { NULL , }
+    };
 
-    domain = OVIRT_STORAGE_DOMAIN(resource);
-    parsed_ok = ovirt_storage_domain_refresh_from_xml(domain, node);
+    parsed_ok = ovirt_rest_xml_node_parse(node, G_OBJECT(resource), storage_domain_elements);
     if (!parsed_ok) {
         return FALSE;
     }
@@ -275,119 +300,6 @@ OvirtStorageDomain *ovirt_storage_domain_new(void)
     domain = g_initable_new(OVIRT_TYPE_STORAGE_DOMAIN, NULL, NULL, NULL);
 
     return OVIRT_STORAGE_DOMAIN(domain);
-}
-
-static gboolean
-_set_property_value_from_type(GValue *value,
-                              GType type,
-                              const char *value_str,
-                              RestXmlNode *node)
-{
-    gboolean ret = TRUE;
-
-    if (g_type_is_a(type, OVIRT_TYPE_RESOURCE)) {
-        GObject *resource_value = g_initable_new(type, NULL, NULL, "xml-node", node, NULL);
-        g_value_set_object(value, resource_value);
-        goto end;
-    }
-
-    /* All other types require valid value_str */
-    if (value_str == NULL)
-        return FALSE;
-
-    if (G_TYPE_IS_ENUM(type)) {
-        int enum_value = ovirt_utils_genum_get_value(type, value_str, 0);
-        g_value_set_enum(value, enum_value);
-        goto end;
-    }
-
-    switch(type) {
-    case G_TYPE_BOOLEAN: {
-        gboolean bool_value = ovirt_utils_boolean_from_string(value_str);
-        g_value_set_boolean(value, bool_value);
-        break;
-    }
-    case G_TYPE_UINT64: {
-        guint64 int64_value = g_ascii_strtoull(value_str, NULL, 0);
-        g_value_set_uint64(value, int64_value);
-        break;
-    }
-    default: {
-        g_warning("Unexpected type '%s' with value '%s'", g_type_name(type), value_str);
-        ret = FALSE;
-    }
-    }
-
-end:
-    return ret;
-}
-
-typedef struct {
-    const char *prop_name;
-    GType type;
-    const char *xml_path;
-} OvirtXmlElement;
-
-static gboolean
-ovirt_resource_parse_xml(OvirtResource *resource,
-                         RestXmlNode *node,
-                         OvirtXmlElement *elements)
-{
-    g_return_val_if_fail(OVIRT_IS_RESOURCE(resource), FALSE);
-    g_return_val_if_fail(elements != NULL, FALSE);
-
-    for (;elements->xml_path != NULL; elements++) {
-        const char *value_str;
-        GValue value = { 0, };
-
-        value_str = ovirt_rest_xml_node_get_content_from_path(node, elements->xml_path);
-
-        g_value_init(&value, elements->type);
-        if (_set_property_value_from_type(&value, elements->type, value_str, node))
-            g_object_set_property(G_OBJECT(resource), elements->prop_name, &value);
-        g_value_unset(&value);
-    }
-
-    return TRUE;
-}
-
-static gboolean
-ovirt_storage_domain_refresh_from_xml(OvirtStorageDomain *domain,
-                                      RestXmlNode *node)
-{
-    OvirtXmlElement storage_domain_elements[] = {
-        { .prop_name = "type",
-          .type = OVIRT_TYPE_STORAGE_DOMAIN_TYPE,
-          .xml_path = "type",
-        },
-        { .prop_name = "master",
-          .type = G_TYPE_BOOLEAN,
-          .xml_path = "master",
-        },
-        { .prop_name = "available",
-          .type = G_TYPE_UINT64,
-          .xml_path = "available",
-        },
-        { .prop_name = "used",
-          .type = G_TYPE_UINT64,
-          .xml_path = "used",
-        },
-        { .prop_name = "committed",
-          .type = G_TYPE_UINT64,
-          .xml_path = "committed",
-        },
-        { .prop_name = "version",
-          .type = OVIRT_TYPE_STORAGE_DOMAIN_FORMAT_VERSION,
-          .xml_path = "storage_format",
-        },
-        { .prop_name = "state",
-          .type = OVIRT_TYPE_STORAGE_DOMAIN_STATE,
-          .xml_path = "status/state",
-        },
-        { NULL , }
-    };
-
-    return ovirt_resource_parse_xml(OVIRT_RESOURCE(domain), node, storage_domain_elements);
 }
 
 
