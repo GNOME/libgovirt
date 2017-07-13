@@ -44,6 +44,8 @@ struct _OvirtVmPrivate {
     OvirtVmDisplay *display;
     gchar *host_href;
     gchar *host_id;
+    gchar *cluster_href;
+    gchar *cluster_id;
 } ;
 G_DEFINE_TYPE(OvirtVm, ovirt_vm, OVIRT_TYPE_RESOURCE);
 
@@ -61,6 +63,8 @@ enum {
     PROP_DISPLAY,
     PROP_HOST_HREF,
     PROP_HOST_ID,
+    PROP_CLUSTER_HREF,
+    PROP_CLUSTER_ID,
 };
 
 static char *ensure_href_from_id(const char *id,
@@ -78,6 +82,14 @@ static const char *get_host_href(OvirtVm *vm)
         vm->priv->host_href = ensure_href_from_id(vm->priv->host_id, "/ovirt-engine/api/hosts");
 
     return vm->priv->host_href;
+}
+
+static const char *get_cluster_href(OvirtVm *vm)
+{
+    if (vm->priv->cluster_href == NULL)
+        vm->priv->cluster_href = ensure_href_from_id(vm->priv->cluster_id, "/ovirt-engine/api/clusters");
+
+    return vm->priv->cluster_href;
 }
 
 static void ovirt_vm_get_property(GObject *object,
@@ -99,6 +111,12 @@ static void ovirt_vm_get_property(GObject *object,
         break;
     case PROP_HOST_ID:
         g_value_set_string(value, vm->priv->host_id);
+        break;
+    case PROP_CLUSTER_HREF:
+        g_value_set_string(value, get_cluster_href(vm));
+        break;
+    case PROP_CLUSTER_ID:
+        g_value_set_string(value, vm->priv->cluster_id);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -129,6 +147,14 @@ static void ovirt_vm_set_property(GObject *object,
         g_free(vm->priv->host_id);
         vm->priv->host_id = g_value_dup_string(value);
         break;
+    case PROP_CLUSTER_HREF:
+        g_free(vm->priv->cluster_href);
+        vm->priv->cluster_href = g_value_dup_string(value);
+        break;
+    case PROP_CLUSTER_ID:
+        g_free(vm->priv->cluster_id);
+        vm->priv->cluster_id = g_value_dup_string(value);
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -143,6 +169,8 @@ static void ovirt_vm_dispose(GObject *object)
     g_clear_object(&vm->priv->display);
     g_clear_pointer(&vm->priv->host_href, g_free);
     g_clear_pointer(&vm->priv->host_id, g_free);
+    g_clear_pointer(&vm->priv->cluster_href, g_free);
+    g_clear_pointer(&vm->priv->cluster_id, g_free);
 
     G_OBJECT_CLASS(ovirt_vm_parent_class)->dispose(object);
 }
@@ -163,6 +191,16 @@ static gboolean ovirt_vm_init_from_xml(OvirtResource *resource,
         { .prop_name = "host-id",
           .type = G_TYPE_STRING,
           .xml_path = "host",
+          .xml_attr = "id",
+        },
+        { .prop_name = "cluster-href",
+          .type = G_TYPE_STRING,
+          .xml_path = "cluster",
+          .xml_attr = "href",
+        },
+        { .prop_name = "cluster-id",
+          .type = G_TYPE_STRING,
+          .xml_path = "cluster",
           .xml_attr = "id",
         },
         { NULL, },
@@ -223,6 +261,22 @@ static void ovirt_vm_class_init(OvirtVmClass *klass)
                                     g_param_spec_string("host-id",
                                                         "Host Id",
                                                         "Host Id for the Virtual Machine",
+                                                        NULL,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_CLUSTER_HREF,
+                                    g_param_spec_string("cluster-href",
+                                                        "Cluster href",
+                                                        "Cluster href for the Virtual Machine",
+                                                        NULL,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_CLUSTER_ID,
+                                    g_param_spec_string("cluster-id",
+                                                        "Cluster Id",
+                                                        "Cluster Id for the Virtual Machine",
                                                         NULL,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
@@ -431,4 +485,24 @@ OvirtHost *ovirt_vm_get_host(OvirtVm *vm)
     g_return_val_if_fail(OVIRT_IS_VM(vm), NULL);
     g_return_val_if_fail(vm->priv->host_id != NULL, NULL);
     return ovirt_host_new_from_id(vm->priv->host_id, get_host_href(vm));
+}
+
+
+/**
+ * ovirt_vm_get_cluster:
+ * @vm: a #OvirtVm
+ *
+ * Gets a #OvirtCluster representing the cluster the virtual machine belongs
+ * to. This method does not initiate any network activity, the remote host must
+ * be then be fetched using ovirt_resource_refresh() or
+ * ovirt_resource_refresh_async().
+ *
+ * Return value: (transfer full): a #OvirtCluster representing cluster the @vm
+ * belongs to.
+ */
+OvirtCluster *ovirt_vm_get_cluster(OvirtVm *vm)
+{
+    g_return_val_if_fail(OVIRT_IS_VM(vm), NULL);
+    g_return_val_if_fail(vm->priv->cluster_id != NULL, NULL);
+    return ovirt_cluster_new_from_id(vm->priv->cluster_id, get_cluster_href(vm));
 }

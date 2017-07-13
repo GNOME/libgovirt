@@ -121,6 +121,7 @@ gboolean ovirt_vm_refresh_finish(OvirtVm *vm,
 
 OvirtCollection *ovirt_vm_get_cdroms(OvirtVm *vm);
 OvirtHost *ovirt_vm_get_host(OvirtVm *vm);
+OvirtCluster *ovirt_vm_get_cluster(OvirtVm *vm);
 
 G_END_DECLS
 
