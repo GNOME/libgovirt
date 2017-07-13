@@ -25,7 +25,14 @@
 
 G_BEGIN_DECLS
 
+typedef struct _OvirtApi OvirtApi;
+typedef struct _OvirtCdrom OvirtCdrom;
+typedef struct _OvirtCollection OvirtCollection;
 typedef struct _OvirtProxy OvirtProxy;
+typedef struct _OvirtStorageDomain OvirtStorageDomain;
+typedef struct _OvirtVmDisplay OvirtVmDisplay;
+typedef struct _OvirtVmPool OvirtVmPool;
+typedef struct _OvirtVm OvirtVm;
 
 G_END_DECLS
 

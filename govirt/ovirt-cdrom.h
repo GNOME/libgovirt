@@ -36,7 +36,6 @@ G_BEGIN_DECLS
 #define OVIRT_IS_CDROM_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OVIRT_TYPE_CDROM))
 #define OVIRT_CDROM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), OVIRT_TYPE_CDROM, OvirtCdromClass))
 
-typedef struct _OvirtCdrom OvirtCdrom;
 typedef struct _OvirtCdromPrivate OvirtCdromPrivate;
 typedef struct _OvirtCdromClass OvirtCdromClass;
 

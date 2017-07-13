@@ -23,6 +23,7 @@
 #define __OVIRT_VM_DISPLAY_H__
 
 #include <glib-object.h>
+#include <govirt/ovirt-types.h>
 
 G_BEGIN_DECLS
 
@@ -33,7 +34,6 @@ G_BEGIN_DECLS
 #define OVIRT_IS_VM_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OVIRT_TYPE_VM_DISPLAY))
 #define OVIRT_VM_DISPLAY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), OVIRT_TYPE_VM_DISPLAY, OvirtVmDisplayClass))
 
-typedef struct _OvirtVmDisplay OvirtVmDisplay;
 typedef struct _OvirtVmDisplayPrivate OvirtVmDisplayPrivate;
 typedef struct _OvirtVmDisplayClass OvirtVmDisplayClass;
 

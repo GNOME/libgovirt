@@ -35,7 +35,6 @@ G_BEGIN_DECLS
 #define OVIRT_IS_VM_POOL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OVIRT_TYPE_VM_POOL))
 #define OVIRT_VM_POOL_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), OVIRT_TYPE_VM_POOL, OvirtVmPoolClass))
 
-typedef struct _OvirtVmPool OvirtVmPool;
 typedef struct _OvirtVmPoolPrivate OvirtVmPoolPrivate;
 typedef struct _OvirtVmPoolClass OvirtVmPoolClass;
 

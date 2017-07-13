@@ -41,7 +41,6 @@ G_BEGIN_DECLS
 #define OVIRT_IS_VM_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OVIRT_TYPE_VM))
 #define OVIRT_VM_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), OVIRT_TYPE_VM, OvirtVmClass))
 
-typedef struct _OvirtVm OvirtVm;
 typedef struct _OvirtVmPrivate OvirtVmPrivate;
 typedef struct _OvirtVmClass OvirtVmClass;
 

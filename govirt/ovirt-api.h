@@ -37,7 +37,6 @@ G_BEGIN_DECLS
 #define OVIRT_IS_API_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OVIRT_TYPE_API))
 #define OVIRT_API_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), OVIRT_TYPE_API, OvirtApiClass))
 
-typedef struct _OvirtApi OvirtApi;
 typedef struct _OvirtApiPrivate OvirtApiPrivate;
 typedef struct _OvirtApiClass OvirtApiClass;
 

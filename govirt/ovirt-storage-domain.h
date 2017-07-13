@@ -61,7 +61,6 @@ typedef enum {
     OVIRT_STORAGE_DOMAIN_TYPE_IMAGE,
 } OvirtStorageDomainType;
 
-typedef struct _OvirtStorageDomain OvirtStorageDomain;
 typedef struct _OvirtStorageDomainPrivate OvirtStorageDomainPrivate;
 typedef struct _OvirtStorageDomainClass OvirtStorageDomainClass;
 

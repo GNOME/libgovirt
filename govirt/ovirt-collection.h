@@ -36,7 +36,6 @@ G_BEGIN_DECLS
 #define OVIRT_IS_COLLECTION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OVIRT_TYPE_COLLECTION))
 #define OVIRT_COLLECTION_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), OVIRT_TYPE_COLLECTION, OvirtCollectionClass))
 
-typedef struct _OvirtCollection OvirtCollection;
 typedef struct _OvirtCollectionPrivate OvirtCollectionPrivate;
 typedef struct _OvirtCollectionClass OvirtCollectionClass;
 
