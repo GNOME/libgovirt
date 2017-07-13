@@ -1065,3 +1065,50 @@ gboolean ovirt_resource_delete_finish(OvirtResource *resource,
 
     return ovirt_rest_call_finish(result, err);
 }
+
+
+static OvirtResource *ovirt_resource_new_valist(GType type, GError **error, const char *prop_name, ...)
+{
+    gpointer resource;
+    va_list var_args;
+    GError *local_error = NULL;
+
+    g_return_val_if_fail(g_type_is_a(type, OVIRT_TYPE_RESOURCE), NULL);
+
+    va_start(var_args, prop_name);
+    resource = g_initable_new_valist(type, prop_name, var_args, NULL, &local_error);
+    va_end(var_args);
+
+    if (local_error != NULL) {
+        g_warning("Failed to create resource of type %s: %s", g_type_name(type), local_error->message);
+        g_propagate_error(error, local_error);
+    }
+
+    return OVIRT_RESOURCE(resource);
+}
+
+
+G_GNUC_INTERNAL
+OvirtResource *ovirt_resource_new(GType type)
+{
+    return ovirt_resource_new_valist(type, NULL, NULL);
+}
+
+
+G_GNUC_INTERNAL
+OvirtResource *ovirt_resource_new_from_id(GType type, const char *id, const char *href)
+{
+    g_return_val_if_fail(id != NULL, NULL);
+    g_return_val_if_fail(href != NULL, NULL);
+
+    return ovirt_resource_new_valist(type, NULL, "guid", id, "href", href, NULL);
+}
+
+
+G_GNUC_INTERNAL
+OvirtResource *ovirt_resource_new_from_xml(GType type, RestXmlNode *node, GError **error)
+{
+    g_return_val_if_fail(node != NULL, NULL);
+
+    return ovirt_resource_new_valist(type, error, "xml-node", node, NULL);
+}

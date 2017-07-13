@@ -27,6 +27,10 @@
 
 G_BEGIN_DECLS
 
+OvirtResource *ovirt_resource_new(GType type);
+OvirtResource *ovirt_resource_new_from_id(GType type, const char *id, const char *href);
+OvirtResource *ovirt_resource_new_from_xml(GType type, RestXmlNode *node, GError **error);
+
 const char *ovirt_resource_get_action(OvirtResource *resource,
                                       const char *action);
 char *ovirt_resource_to_xml(OvirtResource *resource);
