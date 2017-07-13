@@ -168,7 +168,8 @@ static void ovirt_vm_pool_init(G_GNUC_UNUSED OvirtVmPool *vm_pool)
 
 OvirtVmPool *ovirt_vm_pool_new(void)
 {
-    return OVIRT_VM_POOL(g_initable_new(OVIRT_TYPE_VM_POOL, NULL, NULL, NULL));
+    OvirtResource *vm_pool = ovirt_resource_new(OVIRT_TYPE_VM_POOL);
+    return OVIRT_VM_POOL(vm_pool);
 }
 
 

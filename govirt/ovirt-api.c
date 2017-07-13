@@ -98,16 +98,18 @@ static void ovirt_api_init(G_GNUC_UNUSED OvirtApi *api)
     api->priv = OVIRT_API_GET_PRIVATE(api);
 }
 
+G_GNUC_INTERNAL
 OvirtApi *ovirt_api_new_from_xml(RestXmlNode *node, GError **error)
 {
-    return OVIRT_API(g_initable_new(OVIRT_TYPE_API, NULL, error,
-                                   "xml-node", node, NULL));
+    OvirtResource *api = ovirt_resource_new_from_xml(OVIRT_TYPE_API, node, error);
+    return OVIRT_API(api);
 }
 
 
 OvirtApi *ovirt_api_new(void)
 {
-    return OVIRT_API(g_initable_new(OVIRT_TYPE_API, NULL, NULL, NULL));
+    OvirtResource *api = ovirt_resource_new(OVIRT_TYPE_API);
+    return OVIRT_API(api);
 }
 
 

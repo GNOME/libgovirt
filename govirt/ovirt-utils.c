@@ -32,6 +32,7 @@
 
 #include "ovirt-error.h"
 #include "ovirt-resource.h"
+#include "ovirt-resource-private.h"
 
 RestXmlNode *
 ovirt_rest_xml_node_from_call(RestProxyCall *call)
@@ -142,7 +143,7 @@ _set_property_value_from_type(GValue *value,
     const char *value_str;
 
     if (g_type_is_a(type, OVIRT_TYPE_RESOURCE)) {
-        GObject *resource_value = g_initable_new(type, NULL, NULL, "xml-node", node, NULL);
+        OvirtResource *resource_value = ovirt_resource_new_from_xml(type, node, NULL);
         g_value_set_object(value, resource_value);
         goto end;
     } else if (g_type_is_a(type, G_TYPE_STRV)) {

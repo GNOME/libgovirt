@@ -235,9 +235,7 @@ ovirt_collection_new_resource_from_xml(OvirtCollection *collection,
                                        RestXmlNode *node,
                                        GError **error)
 {
-    return OVIRT_RESOURCE(g_initable_new(collection->priv->resource_type,
-                                         NULL, error,
-                                         "xml-node", node , NULL));
+    return ovirt_resource_new_from_xml(collection->priv->resource_type, node, error);
 }
 
 

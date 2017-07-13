@@ -163,15 +163,17 @@ static void ovirt_vm_init(G_GNUC_UNUSED OvirtVm *vm)
     vm->priv = OVIRT_VM_GET_PRIVATE(vm);
 }
 
+G_GNUC_INTERNAL
 OvirtVm *ovirt_vm_new_from_xml(RestXmlNode *node, GError **error)
 {
-    return OVIRT_VM(g_initable_new(OVIRT_TYPE_VM, NULL, error,
-                                   "xml-node", node, NULL));
+    OvirtResource *vm = ovirt_resource_new_from_xml(OVIRT_TYPE_VM, node, error);
+    return OVIRT_VM(vm);
 }
 
 OvirtVm *ovirt_vm_new(void)
 {
-    return OVIRT_VM(g_initable_new(OVIRT_TYPE_VM, NULL, NULL, NULL));
+    OvirtResource *vm = ovirt_resource_new(OVIRT_TYPE_VM);
+    return OVIRT_VM(vm);
 }
 
 

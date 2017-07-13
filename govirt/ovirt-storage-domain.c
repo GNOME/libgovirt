@@ -285,20 +285,13 @@ G_GNUC_INTERNAL
 OvirtStorageDomain *ovirt_storage_domain_new_from_xml(RestXmlNode *node,
                                                       GError **error)
 {
-    GObject *domain;
-
-    domain = g_initable_new(OVIRT_TYPE_STORAGE_DOMAIN, NULL, error,
-                            "xml-node", node, NULL);
-
+    OvirtResource *domain = ovirt_resource_new_from_xml(OVIRT_TYPE_STORAGE_DOMAIN, node, error);
     return OVIRT_STORAGE_DOMAIN(domain);
 }
 
 OvirtStorageDomain *ovirt_storage_domain_new(void)
 {
-    GObject *domain;
-
-    domain = g_initable_new(OVIRT_TYPE_STORAGE_DOMAIN, NULL, NULL, NULL);
-
+    OvirtResource *domain = ovirt_resource_new(OVIRT_TYPE_STORAGE_DOMAIN);
     return OVIRT_STORAGE_DOMAIN(domain);
 }
 
