@@ -132,6 +132,7 @@ GOVIRT_0.4.0 {
         ovirt_data_center_get_type;
         ovirt_data_center_new;
 
+        ovirt_host_get_cluster;
         ovirt_host_get_type;
         ovirt_host_get_vms;
         ovirt_host_new;

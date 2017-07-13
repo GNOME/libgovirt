@@ -42,6 +42,19 @@ enum {
     PROP_CLUSTER_ID,
 };
 
+
+static const char *get_cluster_href(OvirtHost *host)
+{
+    if (host->priv->cluster_href == NULL &&
+        host->priv->cluster_id != NULL) {
+        host->priv->cluster_href = g_strdup_printf("%s/%s",
+                                                   "/ovirt-engine/api/clusters",
+                                                   host->priv->cluster_id);
+    }
+
+    return host->priv->cluster_href;
+}
+
 static void ovirt_host_get_property(GObject *object,
                                     guint prop_id,
                                     GValue *value,
@@ -51,7 +64,7 @@ static void ovirt_host_get_property(GObject *object,
 
     switch (prop_id) {
     case PROP_CLUSTER_HREF:
-        g_value_set_string(value, host->priv->cluster_href);
+        g_value_set_string(value, get_cluster_href(host));
         break;
     case PROP_CLUSTER_ID:
         g_value_set_string(value, host->priv->cluster_id);
@@ -211,4 +224,24 @@ OvirtCollection *ovirt_host_get_vms(OvirtHost *host)
     }
 
     return host->priv->vms;
+}
+
+
+/**
+ * ovirt_host_get_cluster:
+ * @host: a #OvirtHost
+ *
+ * Gets a #OvirtCluster representing the cluster the host belongs
+ * to. This method does not initiate any network activity, the remote host must
+ * be then be fetched using ovirt_resource_refresh() or
+ * ovirt_resource_refresh_async().
+ *
+ * Return value: (transfer full): a #OvirtCluster representing cluster the @host
+ * belongs to.
+ */
+OvirtCluster *ovirt_host_get_cluster(OvirtHost *host)
+{
+    g_return_val_if_fail(OVIRT_IS_HOST(host), NULL);
+    g_return_val_if_fail(host->priv->cluster_id != NULL, NULL);
+    return ovirt_cluster_new_from_id(host->priv->cluster_id, get_cluster_href(host));
 }
