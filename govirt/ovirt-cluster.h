@@ -60,6 +60,7 @@ GType ovirt_cluster_get_type(void);
 
 OvirtCluster *ovirt_cluster_new(void);
 OvirtCollection *ovirt_cluster_get_hosts(OvirtCluster *cluster);
+OvirtDataCenter *ovirt_cluster_get_data_center(OvirtCluster *cluster);
 
 G_END_DECLS
 

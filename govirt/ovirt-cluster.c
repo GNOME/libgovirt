@@ -42,6 +42,18 @@ enum {
     PROP_DATA_CENTER_ID,
 };
 
+static const char *get_data_center_href(OvirtCluster *cluster)
+{
+    if (cluster->priv->data_center_href == NULL &&
+        cluster->priv->data_center_id != NULL) {
+        cluster->priv->data_center_href = g_strdup_printf("%s/%s",
+                                                          "/ovirt-engine/api/data_centers",
+                                                          cluster->priv->data_center_id);
+    }
+
+    return cluster->priv->data_center_href;
+}
+
 static void ovirt_cluster_get_property(GObject *object,
                                        guint prop_id,
                                        GValue *value,
@@ -51,7 +63,7 @@ static void ovirt_cluster_get_property(GObject *object,
 
     switch (prop_id) {
     case PROP_DATA_CENTER_HREF:
-        g_value_set_string(value, cluster->priv->data_center_href);
+        g_value_set_string(value, get_data_center_href(cluster));
         break;
     case PROP_DATA_CENTER_ID:
         g_value_set_string(value, cluster->priv->data_center_id);
@@ -213,3 +225,22 @@ OvirtCollection *ovirt_cluster_get_hosts(OvirtCluster *cluster)
     return cluster->priv->hosts;
 }
 
+
+/**
+ * ovirt_cluster_get_data_center:
+ * @cluster: a #OvirtCluster
+ *
+ * Gets a #OvirtCluster representing the data center the cluster belongs
+ * to. This method does not initiate any network activity, the remote data center must
+ * be then be fetched using ovirt_resource_refresh() or
+ * ovirt_resource_refresh_async().
+ *
+ * Return value: (transfer full): a #OvirtDataCenter representing data center
+ * the @host belongs to.
+ */
+OvirtDataCenter *ovirt_cluster_get_data_center(OvirtCluster *cluster)
+{
+    g_return_val_if_fail(OVIRT_IS_CLUSTER(cluster), NULL);
+    g_return_val_if_fail(cluster->priv->data_center_id != NULL, NULL);
+    return ovirt_data_center_new_from_id(cluster->priv->data_center_id, get_data_center_href(cluster));
+}

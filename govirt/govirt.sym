@@ -123,6 +123,7 @@ GOVIRT_0.4.0 {
         ovirt_api_search_vms;
         ovirt_api_search_vm_pools;
 
+        ovirt_cluster_get_data_center;
         ovirt_cluster_get_type;
         ovirt_cluster_get_hosts;
         ovirt_cluster_new;
