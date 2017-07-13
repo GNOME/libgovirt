@@ -42,6 +42,8 @@ struct _OvirtVmPrivate {
 
     OvirtVmState state;
     OvirtVmDisplay *display;
+    gchar *host_href;
+    gchar *host_id;
 } ;
 G_DEFINE_TYPE(OvirtVm, ovirt_vm, OVIRT_TYPE_RESOURCE);
 
@@ -56,8 +58,27 @@ enum OvirtResponseStatus {
 enum {
     PROP_0,
     PROP_STATE,
-    PROP_DISPLAY
+    PROP_DISPLAY,
+    PROP_HOST_HREF,
+    PROP_HOST_ID,
 };
+
+static char *ensure_href_from_id(const char *id,
+                                 const char *path)
+{
+    if (id == NULL)
+        return NULL;
+
+    return g_strdup_printf("%s/%s", path, id);
+}
+
+static const char *get_host_href(OvirtVm *vm)
+{
+    if (vm->priv->host_href == NULL)
+        vm->priv->host_href = ensure_href_from_id(vm->priv->host_id, "/ovirt-engine/api/hosts");
+
+    return vm->priv->host_href;
+}
 
 static void ovirt_vm_get_property(GObject *object,
                                   guint prop_id,
@@ -72,6 +93,12 @@ static void ovirt_vm_get_property(GObject *object,
         break;
     case PROP_DISPLAY:
         g_value_set_object(value, vm->priv->display);
+        break;
+    case PROP_HOST_HREF:
+        g_value_set_string(value, get_host_href(vm));
+        break;
+    case PROP_HOST_ID:
+        g_value_set_string(value, vm->priv->host_id);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -94,6 +121,14 @@ static void ovirt_vm_set_property(GObject *object,
             g_object_unref(vm->priv->display);
         vm->priv->display = g_value_dup_object(value);
         break;
+    case PROP_HOST_HREF:
+        g_free(vm->priv->host_href);
+        vm->priv->host_href = g_value_dup_string(value);
+        break;
+    case PROP_HOST_ID:
+        g_free(vm->priv->host_id);
+        vm->priv->host_id = g_value_dup_string(value);
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -106,6 +141,8 @@ static void ovirt_vm_dispose(GObject *object)
 
     g_clear_object(&vm->priv->cdroms);
     g_clear_object(&vm->priv->display);
+    g_clear_pointer(&vm->priv->host_href, g_free);
+    g_clear_pointer(&vm->priv->host_id, g_free);
 
     G_OBJECT_CLASS(ovirt_vm_parent_class)->dispose(object);
 }
@@ -117,11 +154,28 @@ static gboolean ovirt_vm_init_from_xml(OvirtResource *resource,
 {
     gboolean parsed_ok;
     OvirtResourceClass *parent_class;
+    OvirtXmlElement vm_elements[] = {
+        { .prop_name = "host-href",
+          .type = G_TYPE_STRING,
+          .xml_path = "host",
+          .xml_attr = "href",
+        },
+        { .prop_name = "host-id",
+          .type = G_TYPE_STRING,
+          .xml_path = "host",
+          .xml_attr = "id",
+        },
+        { NULL, },
+    };
 
     parsed_ok = ovirt_vm_refresh_from_xml(OVIRT_VM(resource), node);
     if (!parsed_ok) {
         return FALSE;
     }
+
+    if (!ovirt_rest_xml_node_parse(node, G_OBJECT(resource), vm_elements))
+        return FALSE;
+
     parent_class = OVIRT_RESOURCE_CLASS(ovirt_vm_parent_class);
 
     return parent_class->init_from_xml(resource, node, error);
@@ -154,6 +208,22 @@ static void ovirt_vm_class_init(OvirtVmClass *klass)
                                                         "Display",
                                                         "Virtual Machine Display Information",
                                                         OVIRT_TYPE_VM_DISPLAY,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_HOST_HREF,
+                                    g_param_spec_string("host-href",
+                                                        "Host href",
+                                                        "Host href for the Virtual Machine",
+                                                        NULL,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
+    g_object_class_install_property(object_class,
+                                    PROP_HOST_ID,
+                                    g_param_spec_string("host-id",
+                                                        "Host Id",
+                                                        "Host Id for the Virtual Machine",
+                                                        NULL,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
 }
@@ -341,4 +411,24 @@ OvirtCollection *ovirt_vm_get_cdroms(OvirtVm *vm)
                                                                   "cdrom");
 
     return vm->priv->cdroms;
+}
+
+
+/**
+ * ovirt_vm_get_host:
+ * @vm: a #OvirtVm
+ *
+ * Gets a #OvirtHost representing the host the virtual machine belongs to.
+ * This method does not initiate any network activity, the remote host must be
+ * then be fetched using ovirt_resource_refresh() or
+ * ovirt_resource_refresh_async().
+ *
+ * Return value: (transfer full): a #OvirtHost representing host the @vm
+ * belongs to.
+ */
+OvirtHost *ovirt_vm_get_host(OvirtVm *vm)
+{
+    g_return_val_if_fail(OVIRT_IS_VM(vm), NULL);
+    g_return_val_if_fail(vm->priv->host_id != NULL, NULL);
+    return ovirt_host_new_from_id(vm->priv->host_id, get_host_href(vm));
 }

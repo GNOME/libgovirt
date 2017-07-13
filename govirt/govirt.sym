@@ -135,5 +135,7 @@ GOVIRT_0.4.0 {
         ovirt_host_get_type;
         ovirt_host_get_vms;
         ovirt_host_new;
+
+        ovirt_vm_get_host;
 } GOVIRT_0.3.4;
 # .... define new API here using predicted next version number ....
