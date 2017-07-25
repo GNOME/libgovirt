@@ -165,10 +165,10 @@ static void test_govirt_list_vms(void)
     GovirtMockHttpd *httpd;
 
     const char *vms_body = "<vms> \
-                              <vm href=\"api/vms/uuid0\" id=\"uuid0\"> \
+                              <vm href=\"/ovirt-engine/api/vms/uuid0\" id=\"uuid0\"> \
                                 <name>vm0</name> \
                               </vm> \
-                              <vm href=\"api/vms/uuid1\" id=\"uuid1\"> \
+                              <vm href=\"/ovirt-engine/api/vms/uuid1\" id=\"uuid1\"> \
                                 <name>vm1</name> \
                                 <type>desktop</type> \
                                 <status><state>up</state></status> \
@@ -185,7 +185,7 @@ static void test_govirt_list_vms(void)
                                     <copy_paste_enabled>true</copy_paste_enabled> \
                                 </display> \
                               </vm> \
-                              <vm href=\"api/vms/uuid2\" id=\"uuid2\"> \
+                              <vm href=\"/ovirt-engine/api/vms/uuid2\" id=\"uuid2\"> \
                                 <name>vm2</name> \
                               </vm> \
                             </vms>";
@@ -341,10 +341,10 @@ static void test_govirt_list_duplicate_vms(void)
     GovirtMockHttpd *httpd;
 
     const char *vms_body = "<vms> \
-                              <vm href=\"api/vms/uuid0\" id=\"uuid0\"> \
+                              <vm href=\"/ovirt-engine/api/vms/uuid0\" id=\"uuid0\"> \
                                 <name>vm0</name> \
                               </vm> \
-                              <vm href=\"api/vms/uuid1\" id=\"uuid1\"> \
+                              <vm href=\"/ovirt-engine/api/vms/uuid1\" id=\"uuid1\"> \
                                 <name>vm0</name> \
                               </vm> \
                             </vms>";
