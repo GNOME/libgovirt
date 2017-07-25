@@ -378,6 +378,67 @@ static void test_govirt_list_duplicate_vms(void)
     govirt_mock_httpd_stop(httpd);
 }
 
+static void test_govirt_http_404(void)
+{
+    OvirtProxy *proxy;
+    OvirtApi *api;
+    OvirtCollection *vms;
+    OvirtResource *vm;
+    GError *error = NULL;
+    GovirtMockHttpd *httpd;
+
+    const char *vms_body = "<vms> \
+                              <vm href=\"/ovirt-engine/api/vms/uuid0\" id=\"uuid0\"> \
+                                <name>vm0</name> \
+                              </vm> \
+                            </vms>";
+
+    g_test_expect_message("libgovirt", G_LOG_LEVEL_WARNING,
+                          "Error while getting collection: Not Found");
+
+    httpd = govirt_mock_httpd_new(GOVIRT_HTTPS_PORT);
+    govirt_mock_httpd_start(httpd);
+
+
+    proxy = ovirt_proxy_new("localhost:" G_STRINGIFY(GOVIRT_HTTPS_PORT));
+    ovirt_proxy_set_mock_ca(proxy);
+    api = ovirt_proxy_fetch_api(proxy, &error);
+    g_test_assert_expected_messages();
+    g_assert_error(error, REST_PROXY_ERROR, 404);
+    govirt_mock_httpd_stop(httpd);
+    g_object_unref(proxy);
+    g_clear_error(&error);
+
+
+    httpd = govirt_mock_httpd_new(GOVIRT_HTTPS_PORT);
+    govirt_mock_httpd_add_request(httpd, "GET", "/ovirt-engine/api",
+                                  "<api><link href=\"/ovirt-engine/api/vms\" rel=\"vms\"/></api>");
+    govirt_mock_httpd_add_request(httpd, "GET", "/ovirt-engine/api/vms", vms_body);
+    govirt_mock_httpd_start(httpd);
+
+    proxy = ovirt_proxy_new("localhost:" G_STRINGIFY(GOVIRT_HTTPS_PORT));
+    ovirt_proxy_set_mock_ca(proxy);
+    api = ovirt_proxy_fetch_api(proxy, &error);
+    g_assert_nonnull(api);
+    g_assert_no_error(error);
+
+    vms = ovirt_api_get_vms(api);
+    ovirt_collection_fetch(vms, proxy, &error);
+    g_test_assert_expected_messages();
+    g_assert_no_error(error);
+
+    vm = ovirt_collection_lookup_resource(vms, "vm0");
+    g_assert_nonnull(vm);
+    ovirt_resource_refresh(OVIRT_RESOURCE(vm), proxy, &error);
+    g_assert_error(error, REST_PROXY_ERROR, 404);
+    g_clear_error(&error);
+
+    govirt_mock_httpd_stop(httpd);
+
+    g_clear_object(&vm);
+    g_clear_object(&proxy);
+}
+
 static void quit(int sig)
 {
     exit(1);
@@ -400,6 +461,7 @@ main(int argc, char **argv)
     g_test_add_func("/govirt/test-list-vms", test_govirt_list_vms);
     g_test_add_func("/govirt/test-list-duplicate-vms", test_govirt_list_duplicate_vms);
     g_test_add_func("/govirt/test-parse-vm-host-cluster", test_govirt_parse_vm_host_cluster);
+    g_test_add_func("/govirt/test-404", test_govirt_http_404);
 
     return g_test_run();
 }
