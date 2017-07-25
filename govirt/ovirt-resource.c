@@ -485,16 +485,17 @@ G_GNUC_INTERNAL RestXmlNode *ovirt_resource_rest_call_sync(OvirtRestCall *call,
         GError *local_error = NULL;
 
         root = ovirt_rest_xml_node_from_call(REST_PROXY_CALL(call));
-        ovirt_utils_gerror_from_xml_fault(root, &local_error);
+        if (root != NULL) {
+            ovirt_utils_gerror_from_xml_fault(root, &local_error);
+            rest_xml_node_unref(root);
+        }
         if (local_error != NULL) {
             g_clear_error(error);
             g_warning("Error while updating resource");
             g_warning("message: %s", local_error->message);
             g_propagate_error(error, local_error);
         }
-        if (root != NULL) {
-            rest_xml_node_unref(root);
-        }
+        g_warn_if_fail(error == NULL || *error != NULL);
 
         return NULL;
     }
