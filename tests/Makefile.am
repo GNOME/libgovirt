@@ -7,6 +7,7 @@ EXTRA_DIST =				\
 	https-cert/server-cert.pem	\
 	https-cert/server-key.csr	\
 	https-cert/server-key.pem	\
+	mock-xml-data/			\
 	$(NULL)
 
 AM_LDFLAGS =					\

@@ -219,6 +219,118 @@ static void test_govirt_list_vms(void)
 }
 
 
+typedef struct {
+    const char *uuid;
+    const char *name;
+    const char *xml;
+    const char *filename;
+} MockOvirtVm;
+
+static void govirt_mock_httpd_add_vms(GovirtMockHttpd *httpd, MockOvirtVm vms[], size_t count)
+{
+    GString *vms_xml;
+    unsigned int i;
+
+    govirt_mock_httpd_add_request(httpd, "GET", "/ovirt-engine/api",
+                                  "<api><link href=\"/ovirt-engine/api/vms\" rel=\"vms\"/></api>");
+
+    /* Create /api/vms */
+    vms_xml = g_string_new("<vms>");
+    for (i = 0; i < count; i++) {
+        MockOvirtVm *vm = &vms[i];
+
+        g_string_append_printf(vms_xml, "<vm href=\"/ovirt-engine/api/vms/%s\" id=\"%s\">", vm->uuid, vm->uuid);
+        g_string_append_printf(vms_xml, "<name>%s</name>", vm->name);
+        g_string_append_printf(vms_xml, "</vm>");
+    }
+    g_string_append(vms_xml, "</vms>");
+
+    govirt_mock_httpd_add_request(httpd, "GET", "/ovirt-engine/api/vms", vms_xml->str);
+    g_string_free(vms_xml, TRUE);
+
+    /* Create individual /api/vms/$uuid entry points */
+    for (i = 0; i < count; i++) {
+        MockOvirtVm *vm = &vms[i];
+        char *href;
+
+        href = g_strdup_printf("/ovirt-engine/api/vms/%s", vm->uuid);
+        if (vm->xml != NULL) {
+            govirt_mock_httpd_add_request(httpd, "GET", href, vm->xml);
+        } else if (vm->filename != NULL) {
+            char *body;
+
+            if (!g_file_get_contents(g_test_get_filename(G_TEST_DIST, "mock-xml-data", vm->filename, NULL),
+                                     &body, NULL, NULL)) {
+                g_warn_if_reached();
+                continue;
+            }
+
+            govirt_mock_httpd_add_request(httpd, "GET", href, body);
+            g_free(body);
+        }
+        g_free(href);
+    }
+}
+
+
+static void test_govirt_parse_vm_host_cluster(void)
+{
+    OvirtProxy *proxy;
+    OvirtApi *api;
+    OvirtCollection *vms;
+    OvirtResource *vm;
+    GError *error = NULL;
+    GovirtMockHttpd *httpd;
+    OvirtHost *host;
+    OvirtCluster *cluster;
+    char *guid;
+    MockOvirtVm mock_vm = { .uuid = "00000000-0000-0000-0000-000000000000",
+                            .name = "vm1",
+                            .filename="test-parse-vm-host-cluster.xml" };
+
+    httpd = govirt_mock_httpd_new(GOVIRT_HTTPS_PORT);
+    govirt_mock_httpd_add_vms(httpd, &mock_vm, 1);
+    govirt_mock_httpd_start(httpd);
+
+    proxy = ovirt_proxy_new("localhost:" G_STRINGIFY(GOVIRT_HTTPS_PORT));
+    ovirt_proxy_set_mock_ca(proxy);
+    api = ovirt_proxy_fetch_api(proxy, &error);
+    g_test_assert_expected_messages();
+    g_assert_nonnull(api);
+    g_assert_no_error(error);
+
+    vms = ovirt_api_get_vms(api);
+    ovirt_collection_fetch(vms, proxy, &error);
+    g_assert_no_error(error);
+
+    vm = ovirt_collection_lookup_resource(vms, "vm1");
+    g_assert_nonnull(vm);
+    ovirt_resource_refresh(vm, proxy, &error);
+    g_assert_no_error(error);
+
+    check_vm_display(OVIRT_VM(vm));
+
+    host = ovirt_vm_get_host(OVIRT_VM(vm));
+    g_assert_nonnull(host);
+    g_object_get(G_OBJECT(host), "guid", &guid, NULL);
+    g_assert_cmpstr(guid, ==, "00000000-0000-0000-0002-000000000000");
+    g_free(guid);
+    g_object_unref(host);
+
+    cluster = ovirt_vm_get_cluster(OVIRT_VM(vm));
+    g_assert_nonnull(cluster);
+    g_object_get(G_OBJECT(cluster), "guid", &guid, NULL);
+    g_assert_cmpstr(guid, ==, "00000000-0000-0000-0001-000000000000");
+    g_free(guid);
+    g_object_unref(cluster);
+
+    g_object_unref(vm);
+    g_object_unref(proxy);
+
+    govirt_mock_httpd_stop(httpd);
+}
+
+
 static void test_govirt_list_duplicate_vms(void)
 {
     OvirtProxy *proxy;
@@ -287,6 +399,7 @@ main(int argc, char **argv)
     g_test_add_func("/govirt/test-http", test_govirt_http);
     g_test_add_func("/govirt/test-list-vms", test_govirt_list_vms);
     g_test_add_func("/govirt/test-list-duplicate-vms", test_govirt_list_duplicate_vms);
+    g_test_add_func("/govirt/test-parse-vm-host-cluster", test_govirt_parse_vm_host_cluster);
 
     return g_test_run();
 }
