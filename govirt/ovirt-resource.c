@@ -499,7 +499,7 @@ G_GNUC_INTERNAL RestXmlNode *ovirt_resource_rest_call_sync(OvirtRestCall *call,
         return NULL;
     }
 
-    return root;
+    return ovirt_rest_xml_node_from_call(REST_PROXY_CALL(call));
 }
 
 
