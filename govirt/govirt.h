@@ -25,8 +25,11 @@
 #include <govirt/ovirt-enum-types.h>
 #include <govirt/ovirt-api.h>
 #include <govirt/ovirt-cdrom.h>
+#include <govirt/ovirt-cluster.h>
 #include <govirt/ovirt-collection.h>
+#include <govirt/ovirt-data-center.h>
 #include <govirt/ovirt-error.h>
+#include <govirt/ovirt-host.h>
 #include <govirt/ovirt-options.h>
 #include <govirt/ovirt-proxy.h>
 #include <govirt/ovirt-resource.h>
