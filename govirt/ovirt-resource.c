@@ -422,7 +422,7 @@ static gboolean ovirt_resource_init_from_xml_real(OvirtResource *resource,
      */
     is_api = OVIRT_IS_API(resource);
 
-    g_return_val_if_fail(resource->priv->xml != NULL, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
 
     guid = rest_xml_node_get_attr(node, "id");
     if ((guid == NULL) && !is_api) {

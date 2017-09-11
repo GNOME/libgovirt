@@ -290,6 +290,8 @@ static void test_govirt_parse_vm_host_cluster(void)
 
     httpd = govirt_mock_httpd_new(GOVIRT_HTTPS_PORT);
     govirt_mock_httpd_add_vms(httpd, &mock_vm, 1);
+    govirt_mock_httpd_add_request(httpd, "GET", "/ovirt-engine/api/clusters/00000000-0000-0000-0001-000000000000",
+                                  "<cluster href=\"/ovirt-engine/api/clusters/00000000-0000-0000-0001-000000000000\" id=\"00000000-0000-0000-0001-000000000000\"/>");
     govirt_mock_httpd_start(httpd);
 
     proxy = ovirt_proxy_new("localhost:" G_STRINGIFY(GOVIRT_HTTPS_PORT));
@@ -322,6 +324,8 @@ static void test_govirt_parse_vm_host_cluster(void)
     g_object_get(G_OBJECT(cluster), "guid", &guid, NULL);
     g_assert_cmpstr(guid, ==, "00000000-0000-0000-0001-000000000000");
     g_free(guid);
+    ovirt_resource_refresh(OVIRT_RESOURCE(cluster), proxy, &error);
+    g_assert_no_error(error);
     g_object_unref(cluster);
 
     g_object_unref(vm);
