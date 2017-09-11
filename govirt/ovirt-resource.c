@@ -97,6 +97,15 @@ static void ovirt_resource_get_property(GObject *object,
     }
 }
 
+static void ovirt_resource_set_xml_node(OvirtResource *resource,
+                                        RestXmlNode *node)
+{
+    g_clear_pointer(&resource->priv->xml, &rest_xml_node_unref);
+    if (node != NULL) {
+        resource->priv->xml = rest_xml_node_ref(node);
+    }
+}
+
 static void ovirt_resource_set_property(GObject *object,
                                         guint prop_id,
                                         const GValue *value,
@@ -121,13 +130,10 @@ static void ovirt_resource_set_property(GObject *object,
         g_free(resource->priv->description);
         resource->priv->description = g_value_dup_string(value);
         break;
-    case PROP_XML_NODE: {
-        if (resource->priv->xml != NULL) {
-            g_boxed_free(REST_TYPE_XML_NODE, resource->priv->xml);
-        }
-        resource->priv->xml = g_value_dup_boxed(value);
+    case PROP_XML_NODE:
+        ovirt_resource_set_xml_node(OVIRT_RESOURCE(object),
+                                    g_value_get_boxed(value));
         break;
-    }
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
     }
@@ -438,6 +444,7 @@ static gboolean ovirt_resource_init_from_xml_real(OvirtResource *resource,
         return FALSE;
     }
 
+    ovirt_resource_set_xml_node(resource, node);
     g_object_set(G_OBJECT(resource), "guid", guid, "href", href, NULL);
 
     ovirt_resource_set_name_from_xml(resource, node);
