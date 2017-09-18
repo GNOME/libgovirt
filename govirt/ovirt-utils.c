@@ -63,9 +63,10 @@ ovirt_rest_xml_node_find(RestXmlNode *node, const char *path)
     pathv = g_strsplit(path, "/", -1);
 
     for (i = 0; i < g_strv_length(pathv); ++i) {
+        gchar *name = node->name;
         node = rest_xml_node_find(node, pathv[i]);
         if (node == NULL) {
-            g_debug("could not find XML node '%s'", pathv[i]);
+            g_debug("could not find subnode '%s' of XML node '%s' (search: %s)", pathv[i], name, path);
             break;
         }
     }
