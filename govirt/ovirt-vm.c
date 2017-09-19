@@ -180,7 +180,8 @@ static gboolean ovirt_vm_init_from_xml(OvirtResource *resource,
                                        RestXmlNode *node,
                                        GError **error)
 {
-    gboolean parsed_ok;
+    OvirtVmDisplay *display;
+    RestXmlNode *display_node;
     OvirtResourceClass *parent_class;
     OvirtXmlElement vm_elements[] = {
         { .prop_name = "host-href",
@@ -205,10 +206,18 @@ static gboolean ovirt_vm_init_from_xml(OvirtResource *resource,
         { NULL, },
     };
 
-    parsed_ok = ovirt_vm_refresh_from_xml(OVIRT_VM(resource), node);
-    if (!parsed_ok) {
+    display_node = rest_xml_node_find(node, "display");
+    if (display_node == NULL) {
+        g_debug("Could not find 'display' node");
         return FALSE;
     }
+
+    display = ovirt_vm_display_new_from_xml(display_node);
+    if (display == NULL)
+        return FALSE;
+
+    g_object_set(G_OBJECT(resource), "display", display, NULL);
+    g_object_unref(G_OBJECT(display));
 
     if (!ovirt_rest_xml_node_parse(node, G_OBJECT(resource), vm_elements))
         return FALSE;

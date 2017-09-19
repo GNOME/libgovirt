@@ -24,6 +24,7 @@
 
 #include <glib-object.h>
 #include <govirt/ovirt-types.h>
+#include <rest/rest-xml-node.h>
 
 G_BEGIN_DECLS
 
@@ -61,6 +62,7 @@ typedef enum {
 
 GType ovirt_vm_display_get_type(void);
 OvirtVmDisplay *ovirt_vm_display_new(void);
+OvirtVmDisplay *ovirt_vm_display_new_from_xml(RestXmlNode *node);
 
 G_END_DECLS
 

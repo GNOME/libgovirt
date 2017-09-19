@@ -24,6 +24,7 @@
 
 #include "ovirt-enum-types.h"
 #include "ovirt-vm-display.h"
+#include "ovirt-utils.h"
 
 #define OVIRT_VM_DISPLAY_GET_PRIVATE(obj)                         \
         (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_VM_DISPLAY, OvirtVmDisplayPrivate))
@@ -302,4 +303,63 @@ static void ovirt_vm_display_init(G_GNUC_UNUSED OvirtVmDisplay *display)
 OvirtVmDisplay *ovirt_vm_display_new(void)
 {
     return OVIRT_VM_DISPLAY(g_object_new(OVIRT_TYPE_VM_DISPLAY, NULL));
+}
+
+static gboolean ovirt_vm_display_set_from_xml(OvirtVmDisplay *display, RestXmlNode *node)
+{
+    OvirtVmDisplayType type;
+    OvirtXmlElement display_elements[] = {
+        { .prop_name = "type",
+          .xml_path = "type",
+        },
+        { .prop_name = "address",
+          .xml_path = "address",
+        },
+        { .prop_name = "port",
+          .xml_path = "port",
+        },
+        { .prop_name = "secure-port",
+          .xml_path = "secure_port",
+        },
+        { .prop_name = "monitor-count",
+          .xml_path = "monitors",
+        },
+        { .prop_name = "smartcard",
+          .xml_path = "smartcard_enabled",
+        },
+        { .prop_name = "allow-override",
+          .xml_path = "allow_override",
+        },
+        { .prop_name = "host-subject",
+          .xml_path = "certificate/subject",
+        },
+        { .prop_name = "proxy-url",
+          .xml_path = "proxy",
+        },
+        { NULL, },
+    };
+
+    ovirt_rest_xml_node_parse(node, G_OBJECT(display), display_elements);
+    g_object_get(G_OBJECT(display), "type", &type, NULL);
+    if (type == OVIRT_VM_DISPLAY_INVALID) {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+OvirtVmDisplay *ovirt_vm_display_new_from_xml(RestXmlNode *node)
+{
+    OvirtVmDisplay *display;
+
+    g_return_val_if_fail(node != NULL, NULL);
+
+    display = ovirt_vm_display_new();
+
+    if (!ovirt_vm_display_set_from_xml(display, node)) {
+        g_object_unref(display);
+        return NULL;
+    }
+
+    return display;
 }

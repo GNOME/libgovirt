@@ -73,7 +73,6 @@ libgovirt_la_SOURCES =						\
 	ovirt-utils.c						\
 	ovirt-vm.c						\
 	ovirt-vm-display.c					\
-	ovirt-vm-xml.c						\
 	ovirt-vm-pool.c						\
 	$(NULL)
 
