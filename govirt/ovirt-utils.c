@@ -135,6 +135,39 @@ ovirt_rest_xml_node_get_str_array_from_path(RestXmlNode *node, const char *path,
 }
 
 static gboolean
+_set_property_value_from_basic_type(GValue *value,
+                                    GType type,
+                                    const char *value_str)
+{
+    switch(type) {
+    case G_TYPE_BOOLEAN: {
+        gboolean bool_value = ovirt_utils_boolean_from_string(value_str);
+        g_value_set_boolean(value, bool_value);
+        return TRUE;
+    }
+    case G_TYPE_STRING: {
+        g_value_set_string(value, value_str);
+        return TRUE;
+    }
+    case G_TYPE_UINT: {
+        guint uint_value = strtoul(value_str, NULL, 0);
+        g_value_set_uint(value, uint_value);
+        return TRUE;
+    }
+    case G_TYPE_UINT64: {
+        guint64 int64_value = g_ascii_strtoull(value_str, NULL, 0);
+        g_value_set_uint64(value, int64_value);
+        return TRUE;
+    }
+    default: {
+        g_warning("Unexpected type '%s' with value '%s'", g_type_name(type), value_str);
+    }
+    }
+
+    return FALSE;
+}
+
+static gboolean
 _set_property_value_from_type(GValue *value,
                               GType type,
                               const char *path,
@@ -174,31 +207,7 @@ _set_property_value_from_type(GValue *value,
         goto end;
     }
 
-    switch(type) {
-    case G_TYPE_BOOLEAN: {
-        gboolean bool_value = ovirt_utils_boolean_from_string(value_str);
-        g_value_set_boolean(value, bool_value);
-        break;
-    }
-    case G_TYPE_STRING: {
-        g_value_set_string(value, value_str);
-        break;
-    }
-    case G_TYPE_UINT: {
-        guint uint_value = strtoul(value_str, NULL, 0);
-        g_value_set_uint(value, uint_value);
-        break;
-    }
-    case G_TYPE_UINT64: {
-        guint64 int64_value = g_ascii_strtoull(value_str, NULL, 0);
-        g_value_set_uint64(value, int64_value);
-        break;
-    }
-    default: {
-        g_warning("Unexpected type '%s' with value '%s'", g_type_name(type), value_str);
-        ret = FALSE;
-    }
-    }
+    ret = _set_property_value_from_basic_type(value, type, value_str);
 
 end:
     return ret;
