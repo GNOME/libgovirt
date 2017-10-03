@@ -169,13 +169,14 @@ _set_property_value_from_basic_type(GValue *value,
 
 static gboolean
 _set_property_value_from_type(GValue *value,
-                              GType type,
+                              GParamSpec *prop,
                               const char *path,
                               const char *attr,
                               RestXmlNode *node)
 {
     gboolean ret = TRUE;
     const char *value_str;
+    GType type = prop->value_type;
 
     if (g_type_is_a(type, OVIRT_TYPE_RESOURCE)) {
         OvirtResource *resource_value = ovirt_resource_new_from_xml(type, node, NULL);
@@ -202,7 +203,8 @@ _set_property_value_from_type(GValue *value,
         return FALSE;
 
     if (G_TYPE_IS_ENUM(type)) {
-        int enum_value = ovirt_utils_genum_get_value(type, value_str, 0);
+        GParamSpecEnum *enum_prop = G_PARAM_SPEC_ENUM(prop);
+        int enum_value = ovirt_utils_genum_get_value(type, value_str, enum_prop->default_value);
         g_value_set_enum(value, enum_value);
         goto end;
     }
@@ -229,7 +231,7 @@ ovirt_rest_xml_node_parse(RestXmlNode *node,
         g_return_val_if_fail(prop != NULL, FALSE);
 
         g_value_init(&value, prop->value_type);
-        if (_set_property_value_from_type(&value, prop->value_type, elements->xml_path, elements->xml_attr, node))
+        if (_set_property_value_from_type(&value, prop, elements->xml_path, elements->xml_attr, node))
             g_object_set_property(object, elements->prop_name, &value);
         g_value_unset(&value);
     }
