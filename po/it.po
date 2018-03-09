@@ -1,0 +1,115 @@
+# Italian translation for libgovirt.
+# Copyright (C) 2018 Free Software Foundation, Inc.
+# This file is distributed under the same license as the libgovirt package.
+# Milo Casagrande <milo@milo.name>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=libgovirt&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2018-01-16 18:15+0000\n"
+"PO-Revision-Date: 2018-03-09 13:27+0100\n"
+"Language-Team: Italian <gnome-it-list@gnome.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: Milo Casagrande <milo@milo.name>\n"
+"X-Generator: Poedit 2.0.6\n"
+
+#: govirt/ovirt-action-rest-call.c:57 govirt/ovirt-resource-rest-call.c:146
+msgid "Unexpected parameter type in REST call"
+msgstr "Tipo di parametro inatteso nella chiamata REST"
+
+#: govirt/ovirt-collection.c:258
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Ottenuto nodo «%s», previsto «%s»"
+
+#: govirt/ovirt-options.c:54
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "File del certificato principale CA per connessioni sicure"
+
+#: govirt/ovirt-options.c:54
+msgid "<file>"
+msgstr "<file>"
+
+#: govirt/ovirt-options.c:56
+msgid "Display libgovirt version information"
+msgstr "Visualizza le informazioni sulla versione"
+
+#: govirt/ovirt-options.c:61
+msgid "oVirt Options:"
+msgstr "Opzioni di oVirt:"
+
+#: govirt/ovirt-options.c:61
+msgid "Show oVirt Options"
+msgstr "Mostra le opzioni"
+
+#: govirt/ovirt-proxy.c:526
+#, c-format
+msgid "Failed to write to '%s': %s"
+msgstr "Scrittura su «%s» non riuscita: %s"
+
+#: govirt/ovirt-proxy.c:544
+#, c-format
+msgid "Failed to close '%s': %s"
+msgstr "Chiusura di «%s» non riuscita: %s"
+
+#: govirt/ovirt-proxy.c:661
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Impossibile estrarre il nome del file del certificato CA dall'URI"
+
+#: govirt/ovirt-resource.c:185
+msgid "Cancellable initialization not supported"
+msgstr "Inizializzazione annullabile non supportata"
+
+#: govirt/ovirt-resource.c:436
+msgid "Missing mandatory 'id' attribute"
+msgstr "Manca l'attributo obbligatorio «id»"
+
+#: govirt/ovirt-resource.c:443
+msgid "Missing mandatory 'href' attribute"
+msgstr "Manca l'attributo obbligatorio «href»"
+
+#: govirt/ovirt-resource.c:699
+msgid "Could not find 'status' node"
+msgstr "Impossibile trovare il nodo «status»"
+
+#: govirt/ovirt-resource.c:705
+msgid "Could not find 'state' node"
+msgstr "Impossibile trovare il nodo «state»"
+
+#: govirt/ovirt-resource.c:713
+msgid "Action is pending"
+msgstr "L'azione è in attesa"
+
+#: govirt/ovirt-resource.c:717
+msgid "Action is in progress"
+msgstr "L'azione è in corso"
+
+#: govirt/ovirt-resource.c:721
+msgid "Action has failed"
+msgstr "L'azione non è riuscita"
+
+#: govirt/ovirt-resource.c:726
+msgid "Unknown action failure"
+msgstr "Errore sconosciuto dell'azione"
+
+#: govirt/ovirt-utils.c:354
+msgid "Could not find 'reason' node"
+msgstr "Impossibile trovare il nodo «reason»"
+
+#: govirt/ovirt-vm.c:408
+msgid "Could not find 'ticket' node"
+msgstr "Impossibile trovare il nodo «ticket»"
+
+#: govirt/ovirt-vm.c:418
+msgid "Could not find 'value' node"
+msgstr "Impossibile trovare il nodo «value»"
+
+#: govirt/ovirt-vm.c:425
+msgid "Could not find 'expiry' node"
+msgstr "Impossibile trovare il nodo «expiry»"
