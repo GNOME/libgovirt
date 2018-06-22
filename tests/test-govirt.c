@@ -241,6 +241,10 @@ static void govirt_mock_httpd_add_vms(GovirtMockHttpd *httpd, MockOvirtVm vms[],
 
         g_string_append_printf(vms_xml, "<vm href=\"/ovirt-engine/api/vms/%s\" id=\"%s\">", vm->uuid, vm->uuid);
         g_string_append_printf(vms_xml, "<name>%s</name>", vm->name);
+        g_string_append_printf(vms_xml, "<display> \
+                                             <type>spice</type> \
+                                             <monitors>1</monitors> \
+                                         </display>");
         g_string_append_printf(vms_xml, "</vm>");
     }
     g_string_append(vms_xml, "</vms>");
@@ -347,9 +351,17 @@ static void test_govirt_list_duplicate_vms(void)
     const char *vms_body = "<vms> \
                               <vm href=\"/ovirt-engine/api/vms/uuid0\" id=\"uuid0\"> \
                                 <name>vm0</name> \
+                                <display> \
+                                    <type>spice</type> \
+                                    <monitors>1</monitors> \
+                                </display> \
                               </vm> \
                               <vm href=\"/ovirt-engine/api/vms/uuid1\" id=\"uuid1\"> \
                                 <name>vm0</name> \
+                                <display> \
+                                    <type>spice</type> \
+                                    <monitors>1</monitors> \
+                                </display> \
                               </vm> \
                             </vms>";
 
@@ -394,6 +406,10 @@ static void test_govirt_http_404(void)
     const char *vms_body = "<vms> \
                               <vm href=\"/ovirt-engine/api/vms/uuid0\" id=\"uuid0\"> \
                                 <name>vm0</name> \
+                                <display> \
+                                    <type>spice</type> \
+                                    <monitors>1</monitors> \
+                                </display> \
                               </vm> \
                             </vms>";
 
