@@ -347,9 +347,17 @@ static void test_govirt_list_duplicate_vms(void)
     const char *vms_body = "<vms> \
                               <vm href=\"/ovirt-engine/api/vms/uuid0\" id=\"uuid0\"> \
                                 <name>vm0</name> \
+                                <display> \
+                                    <type>spice</type> \
+                                    <monitors>1</monitors> \
+                                </display> \
                               </vm> \
                               <vm href=\"/ovirt-engine/api/vms/uuid1\" id=\"uuid1\"> \
                                 <name>vm0</name> \
+                                <display> \
+                                    <type>spice</type> \
+                                    <monitors>1</monitors> \
+                                </display> \
                               </vm> \
                             </vms>";
 
