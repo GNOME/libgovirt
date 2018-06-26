@@ -20,6 +20,7 @@ AM_CFLAGS =					\
 	$(GLIB_CFLAGS)				\
 	$(REST_CFLAGS)				\
 	-Dabs_srcdir="\"$(abs_srcdir)\""	\
+	-Dsrcdir="\"$(srcdir)\""		\
 	-I$(top_srcdir)				\
 	-I$(top_srcdir)/govirt
 
