@@ -263,7 +263,7 @@ static void govirt_mock_httpd_add_vms(GovirtMockHttpd *httpd, MockOvirtVm vms[],
         } else if (vm->filename != NULL) {
             char *body;
 
-            if (!g_file_get_contents(g_test_get_filename(G_TEST_DIST, "mock-xml-data", vm->filename, NULL),
+            if (!g_file_get_contents(g_test_build_filename(G_TEST_DIST, srcdir, "mock-xml-data", vm->filename, NULL),
                                      &body, NULL, NULL)) {
                 g_warn_if_reached();
                 continue;
