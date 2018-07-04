@@ -7,7 +7,7 @@ EXTRA_DIST =				\
 	https-cert/server-cert.pem	\
 	https-cert/server-key.csr	\
 	https-cert/server-key.pem	\
-	mock-xml-data/			\
+	mock-xml-data			\
 	$(NULL)
 
 AM_LDFLAGS =					\
@@ -20,6 +20,7 @@ AM_CFLAGS =					\
 	$(GLIB_CFLAGS)				\
 	$(REST_CFLAGS)				\
 	-Dabs_srcdir="\"$(abs_srcdir)\""	\
+	-Dsrcdir="\"$(srcdir)\""		\
 	-I$(top_srcdir)				\
 	-I$(top_srcdir)/govirt
 
@@ -27,3 +28,5 @@ noinst_LTLIBRARIES = libmock-httpd.la
 libmock_httpd_la_SOURCES = mock-httpd.c mock-httpd.h
 
 test_govirt_LDADD = $(AM_LDFLAGS) libmock-httpd.la
+
+-include $(top_srcdir)/git.mk
