@@ -238,6 +238,22 @@ call_async_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
 }
 
 
+static void rest_call_async_set_error(RestProxyCall *call, GSimpleAsyncResult *result, const GError *error)
+{
+    GError *local_error = NULL;
+    RestXmlNode *root = ovirt_rest_xml_node_from_call(call);
+
+    if (root != NULL && ovirt_utils_gerror_from_xml_fault(root, &local_error)) {
+        g_debug("ovirt_rest_call_async(): %s", local_error->message);
+        g_simple_async_result_set_from_error(result, local_error);
+        g_clear_error(&local_error);
+    } else {
+        g_simple_async_result_set_from_error(result, error);
+    }
+
+    rest_xml_node_unref(root);
+}
+
 static void
 call_async_cb(RestProxyCall *call, const GError *error,
               G_GNUC_UNUSED GObject *weak_object,
@@ -247,7 +263,7 @@ call_async_cb(RestProxyCall *call, const GError *error,
     GSimpleAsyncResult *result = data->result;
 
     if (error != NULL) {
-        g_simple_async_result_set_from_error(result, error);
+        rest_call_async_set_error(call, result, error);
     } else {
         GError *call_error = NULL;
         gboolean callback_result = TRUE;
@@ -257,7 +273,7 @@ call_async_cb(RestProxyCall *call, const GError *error,
                                                   data->call_user_data,
                                                   &call_error);
             if (call_error != NULL) {
-                g_simple_async_result_set_from_error(result, call_error);
+                rest_call_async_set_error(call, result, call_error);
             }
         }
 
