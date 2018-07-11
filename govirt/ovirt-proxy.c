@@ -1350,3 +1350,15 @@ GList *ovirt_proxy_get_vms_internal(OvirtProxy *proxy)
 
     return g_hash_table_get_values(vms);
 }
+
+
+/**
+ * ovirt_proxy_get_admin_mode:
+ *
+ * Return value:
+ */
+gboolean
+ovirt_proxy_get_admin_mode(OvirtProxy *proxy)
+{
+    return proxy->priv->admin_mode;
+}

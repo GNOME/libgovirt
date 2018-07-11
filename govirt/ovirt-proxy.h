@@ -105,5 +105,6 @@ OvirtApi *ovirt_proxy_fetch_api_finish(OvirtProxy *proxy,
                                        GAsyncResult *result,
                                        GError **err);
 OvirtApi *ovirt_proxy_get_api(OvirtProxy *proxy);
+gboolean ovirt_proxy_get_admin_mode(OvirtProxy *proxy);
 
 #endif
