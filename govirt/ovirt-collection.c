@@ -40,6 +40,7 @@ struct _OvirtCollectionPrivate {
     char *resource_xml_name;
 
     GHashTable *resources;
+    GHashTable *resources_uuid;
 };
 
 G_DEFINE_TYPE(OvirtCollection, ovirt_collection, G_TYPE_OBJECT);
@@ -206,6 +207,18 @@ GHashTable *ovirt_collection_get_resources(OvirtCollection *collection)
     g_return_val_if_fail(OVIRT_IS_COLLECTION(collection), NULL);
 
     return collection->priv->resources;
+}
+
+/**
+ * ovirt_collection_get_resources_by_uuid:
+ *
+ * Returns: (element-type utf8 OvirtResource) (transfer none):
+ */
+GHashTable *ovirt_collection_get_resources_by_uuid(OvirtCollection *collection)
+{
+    g_return_val_if_fail(OVIRT_IS_COLLECTION(collection), NULL);
+
+    return collection->priv->resources_uuid;
 }
 
 /**

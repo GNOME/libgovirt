@@ -57,6 +57,7 @@ struct _OvirtCollectionClass
 
 GType ovirt_collection_get_type(void);
 GHashTable *ovirt_collection_get_resources(OvirtCollection *collection);
+GHashTable *ovirt_collection_get_resources_by_uuid(OvirtCollection *collection);
 
 OvirtResource *ovirt_collection_lookup_resource(OvirtCollection *collection,
                                                 const char *name);

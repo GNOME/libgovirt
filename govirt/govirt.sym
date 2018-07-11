@@ -128,6 +128,8 @@ GOVIRT_0.4.0 {
         ovirt_cluster_get_hosts;
         ovirt_cluster_new;
 
+        ovirt_collection_get_resources_by_uuid;
+
         ovirt_data_center_get_clusters;
         ovirt_data_center_get_storage_domains;
         ovirt_data_center_get_type;
