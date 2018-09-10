@@ -100,7 +100,6 @@ static gboolean ovirt_cdrom_init_from_xml(OvirtResource *resource,
                                           RestXmlNode *node,
                                           GError **error)
 {
-    gboolean ret = FALSE;
     char *name;
     OvirtResourceClass *parent_class;
     OvirtXmlElement cdrom_elements[] = {
