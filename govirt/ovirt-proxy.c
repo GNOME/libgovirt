@@ -251,7 +251,9 @@ static void rest_call_async_set_error(RestProxyCall *call, GSimpleAsyncResult *r
         g_simple_async_result_set_from_error(result, error);
     }
 
-    rest_xml_node_unref(root);
+    if (root != NULL) {
+        rest_xml_node_unref(root);
+    }
 }
 
 static void
