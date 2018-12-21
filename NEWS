@@ -1,5 +1,59 @@
-0.3.4 -
-======================
+0.3.5 - December 21st 2018
+==========================
+
+Changes since 0.3.4
+
+- API additions:
+        - ovirt_api_get_clusters()
+        - ovirt_api_get_data_centers()
+        - ovirt_api_get_hosts()
+
+        - ovirt_api_search_clusters()
+        - ovirt_api_search_data_centers()
+        - ovirt_api_search_hosts()
+        - ovirt_api_search_storage_domains()
+        - ovirt_api_search_vms()
+        - ovirt_api_search_vm_pools()
+
+        - ovirt_cluster_get_data_center()
+        - ovirt_cluster_get_type()
+        - ovirt_cluster_get_hosts()
+        - ovirt_cluster_new()
+
+        - ovirt_data_center_get_clusters()
+        - ovirt_data_center_get_storage_domains()
+        - ovirt_data_center_get_type()
+        - ovirt_data_center_new()
+
+        - ovirt_host_get_cluster()
+        - ovirt_host_get_type()
+        - ovirt_host_get_vms()
+        - ovirt_host_new()
+
+        - ovirt_vm_get_host()
+        - ovirt_vm_get_cluster()
+
+- Force use of v3 REST API
+- Fix crash on 404
+- Fix persistent session with oVirt 3.6
+- Support for new storage format added in oVirt 4.1
+- New unified mode for parsing nodes using a single struct
+- Initial support for hosts/clusters/datacenters
+- Support for searching queries of collections
+- New nodes can be created with name/uuid only, but require explicit refresh()
+  call to retrieve attributes/subnodes.
+- Improved error messages in case of error in async call
+- Translations:
+        * Danish (Ask Hjorth Larsen)
+        * Dutch (Nathan Follens)
+        * Friulian (Fabio Tomat)
+        * Italian (Milo Casagrande)
+        * Polish (Piotr Drąg)
+        * Spanish (Daniel Mustieles)
+
+
+0.3.4 - April 13th 2016
+=======================
 
 Changes since 0.3.3
 
