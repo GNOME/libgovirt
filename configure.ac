@@ -4,7 +4,7 @@ AC_PREREQ(2.63)
 
 m4_define([govirt_major_version], [0])
 m4_define([govirt_minor_version], [3])
-m4_define([govirt_micro_version], [4])
+m4_define([govirt_micro_version], [5])
 m4_define([govirt_version],
           [govirt_major_version.govirt_minor_version.govirt_micro_version])
 
@@ -26,18 +26,22 @@ AC_SUBST(G_OVIRT_MAJOR_VERSION)
 AC_SUBST(G_OVIRT_MINOR_VERSION)
 AC_SUBST(G_OVIRT_MICRO_VERSION)
 
-# libtool versioning - this applies to libgovirt
+# Before making a release, the LT_VERSION string should be modified. The
+# string is of the form c:r:a. Follow these instructions sequentially:
+#   1. If the library source code has changed at all since the last update, then
+#      increment revision (‘c:r:a’ becomes ‘c:r+1:a’).
+#   2. If any interfaces have been added, removed, or changed since the last
+#      update, increment current, and set revision to 0.
+#   3. If any interfaces have been added since the last public release, then
+#      increment age.
+#   4. If any interfaces have been removed or changed since the last public
+#      release, then set age to 0.
 #
-# See http://sources.redhat.com/autobook/autobook/autobook_91.html#SEC91
+# See https://developer.gnome.org/programming-guidelines/stable/versioning.html.en#libtool-versioning
 # for details
-#
-# increment;
-# CURRENT	If the API or ABI interface has changed (reset REVISION to 0)
-# REVISION	If the API and ABI remains the same, but bugs are fixed.
-# AGE		Don't use.
-LT_CURRENT=3
+LT_CURRENT=4
 LT_REVISION=0
-LT_AGE=1
+LT_AGE=2
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
