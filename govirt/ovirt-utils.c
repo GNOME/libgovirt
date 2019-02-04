@@ -40,11 +40,14 @@ ovirt_rest_xml_node_from_call(RestProxyCall *call)
 {
     RestXmlParser *parser;
     RestXmlNode *node;
+    const char * data = rest_proxy_call_get_payload (call);
+
+    if (data == NULL)
+        return NULL;
 
     parser = rest_xml_parser_new ();
 
-    node = rest_xml_parser_parse_from_data (parser,
-            rest_proxy_call_get_payload (call),
+    node = rest_xml_parser_parse_from_data (parser, data
             rest_proxy_call_get_payload_length (call));
 
     g_object_unref(G_OBJECT(parser));
