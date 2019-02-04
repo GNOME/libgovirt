@@ -864,17 +864,24 @@ static gboolean ovirt_resource_refresh_async_cb(OvirtProxy *proxy,
 {
     OvirtResource *resource;
     RestXmlNode *root;
-    gboolean refreshed;
+    gboolean refreshed = FALSE;
 
     g_return_val_if_fail(REST_IS_PROXY_CALL(call), FALSE);
     g_return_val_if_fail(OVIRT_IS_RESOURCE(user_data), FALSE);
 
     root = ovirt_rest_xml_node_from_call(call);
+    if (root == NULL) {
+        g_set_error_literal(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                            _("Failed to parse response from resource"));
+        goto end;
+    }
+
     resource = OVIRT_RESOURCE(user_data);
     refreshed = ovirt_resource_init_from_xml(resource, root, error);
 
     rest_xml_node_unref(root);
 
+end:
     return refreshed;
 }
 

@@ -361,6 +361,11 @@ static gboolean get_collection_xml_async_cb(OvirtProxy* proxy,
     data = (OvirtProxyGetCollectionAsyncData *)user_data;
 
     root = ovirt_rest_xml_node_from_call(call);
+    if (root == NULL) {
+        g_set_error_literal(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
+                            _("Failed to parse response from collection"));
+        goto end;
+    }
 
     /* Do the parsing */
     g_warn_if_fail(data->parser != NULL);
@@ -370,6 +375,7 @@ static gboolean get_collection_xml_async_cb(OvirtProxy* proxy,
 
     rest_xml_node_unref(root);
 
+end:
     return parsed;
 }
 
