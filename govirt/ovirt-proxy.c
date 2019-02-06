@@ -40,9 +40,7 @@
 #include <rest/rest-xml-node.h>
 #include <rest/rest-xml-parser.h>
 
-G_DEFINE_TYPE (OvirtProxy, ovirt_proxy, REST_TYPE_PROXY);
-
-#define OVIRT_PROXY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE((o), OVIRT_TYPE_PROXY, OvirtProxyPrivate))
+G_DEFINE_TYPE_WITH_PRIVATE (OvirtProxy, ovirt_proxy, REST_TYPE_PROXY);
 
 enum {
     PROP_0,
@@ -964,8 +962,6 @@ ovirt_proxy_class_init(OvirtProxyClass *klass)
                                                         NULL,
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
-
-    g_type_class_add_private(klass, sizeof(OvirtProxyPrivate));
 }
 
 static void ssl_ca_file_changed(GObject *gobject,
@@ -985,7 +981,7 @@ ovirt_proxy_init(OvirtProxy *self)
 {
     gulong handler_id;
 
-    self->priv = OVIRT_PROXY_GET_PRIVATE(self);
+    self->priv = ovirt_proxy_get_instance_private(self);
 
     handler_id = g_signal_connect(G_OBJECT(self), "notify::ssl-ca-file",
                                   (GCallback)ssl_ca_file_changed, NULL);
