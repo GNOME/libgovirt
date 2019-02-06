@@ -25,9 +25,6 @@
 #include "ovirt-storage-domain.h"
 #include "govirt-private.h"
 
-#define OVIRT_STORAGE_DOMAIN_GET_PRIVATE(obj)                         \
-        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_STORAGE_DOMAIN, OvirtStorageDomainPrivate))
-
 struct _OvirtStorageDomainPrivate {
     OvirtCollection *files;
     GStrv data_center_ids;
@@ -41,7 +38,7 @@ struct _OvirtStorageDomainPrivate {
     OvirtStorageDomainState state;
 };
 
-G_DEFINE_TYPE(OvirtStorageDomain, ovirt_storage_domain, OVIRT_TYPE_RESOURCE);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtStorageDomain, ovirt_storage_domain, OVIRT_TYPE_RESOURCE);
 
 enum {
     PROP_0,
@@ -196,8 +193,6 @@ static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
     OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
     GParamSpec *param_spec;
 
-    g_type_class_add_private(klass, sizeof(OvirtStorageDomainPrivate));
-
     resource_class->init_from_xml = ovirt_storage_domain_init_from_xml;
     object_class->dispose = ovirt_storage_domain_dispose;
     object_class->get_property = ovirt_storage_domain_get_property;
@@ -295,7 +290,7 @@ static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
 
 static void ovirt_storage_domain_init(OvirtStorageDomain *domain)
 {
-    domain->priv = OVIRT_STORAGE_DOMAIN_GET_PRIVATE(domain);
+    domain->priv = ovirt_storage_domain_get_instance_private(domain);
 }
 
 G_GNUC_INTERNAL

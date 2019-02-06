@@ -25,15 +25,12 @@
 #include "ovirt-data-center.h"
 #include "govirt-private.h"
 
-#define OVIRT_DATA_CENTER_GET_PRIVATE(obj)                         \
-        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_DATA_CENTER, OvirtDataCenterPrivate))
-
 struct _OvirtDataCenterPrivate {
     OvirtCollection *clusters;
     OvirtCollection *storage_domains;
 };
 
-G_DEFINE_TYPE(OvirtDataCenter, ovirt_data_center, OVIRT_TYPE_RESOURCE);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtDataCenter, ovirt_data_center, OVIRT_TYPE_RESOURCE);
 
 static void
 ovirt_data_center_dispose(GObject *obj)
@@ -50,15 +47,13 @@ static void ovirt_data_center_class_init(OvirtDataCenterClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-    g_type_class_add_private(klass, sizeof(OvirtDataCenterPrivate));
-
     object_class->dispose = ovirt_data_center_dispose;
 }
 
 
 static void ovirt_data_center_init(OvirtDataCenter *data_center)
 {
-    data_center->priv = OVIRT_DATA_CENTER_GET_PRIVATE(data_center);
+    data_center->priv = ovirt_data_center_get_instance_private(data_center);
 }
 
 G_GNUC_INTERNAL
