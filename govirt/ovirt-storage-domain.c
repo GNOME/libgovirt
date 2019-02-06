@@ -41,7 +41,7 @@ struct _OvirtStorageDomainPrivate {
     OvirtStorageDomainState state;
 };
 
-G_DEFINE_TYPE(OvirtStorageDomain, ovirt_storage_domain, OVIRT_TYPE_RESOURCE);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtStorageDomain, ovirt_storage_domain, OVIRT_TYPE_RESOURCE);
 
 enum {
     PROP_0,
@@ -195,8 +195,6 @@ static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
     OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
     GParamSpec *param_spec;
-
-    g_type_class_add_private(klass, sizeof(OvirtStorageDomainPrivate));
 
     resource_class->init_from_xml = ovirt_storage_domain_init_from_xml;
     object_class->dispose = ovirt_storage_domain_dispose;

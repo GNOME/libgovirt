@@ -39,7 +39,7 @@ struct _OvirtRestCallPrivate {
 };
 
 
-G_DEFINE_ABSTRACT_TYPE(OvirtRestCall, ovirt_rest_call, REST_TYPE_PROXY_CALL);
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE(OvirtRestCall, ovirt_rest_call, REST_TYPE_PROXY_CALL);
 
 
 enum {
@@ -138,8 +138,6 @@ static void ovirt_rest_call_class_init(OvirtRestCallClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
     GParamSpec *param_spec;
-
-    g_type_class_add_private(klass, sizeof(OvirtRestCallPrivate));
 
     object_class->get_property = ovirt_rest_call_get_property;
     object_class->set_property = ovirt_rest_call_set_property;

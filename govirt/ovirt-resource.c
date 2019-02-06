@@ -60,7 +60,8 @@ static gboolean ovirt_resource_init_from_xml(OvirtResource *resource,
 
 G_DEFINE_TYPE_WITH_CODE(OvirtResource, ovirt_resource, G_TYPE_OBJECT,
                         G_IMPLEMENT_INTERFACE(G_TYPE_INITABLE,
-                                              ovirt_resource_initable_iface_init));
+                                              ovirt_resource_initable_iface_init);
+                        G_ADD_PRIVATE(OvirtResource));
 
 
 enum {
@@ -203,8 +204,6 @@ static void ovirt_resource_initable_iface_init(GInitableIface *iface)
 static void ovirt_resource_class_init(OvirtResourceClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
-
-    g_type_class_add_private(klass, sizeof(OvirtResourcePrivate));
 
     klass->init_from_xml = ovirt_resource_init_from_xml_real;
     object_class->dispose = ovirt_resource_dispose;

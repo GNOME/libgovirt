@@ -42,7 +42,7 @@ struct _OvirtCollectionPrivate {
     GHashTable *resources;
 };
 
-G_DEFINE_TYPE(OvirtCollection, ovirt_collection, G_TYPE_OBJECT);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtCollection, ovirt_collection, G_TYPE_OBJECT);
 
 
 enum {
@@ -128,8 +128,6 @@ static void ovirt_collection_class_init(OvirtCollectionClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
     GParamSpec *param_spec;
-
-    g_type_class_add_private(klass, sizeof(OvirtCollectionPrivate));
 
     object_class->finalize = ovirt_collection_finalize;
     object_class->get_property = ovirt_collection_get_property;

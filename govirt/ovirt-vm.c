@@ -47,7 +47,7 @@ struct _OvirtVmPrivate {
     gchar *cluster_href;
     gchar *cluster_id;
 } ;
-G_DEFINE_TYPE(OvirtVm, ovirt_vm, OVIRT_TYPE_RESOURCE);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtVm, ovirt_vm, OVIRT_TYPE_RESOURCE);
 
 enum OvirtResponseStatus {
     OVIRT_RESPONSE_UNKNOWN,
@@ -231,8 +231,6 @@ static void ovirt_vm_class_init(OvirtVmClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
     OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
-
-    g_type_class_add_private(klass, sizeof(OvirtVmPrivate));
 
     resource_class->init_from_xml = ovirt_vm_init_from_xml;
     object_class->dispose = ovirt_vm_dispose;

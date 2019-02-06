@@ -44,7 +44,7 @@ struct _OvirtVmDisplayPrivate {
     char *proxy_url;
 };
 
-G_DEFINE_TYPE(OvirtVmDisplay, ovirt_vm_display, G_TYPE_OBJECT);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtVmDisplay, ovirt_vm_display, G_TYPE_OBJECT);
 
 enum {
     PROP_0,
@@ -185,8 +185,6 @@ static void ovirt_vm_display_finalize(GObject *object)
 static void ovirt_vm_display_class_init(OvirtVmDisplayClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
-
-    g_type_class_add_private(klass, sizeof(OvirtVmDisplayPrivate));
 
     object_class->finalize = ovirt_vm_display_finalize;
     object_class->get_property = ovirt_vm_display_get_property;

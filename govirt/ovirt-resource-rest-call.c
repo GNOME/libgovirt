@@ -40,7 +40,7 @@
 struct _OvirtResourceRestCallPrivate {
     OvirtResource *resource;
 } ;
-G_DEFINE_TYPE(OvirtResourceRestCall, ovirt_resource_rest_call, OVIRT_TYPE_REST_CALL);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtResourceRestCall, ovirt_resource_rest_call, OVIRT_TYPE_REST_CALL);
 
 enum {
     PROP_0,
@@ -165,8 +165,6 @@ static void ovirt_resource_rest_call_class_init(OvirtResourceRestCallClass *klas
 {
     GParamSpec *param_spec;
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
-
-    g_type_class_add_private(klass, sizeof(OvirtResourceRestCallPrivate));
 
     object_class->dispose = ovirt_resource_rest_call_dispose;
     object_class->get_property = ovirt_resource_rest_call_get_property;

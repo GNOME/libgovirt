@@ -37,7 +37,7 @@ struct _OvirtCdromPrivate {
     char *file;
 };
 
-G_DEFINE_TYPE(OvirtCdrom, ovirt_cdrom, OVIRT_TYPE_RESOURCE);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtCdrom, ovirt_cdrom, OVIRT_TYPE_RESOURCE);
 
 
 enum {
@@ -155,8 +155,6 @@ static void ovirt_cdrom_class_init(OvirtCdromClass *klass)
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
     OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
     GParamSpec *param_spec;
-
-    g_type_class_add_private(klass, sizeof(OvirtCdromPrivate));
 
     resource_class->init_from_xml = ovirt_cdrom_init_from_xml;
     resource_class->to_xml = ovirt_cdrom_to_xml;

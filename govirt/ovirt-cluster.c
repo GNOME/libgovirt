@@ -34,7 +34,7 @@ struct _OvirtClusterPrivate {
     OvirtCollection *hosts;
 };
 
-G_DEFINE_TYPE(OvirtCluster, ovirt_cluster, OVIRT_TYPE_RESOURCE);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtCluster, ovirt_cluster, OVIRT_TYPE_RESOURCE);
 
 enum {
     PROP_0,
@@ -138,8 +138,6 @@ static void ovirt_cluster_class_init(OvirtClusterClass *klass)
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
     OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
     GParamSpec *param_spec;
-
-    g_type_class_add_private(klass, sizeof(OvirtClusterPrivate));
 
     resource_class->init_from_xml = ovirt_cluster_init_from_xml;
     object_class->dispose = ovirt_cluster_dispose;
