@@ -30,16 +30,12 @@
 #include "ovirt-rest-call-error.h"
 #include "ovirt-utils.h"
 
-#define OVIRT_REST_CALL_GET_PRIVATE(obj)                         \
-        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_REST_CALL, OvirtRestCallPrivate))
-
-
 struct _OvirtRestCallPrivate {
     char *href;
 };
 
 
-G_DEFINE_ABSTRACT_TYPE(OvirtRestCall, ovirt_rest_call, REST_TYPE_PROXY_CALL);
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE(OvirtRestCall, ovirt_rest_call, REST_TYPE_PROXY_CALL);
 
 
 enum {
@@ -139,8 +135,6 @@ static void ovirt_rest_call_class_init(OvirtRestCallClass *klass)
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
     GParamSpec *param_spec;
 
-    g_type_class_add_private(klass, sizeof(OvirtRestCallPrivate));
-
     object_class->get_property = ovirt_rest_call_get_property;
     object_class->set_property = ovirt_rest_call_set_property;
     object_class->constructed = ovirt_rest_call_constructed;
@@ -169,5 +163,5 @@ static void ovirt_rest_call_class_init(OvirtRestCallClass *klass)
 
 static void ovirt_rest_call_init(G_GNUC_UNUSED OvirtRestCall *call)
 {
-    call->priv = OVIRT_REST_CALL_GET_PRIVATE(call);
+    call->priv = ovirt_rest_call_get_instance_private(call);
 }

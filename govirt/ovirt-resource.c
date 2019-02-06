@@ -35,9 +35,6 @@
 #include "ovirt-resource.h"
 #undef GOVIRT_UNSTABLE_API_ABI
 
-#define OVIRT_RESOURCE_GET_PRIVATE(obj)                         \
-        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_RESOURCE, OvirtResourcePrivate))
-
 struct _OvirtResourcePrivate {
     char *guid;
     char *href;
@@ -60,7 +57,8 @@ static gboolean ovirt_resource_init_from_xml(OvirtResource *resource,
 
 G_DEFINE_TYPE_WITH_CODE(OvirtResource, ovirt_resource, G_TYPE_OBJECT,
                         G_IMPLEMENT_INTERFACE(G_TYPE_INITABLE,
-                                              ovirt_resource_initable_iface_init));
+                                              ovirt_resource_initable_iface_init);
+                        G_ADD_PRIVATE(OvirtResource));
 
 
 enum {
@@ -204,8 +202,6 @@ static void ovirt_resource_class_init(OvirtResourceClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-    g_type_class_add_private(klass, sizeof(OvirtResourcePrivate));
-
     klass->init_from_xml = ovirt_resource_init_from_xml_real;
     object_class->dispose = ovirt_resource_dispose;
     object_class->finalize = ovirt_resource_finalize;
@@ -257,7 +253,7 @@ static void ovirt_resource_class_init(OvirtResourceClass *klass)
 
 static void ovirt_resource_init(OvirtResource *resource)
 {
-    resource->priv = OVIRT_RESOURCE_GET_PRIVATE(resource);
+    resource->priv = ovirt_resource_get_instance_private(resource);
     resource->priv->actions = g_hash_table_new_full(g_str_hash, g_str_equal,
                                                     g_free, g_free);
     resource->priv->sub_collections = g_hash_table_new_full(g_str_hash,

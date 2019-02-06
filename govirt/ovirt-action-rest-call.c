@@ -29,9 +29,6 @@
 #include "ovirt-rest-call-error.h"
 #include <rest/rest-params.h>
 
-#define OVIRT_ACTION_REST_CALL_GET_PRIVATE(obj)                         \
-        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_ACTION_REST_CALL, OvirtActionRestCallPrivate))
-
 G_DEFINE_TYPE(OvirtActionRestCall, ovirt_action_rest_call, OVIRT_TYPE_REST_CALL);
 
 static gboolean ovirt_action_rest_call_class_serialize_params(RestProxyCall *call,

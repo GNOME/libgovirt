@@ -26,9 +26,6 @@
 #include "ovirt-vm-display.h"
 #include "ovirt-utils.h"
 
-#define OVIRT_VM_DISPLAY_GET_PRIVATE(obj)                         \
-        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_VM_DISPLAY, OvirtVmDisplayPrivate))
-
 struct _OvirtVmDisplayPrivate {
     OvirtVmDisplayType type;
     char *address;
@@ -44,7 +41,7 @@ struct _OvirtVmDisplayPrivate {
     char *proxy_url;
 };
 
-G_DEFINE_TYPE(OvirtVmDisplay, ovirt_vm_display, G_TYPE_OBJECT);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtVmDisplay, ovirt_vm_display, G_TYPE_OBJECT);
 
 enum {
     PROP_0,
@@ -186,8 +183,6 @@ static void ovirt_vm_display_class_init(OvirtVmDisplayClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-    g_type_class_add_private(klass, sizeof(OvirtVmDisplayPrivate));
-
     object_class->finalize = ovirt_vm_display_finalize;
     object_class->get_property = ovirt_vm_display_get_property;
     object_class->set_property = ovirt_vm_display_set_property;
@@ -297,7 +292,7 @@ static void ovirt_vm_display_class_init(OvirtVmDisplayClass *klass)
 
 static void ovirt_vm_display_init(G_GNUC_UNUSED OvirtVmDisplay *display)
 {
-    display->priv = OVIRT_VM_DISPLAY_GET_PRIVATE(display);
+    display->priv = ovirt_vm_display_get_instance_private(display);
 }
 
 OvirtVmDisplay *ovirt_vm_display_new(void)

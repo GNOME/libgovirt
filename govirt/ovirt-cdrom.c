@@ -30,14 +30,11 @@
 #include "ovirt-resource-rest-call.h"
 #include "ovirt-utils.h"
 
-#define OVIRT_CDROM_GET_PRIVATE(obj)                         \
-        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_CDROM, OvirtCdromPrivate))
-
 struct _OvirtCdromPrivate {
     char *file;
 };
 
-G_DEFINE_TYPE(OvirtCdrom, ovirt_cdrom, OVIRT_TYPE_RESOURCE);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtCdrom, ovirt_cdrom, OVIRT_TYPE_RESOURCE);
 
 
 enum {
@@ -156,8 +153,6 @@ static void ovirt_cdrom_class_init(OvirtCdromClass *klass)
     OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
     GParamSpec *param_spec;
 
-    g_type_class_add_private(klass, sizeof(OvirtCdromPrivate));
-
     resource_class->init_from_xml = ovirt_cdrom_init_from_xml;
     resource_class->to_xml = ovirt_cdrom_to_xml;
     resource_class->add_rest_params = ovirt_cdrom_add_rest_params;
@@ -179,7 +174,7 @@ static void ovirt_cdrom_class_init(OvirtCdromClass *klass)
 
 static void ovirt_cdrom_init(OvirtCdrom *cdrom)
 {
-    cdrom->priv = OVIRT_CDROM_GET_PRIVATE(cdrom);
+    cdrom->priv = ovirt_cdrom_get_instance_private(cdrom);
 }
 
 

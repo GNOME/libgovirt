@@ -29,8 +29,6 @@
 
 
 static gboolean ovirt_vm_pool_refresh_from_xml(OvirtVmPool *vm_pool, RestXmlNode *node);
-#define OVIRT_VM_POOL_GET_PRIVATE(obj)                         \
-        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_VM_POOL, OvirtVmPoolPrivate))
 
 struct _OvirtVmPoolPrivate {
         guint prestarted_vms;
@@ -38,7 +36,7 @@ struct _OvirtVmPoolPrivate {
         guint size;
 };
 
-G_DEFINE_TYPE(OvirtVmPool, ovirt_vm_pool, OVIRT_TYPE_RESOURCE);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtVmPool, ovirt_vm_pool, OVIRT_TYPE_RESOURCE);
 
 enum OvirtResponseStatus {
     OVIRT_RESPONSE_UNKNOWN,
@@ -125,8 +123,6 @@ static void ovirt_vm_pool_class_init(OvirtVmPoolClass *klass)
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
     OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
 
-    g_type_class_add_private(klass, sizeof(OvirtVmPoolPrivate));
-
     resource_class->init_from_xml = ovirt_vm_pool_init_from_xml;
     object_class->dispose = ovirt_vm_pool_dispose;
     object_class->get_property = ovirt_vm_pool_get_property;
@@ -163,7 +159,7 @@ static void ovirt_vm_pool_class_init(OvirtVmPoolClass *klass)
 
 static void ovirt_vm_pool_init(G_GNUC_UNUSED OvirtVmPool *vm_pool)
 {
-    vm_pool->priv = OVIRT_VM_POOL_GET_PRIVATE(vm_pool);
+    vm_pool->priv = ovirt_vm_pool_get_instance_private(vm_pool);
 }
 
 OvirtVmPool *ovirt_vm_pool_new(void)

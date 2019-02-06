@@ -25,16 +25,13 @@
 #include "ovirt-cluster.h"
 #include "govirt-private.h"
 
-#define OVIRT_CLUSTER_GET_PRIVATE(obj)                         \
-        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_CLUSTER, OvirtClusterPrivate))
-
 struct _OvirtClusterPrivate {
     gchar *data_center_href;
     gchar *data_center_id;
     OvirtCollection *hosts;
 };
 
-G_DEFINE_TYPE(OvirtCluster, ovirt_cluster, OVIRT_TYPE_RESOURCE);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtCluster, ovirt_cluster, OVIRT_TYPE_RESOURCE);
 
 enum {
     PROP_0,
@@ -139,8 +136,6 @@ static void ovirt_cluster_class_init(OvirtClusterClass *klass)
     OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
     GParamSpec *param_spec;
 
-    g_type_class_add_private(klass, sizeof(OvirtClusterPrivate));
-
     resource_class->init_from_xml = ovirt_cluster_init_from_xml;
     object_class->dispose = ovirt_cluster_dispose;
     object_class->get_property = ovirt_cluster_get_property;
@@ -169,7 +164,7 @@ static void ovirt_cluster_class_init(OvirtClusterClass *klass)
 
 static void ovirt_cluster_init(OvirtCluster *cluster)
 {
-    cluster->priv = OVIRT_CLUSTER_GET_PRIVATE(cluster);
+    cluster->priv = ovirt_cluster_get_instance_private(cluster);
 }
 
 G_GNUC_INTERNAL

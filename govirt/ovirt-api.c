@@ -36,10 +36,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define OVIRT_API_GET_PRIVATE(obj)                         \
-        (G_TYPE_INSTANCE_GET_PRIVATE((obj), OVIRT_TYPE_API, OvirtApiPrivate))
-
-
 struct _OvirtApiPrivate {
     OvirtCollection *clusters;
     OvirtCollection *data_centers;
@@ -50,7 +46,7 @@ struct _OvirtApiPrivate {
 };
 
 
-G_DEFINE_TYPE(OvirtApi, ovirt_api, OVIRT_TYPE_RESOURCE);
+G_DEFINE_TYPE_WITH_PRIVATE(OvirtApi, ovirt_api, OVIRT_TYPE_RESOURCE);
 
 
 static gboolean ovirt_api_init_from_xml(OvirtResource *resource,
@@ -92,8 +88,6 @@ static void ovirt_api_class_init(OvirtApiClass *klass)
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
     OvirtResourceClass *resource_class = OVIRT_RESOURCE_CLASS(klass);
 
-    g_type_class_add_private(klass, sizeof(OvirtApiPrivate));
-
     object_class->dispose = ovirt_api_dispose;
 
     resource_class->init_from_xml = ovirt_api_init_from_xml;
@@ -101,7 +95,7 @@ static void ovirt_api_class_init(OvirtApiClass *klass)
 
 static void ovirt_api_init(G_GNUC_UNUSED OvirtApi *api)
 {
-    api->priv = OVIRT_API_GET_PRIVATE(api);
+    api->priv = ovirt_api_get_instance_private(api);
 }
 
 G_GNUC_INTERNAL
