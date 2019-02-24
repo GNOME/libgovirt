@@ -1,0 +1,102 @@
+# Danish translation for libgovirt.
+# Copyright (C) 2019 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# scootergrisen, 2019.
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
+"POT-Creation-Date: 2019-02-07 18:56+0000\n"
+"PO-Revision-Date: 2019-02-20 00:00+0200\n"
+"Last-Translator: scootergrisen\n"
+"Language-Team: Danish\n"
+"Language: da\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "Uventet parametertype i REST-kald"
+
+#: govirt/ovirt-collection.c:253
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Fik “%s”-knudepunkt, ventede “%s”"
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Rod CA-certifikatfil til sikre SSL-forbindelser"
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr "<fil>"
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "Vis information om libgovirt-version"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "Tilvalg for oVirt:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "Vis tilvalg for oVirt"
+
+#: govirt/ovirt-proxy.c:625
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Kunne ikke udtrække filnavnet for CA-certifikat fra URI"
+
+#: govirt/ovirt-resource.c:183
+msgid "Cancellable initialization not supported"
+msgstr "Annullerbar initialisering understøttes ikke"
+
+#: govirt/ovirt-resource.c:432
+msgid "Missing mandatory 'id' attribute"
+msgstr "Mangler obligatorisk “id”-attribut"
+
+#: govirt/ovirt-resource.c:439
+msgid "Missing mandatory 'href' attribute"
+msgstr "Mangler obligatorisk “href”-attribut"
+
+#: govirt/ovirt-resource.c:695
+msgid "Could not find 'status' node"
+msgstr "Kunne ikke finde “status”-knudepunkt"
+
+#: govirt/ovirt-resource.c:701
+msgid "Could not find 'state' node"
+msgstr "Kunne ikke finde “state”-knudepunkt"
+
+#: govirt/ovirt-resource.c:709
+msgid "Action is pending"
+msgstr "Handling afventes"
+
+#: govirt/ovirt-resource.c:713
+msgid "Action is in progress"
+msgstr "Handling er i gang"
+
+#: govirt/ovirt-resource.c:717
+msgid "Action has failed"
+msgstr "Handling mislykkedes"
+
+#: govirt/ovirt-resource.c:722
+msgid "Unknown action failure"
+msgstr "Ukendt handling mislykkedes"
+
+#: govirt/ovirt-utils.c:354
+msgid "Could not find 'reason' node"
+msgstr "Kunne ikke finde “reason”-knudepunkt"
+
+#: govirt/ovirt-vm.c:404
+msgid "Could not find 'ticket' node"
+msgstr "Kunne ikke finde “ticket”-knudepunkt"
+
+#: govirt/ovirt-vm.c:414
+msgid "Could not find 'value' node"
+msgstr "Kunne ikke finde “value”-knudepunkt"
+
+#: govirt/ovirt-vm.c:421
+msgid "Could not find 'expiry' node"
+msgstr "Kunne ikke finde “expiry”-knudepunkt"
