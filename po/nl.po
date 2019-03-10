@@ -1,0 +1,104 @@
+# Dutch translation for libgovirt.
+# Copyright (C) 2019 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# Nathan Follens <nthn@unseen.is>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
+"POT-Creation-Date: 2019-02-24 13:49+0000\n"
+"PO-Revision-Date: 2019-03-04 16:25+0100\n"
+"Language-Team: Dutch <gnome-nl-list@gnome.org>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: Nathan Follens <nthn@unseen.is>\n"
+"X-Generator: Poedit 2.2.1\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "Onverwacht type parameter in REST-oproep"
+
+#: govirt/ovirt-collection.c:253
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "‘%s’-node gekregen, ‘%s’ verwacht"
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Root-CA-certificaatsbestand voor beveiligde SSL-verbindingen"
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr "<file>"
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "Versie-informatie over libgovirt tonen"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "oVirt-opties:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "oVirt-opties tonen"
+
+#: govirt/ovirt-proxy.c:625
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Kon CA-certificaatsbestandsnaam niet uitpakken uit URI"
+
+#: govirt/ovirt-resource.c:183
+msgid "Cancellable initialization not supported"
+msgstr "Annuleerbare initialisatie wordt niet ondersteund"
+
+#: govirt/ovirt-resource.c:432
+msgid "Missing mandatory 'id' attribute"
+msgstr "Verplicht ‘id’-attribuut ontbreekt"
+
+#: govirt/ovirt-resource.c:439
+msgid "Missing mandatory 'href' attribute"
+msgstr "Verplicht ‘href’-attribuut ontbreekt"
+
+#: govirt/ovirt-resource.c:695
+msgid "Could not find 'status' node"
+msgstr "Kon ‘status’-node niet vinden"
+
+#: govirt/ovirt-resource.c:701
+msgid "Could not find 'state' node"
+msgstr "Kon ‘state’-node niet vinden"
+
+#: govirt/ovirt-resource.c:709
+msgid "Action is pending"
+msgstr "Opdracht in wacht"
+
+#: govirt/ovirt-resource.c:713
+msgid "Action is in progress"
+msgstr "Opdracht in behandeling"
+
+#: govirt/ovirt-resource.c:717
+msgid "Action has failed"
+msgstr "Opdracht mislukt"
+
+#: govirt/ovirt-resource.c:722
+msgid "Unknown action failure"
+msgstr "Onbekende opdrachtfout"
+
+#: govirt/ovirt-utils.c:354
+msgid "Could not find 'reason' node"
+msgstr "Kon ‘reason’-node niet vinden"
+
+#: govirt/ovirt-vm.c:404
+msgid "Could not find 'ticket' node"
+msgstr "Kon ‘ticket’-node niet vinden"
+
+#: govirt/ovirt-vm.c:414
+msgid "Could not find 'value' node"
+msgstr "Kon ‘value’-node niet vinden"
+
+#: govirt/ovirt-vm.c:421
+msgid "Could not find 'expiry' node"
+msgstr "Kon ‘expiry’-node niet vinden"
