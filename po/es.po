@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
-"POT-Creation-Date: 2019-03-27 18:38+0000\n"
-"PO-Revision-Date: 2019-03-28 13:03+0100\n"
+"POT-Creation-Date: 2019-03-28 12:06+0000\n"
+"PO-Revision-Date: 2019-05-13 15:29+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: es <gnome-es-list@gnome.org>\n"
 "Language: es\n"
@@ -94,7 +94,7 @@ msgstr "Fallo en acción desconocido"
 
 #: govirt/ovirt-resource.c:875
 msgid "Failed to parse response from resource"
-msgstr ""
+msgstr "Falló al analizar la respuesta del recurso"
 
 #: govirt/ovirt-utils.c:357
 msgid "Could not find 'reason' node"
