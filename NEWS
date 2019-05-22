@@ -1,3 +1,16 @@
+0.3.6 - May 22nd 2019
+=====================
+
+Changes since 0.3.5
+
+- Fixed distcheck build by renewing tests certificates which had been expired.
+- Updated Translations:
+        * Spanish (Daniel Mustieles)
+        * Brazilian Portuguese (Rafael Fontenelle)
+        * Polish (Piotr Drąg)
+        * Indonesian (Kukuh Syafaat)
+        * Hungarian (Balázs Úr)
+
 0.3.5 - March 28th 2019
 =======================
 
