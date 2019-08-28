@@ -141,14 +141,9 @@ static void ovirt_resource_dispose(GObject *object)
 {
     OvirtResource *resource = OVIRT_RESOURCE(object);
 
-    if (resource->priv->actions != NULL) {
-        g_hash_table_unref(resource->priv->actions);
-        resource->priv->actions = NULL;
-    }
-    if (resource->priv->sub_collections != NULL) {
-        g_hash_table_unref(resource->priv->sub_collections);
-        resource->priv->sub_collections = NULL;
-    }
+    g_clear_pointer(&resource->priv->actions, g_hash_table_unref);
+    g_clear_pointer(&resource->priv->sub_collections, g_hash_table_unref);
+
     if (resource->priv->xml != NULL) {
         g_boxed_free(REST_TYPE_XML_NODE, resource->priv->xml);
         resource->priv->xml = NULL;

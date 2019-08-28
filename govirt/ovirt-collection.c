@@ -110,9 +110,7 @@ static void ovirt_collection_finalize(GObject *object)
 {
     OvirtCollection *collection = OVIRT_COLLECTION(object);
 
-    if (collection->priv->resources != NULL) {
-        g_hash_table_unref(collection->priv->resources);
-    }
+    g_clear_pointer(&collection->priv->resources, g_hash_table_unref);
     g_free(collection->priv->href);
     g_free(collection->priv->collection_xml_name);
     g_free(collection->priv->resource_xml_name);
@@ -212,13 +210,10 @@ void ovirt_collection_set_resources(OvirtCollection *collection, GHashTable *res
 {
     g_return_if_fail(OVIRT_IS_COLLECTION(collection));
 
-    if (collection->priv->resources != NULL) {
-        g_hash_table_unref(collection->priv->resources);
-    }
+    g_clear_pointer(&collection->priv->resources, g_hash_table_unref);
+
     if (resources != NULL) {
         collection->priv->resources = g_hash_table_ref(resources);
-    } else {
-        collection->priv->resources = NULL;
     }
 
     g_object_notify(G_OBJECT(collection), "resources");

@@ -133,8 +133,7 @@ static void ovirt_vm_set_property(GObject *object,
         vm->priv->state = g_value_get_enum(value);
         break;
     case PROP_DISPLAY:
-        if (vm->priv->display != NULL)
-            g_object_unref(vm->priv->display);
+        g_clear_object(&vm->priv->display);
         vm->priv->display = g_value_dup_object(value);
         break;
     case PROP_HOST_HREF:
