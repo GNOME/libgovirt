@@ -204,28 +204,26 @@ typedef struct {
 
 static void ovirt_proxy_call_async_data_free(OvirtProxyCallAsyncData *data)
 {
-        if (data->destroy_call_data != NULL) {
-            data->destroy_call_data(data->call_user_data);
+    if (data->destroy_call_data != NULL) {
+        data->destroy_call_data(data->call_user_data);
+    }
+
+    g_clear_object(&data->proxy);
+    g_clear_object(&data->result);
+
+    if ((data->cancellable != NULL) && (data->cancellable_cb_id != 0)) {
+        if (g_cancellable_is_cancelled(data->cancellable)) {
+            /* Cancellable has already been cancelled, we don't need to use
+             * g_cancellable_disconnect() to disconnect the signal handler
+             * as we know the 'cancelled' signal is no longer going to be emitted
+             */
+            g_signal_handler_disconnect(data->cancellable, data->cancellable_cb_id);
+        } else {
+            g_cancellable_disconnect(data->cancellable, data->cancellable_cb_id);
         }
-        if (data->proxy != NULL) {
-            g_object_unref(G_OBJECT(data->proxy));
-        }
-        if (data->result != NULL) {
-            g_object_unref(G_OBJECT(data->result));
-        }
-        if ((data->cancellable != NULL) && (data->cancellable_cb_id != 0)) {
-            if (g_cancellable_is_cancelled(data->cancellable)) {
-                /* Cancellable has already been cancelled, we don't need to use
-                 * g_cancellable_disconnect() to disconnect the signal handler
-                 * as we know the 'cancelled' signal is no longer going to be emitted
-                 */
-                g_signal_handler_disconnect(data->cancellable, data->cancellable_cb_id);
-            } else {
-                g_cancellable_disconnect(data->cancellable, data->cancellable_cb_id);
-            }
-        }
-        g_clear_object(&data->cancellable);
-        g_slice_free(OvirtProxyCallAsyncData, data);
+    }
+    g_clear_object(&data->cancellable);
+    g_slice_free(OvirtProxyCallAsyncData, data);
 }
 
 static void
@@ -513,12 +511,8 @@ static char *write_to_tmp_file(const char *template,
     result = g_file_get_path(tmp_file);
 
 end:
-    if (tmp_file != NULL) {
-        g_object_unref(G_OBJECT(tmp_file));
-    }
-    if (iostream != NULL) {
-        g_object_unref(G_OBJECT(iostream));
-    }
+    g_clear_object(&tmp_file);
+    g_clear_object(&iostream);
 
     return result;
 }
@@ -644,8 +638,7 @@ gboolean ovirt_proxy_fetch_ca_certificate(OvirtProxy *proxy, GError **error)
     set_display_ca_cert_from_data(proxy, cert_data, cert_length);
 
 error:
-    if (source != NULL)
-        g_object_unref(source);
+    g_clear_object(&source);
 
     return load_ok;
 }
@@ -837,24 +830,10 @@ ovirt_proxy_dispose(GObject *obj)
 {
     OvirtProxy *proxy = OVIRT_PROXY(obj);
 
-    if (proxy->priv->cookie_jar) {
-        g_object_unref(G_OBJECT(proxy->priv->cookie_jar));
-        proxy->priv->cookie_jar = NULL;
-    }
-
-    g_warn_if_fail(proxy->priv->additional_headers != NULL);
-    g_hash_table_unref(proxy->priv->additional_headers);
-    proxy->priv->additional_headers = NULL;
-
-    if (proxy->priv->api != NULL) {
-        g_object_unref(proxy->priv->api);
-        proxy->priv->api = NULL;
-    }
-
-    if (proxy->priv->display_ca != NULL) {
-        g_byte_array_unref(proxy->priv->display_ca);
-        proxy->priv->display_ca = NULL;
-    }
+    g_clear_object(&proxy->priv->cookie_jar);
+    g_clear_pointer(&proxy->priv->additional_headers, g_hash_table_unref);
+    g_clear_object(&proxy->priv->api);
+    g_clear_pointer(&proxy->priv->display_ca, g_byte_array_unref);
 
     G_OBJECT_CLASS(ovirt_proxy_parent_class)->dispose(obj);
 }
@@ -1164,9 +1143,7 @@ static void ovirt_proxy_set_api_from_xml(OvirtProxy *proxy,
 {
     OvirtCollection *vms;
 
-    if (proxy->priv->api != NULL) {
-        g_object_unref(G_OBJECT(proxy->priv->api));
-    }
+    g_clear_object(&proxy->priv->api);
     proxy->priv->api = ovirt_api_new_from_xml(node, error);
 
     vms = ovirt_api_get_vms(proxy->priv->api);
