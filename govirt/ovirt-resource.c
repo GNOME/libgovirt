@@ -616,19 +616,18 @@ ovirt_resource_create_rest_call_for_action(OvirtResource *resource,
                                            OvirtProxy *proxy,
                                            const char *action)
 {
-    OvirtActionRestCall *call;
+    RestProxyCall *call;
     const char *function;
 
     function = ovirt_resource_get_action(resource, action);
     g_return_val_if_fail(function != NULL, NULL);
 
-    call = ovirt_action_rest_call_new(REST_PROXY(proxy));
-    rest_proxy_call_set_method(REST_PROXY_CALL(call), "POST");
-    rest_proxy_call_set_function(REST_PROXY_CALL(call), function);
-    rest_proxy_call_add_param(REST_PROXY_CALL(call),
-                              "async", "false");
+    call = REST_PROXY_CALL(ovirt_action_rest_call_new(REST_PROXY(proxy)));
+    rest_proxy_call_set_method(call, "POST");
+    rest_proxy_call_set_function(call, function);
+    rest_proxy_call_add_param(call, "async", "false");
 
-    return REST_PROXY_CALL(call);
+    return call;
 }
 
 gboolean
