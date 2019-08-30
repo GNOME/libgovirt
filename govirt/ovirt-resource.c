@@ -626,6 +626,7 @@ ovirt_resource_create_rest_call_for_action(OvirtResource *resource,
     rest_proxy_call_set_method(call, "POST");
     rest_proxy_call_set_function(call, function);
     rest_proxy_call_add_param(call, "async", "false");
+    ovirt_resource_add_rest_params(resource, call);
 
     return call;
 }
@@ -948,10 +949,10 @@ void ovirt_resource_add_rest_params(OvirtResource *resource,
     OvirtResourceClass *klass;
 
     g_return_if_fail(OVIRT_IS_RESOURCE(resource));
-    g_return_if_fail(OVIRT_IS_RESOURCE_REST_CALL(call));
+    g_return_if_fail(OVIRT_IS_REST_CALL(call));
 
     klass = OVIRT_RESOURCE_GET_CLASS(resource);
-    if (klass->to_xml != NULL)
+    if (klass->add_rest_params != NULL)
         klass->add_rest_params(resource, call);
 }
 
