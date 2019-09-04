@@ -432,17 +432,18 @@ void ovirt_collection_fetch_async(OvirtCollection *collection,
                                   GAsyncReadyCallback callback,
                                   gpointer user_data)
 {
-    GSimpleAsyncResult *result;
+    GTask *task;
 
     g_return_if_fail(OVIRT_IS_COLLECTION(collection));
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
-    result = g_simple_async_result_new (G_OBJECT(collection), callback,
-                                        user_data,
-                                        ovirt_collection_fetch_async);
+    task = g_task_new(G_OBJECT(collection),
+                      cancellable,
+                      callback,
+                      user_data);
     ovirt_proxy_get_collection_xml_async(proxy, collection->priv->href,
-                                         result, cancellable,
+                                         task, cancellable,
                                          ovirt_collection_fetch_async_cb,
                                          collection, NULL);
 }
@@ -460,14 +461,10 @@ gboolean ovirt_collection_fetch_finish(OvirtCollection *collection,
                                        GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_COLLECTION(collection), FALSE);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(collection),
-                                                        ovirt_collection_fetch_async),
+    g_return_val_if_fail(g_task_is_valid(G_TASK(result), collection),
                          FALSE);
 
-    if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
-        return FALSE;
-
-    return g_simple_async_result_get_op_res_gboolean(G_SIMPLE_ASYNC_RESULT(result));
+    return g_task_propagate_boolean(G_TASK(result), err);
 }
 
 

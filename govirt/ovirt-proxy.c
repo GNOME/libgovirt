@@ -194,7 +194,7 @@ RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
 
 typedef struct {
     OvirtProxy *proxy;
-    GSimpleAsyncResult *result;
+    GTask *task;
     GCancellable *cancellable;
     gulong cancellable_cb_id;
     OvirtProxyCallAsyncCb call_async_cb;
@@ -209,7 +209,7 @@ static void ovirt_proxy_call_async_data_free(OvirtProxyCallAsyncData *data)
     }
 
     g_clear_object(&data->proxy);
-    g_clear_object(&data->result);
+    g_clear_object(&data->task);
 
     if ((data->cancellable != NULL) && (data->cancellable_cb_id != 0)) {
         if (g_cancellable_is_cancelled(data->cancellable)) {
@@ -234,17 +234,17 @@ call_async_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
 }
 
 
-static void rest_call_async_set_error(RestProxyCall *call, GSimpleAsyncResult *result, const GError *error)
+static void rest_call_async_set_error(RestProxyCall *call, GTask *task, const GError *error)
 {
     GError *local_error = NULL;
     RestXmlNode *root = ovirt_rest_xml_node_from_call(call);
 
     if (root != NULL && ovirt_utils_gerror_from_xml_fault(root, &local_error)) {
         g_debug("ovirt_rest_call_async(): %s", local_error->message);
-        g_simple_async_result_set_from_error(result, local_error);
+        g_task_return_error(task, local_error);
         g_clear_error(&local_error);
     } else {
-        g_simple_async_result_set_from_error(result, error);
+        g_task_return_error(task, (GError *) error);
     }
 
     if (root != NULL) {
@@ -258,33 +258,34 @@ call_async_cb(RestProxyCall *call, const GError *error,
               gpointer user_data)
 {
     OvirtProxyCallAsyncData *data = user_data;
-    GSimpleAsyncResult *result = data->result;
+    GTask *task = data->task;
+    gboolean callback_result = TRUE;
 
     if (error != NULL) {
-        rest_call_async_set_error(call, result, error);
-    } else {
-        GError *call_error = NULL;
-        gboolean callback_result = TRUE;
-
-        if (data->call_async_cb != NULL) {
-            callback_result = data->call_async_cb(data->proxy, call,
-                                                  data->call_user_data,
-                                                  &call_error);
-            if (call_error != NULL) {
-                rest_call_async_set_error(call, result, call_error);
-            }
-        }
-
-        g_simple_async_result_set_op_res_gboolean(result, callback_result);
+        rest_call_async_set_error(call, task, error);
+        goto exit;
     }
 
-    g_simple_async_result_complete (result);
+    if (data->call_async_cb != NULL) {
+        GError *call_error = NULL;
+        callback_result = data->call_async_cb(data->proxy, call,
+                                              data->call_user_data,
+                                              &call_error);
+        if (call_error != NULL) {
+            rest_call_async_set_error(call, task, error);
+            goto exit;
+        }
+    }
+
+    g_task_return_boolean(task, callback_result);
+
+exit:
     ovirt_proxy_call_async_data_free(data);
 }
 
 
 void ovirt_rest_call_async(OvirtRestCall *call,
-                           GSimpleAsyncResult *result,
+                           GTask *task,
                            GCancellable *cancellable,
                            OvirtProxyCallAsyncCb callback,
                            gpointer user_data,
@@ -300,7 +301,7 @@ void ovirt_rest_call_async(OvirtRestCall *call,
 
     data = g_slice_new0(OvirtProxyCallAsyncData);
     data->proxy = proxy;
-    data->result = result;
+    data->task = task;
     data->call_async_cb = callback;
     data->call_user_data = user_data;
     data->destroy_call_data = destroy_func;
@@ -314,8 +315,7 @@ void ovirt_rest_call_async(OvirtRestCall *call,
     if (!rest_proxy_call_async(REST_PROXY_CALL(call), call_async_cb, NULL,
                                data, &error)) {
         g_warning("Error while getting collection XML");
-        g_simple_async_result_set_from_error(result, error);
-        g_simple_async_result_complete(result);
+        g_task_return_error(task, error);
         ovirt_proxy_call_async_data_free(data);
     }
 }
@@ -323,13 +323,7 @@ void ovirt_rest_call_async(OvirtRestCall *call,
 
 gboolean ovirt_rest_call_finish(GAsyncResult *result, GError **err)
 {
-    GSimpleAsyncResult *simple;
-
-    simple = G_SIMPLE_ASYNC_RESULT(result);
-    if (g_simple_async_result_propagate_error(simple, err))
-        return FALSE;
-
-    return g_simple_async_result_get_op_res_gboolean(simple);
+    return g_task_propagate_boolean(G_TASK(result), err);
 }
 
 typedef struct {
@@ -385,7 +379,7 @@ end:
  */
 void ovirt_proxy_get_collection_xml_async(OvirtProxy *proxy,
                                           const char *href,
-                                          GSimpleAsyncResult *result,
+                                          GTask *task,
                                           GCancellable *cancellable,
                                           OvirtProxyGetCollectionAsyncCb callback,
                                           gpointer user_data,
@@ -401,7 +395,7 @@ void ovirt_proxy_get_collection_xml_async(OvirtProxy *proxy,
 
     call = ovirt_rest_call_new(proxy, "GET", href);
 
-    ovirt_rest_call_async(OVIRT_REST_CALL(call), result, cancellable,
+    ovirt_rest_call_async(OVIRT_REST_CALL(call), task, cancellable,
                           get_collection_xml_async_cb, data,
                           (GDestroyNotify)ovirt_proxy_get_collection_async_data_destroy);
     g_object_unref(call);
@@ -647,33 +641,32 @@ static void ca_file_loaded_cb(GObject *source_object,
                               GAsyncResult *res,
                               gpointer user_data)
 {
-    GSimpleAsyncResult *fetch_result;
+    GTask *task;
     GObject *proxy;
     GError *error = NULL;
     char *cert_data;
     gsize cert_length;
 
-    fetch_result = G_SIMPLE_ASYNC_RESULT(user_data);
+    task = G_TASK(user_data);
     g_file_load_contents_finish(G_FILE(source_object), res,
                                 &cert_data, &cert_length,
                                 NULL, &error);
     if (error != NULL) {
-        g_simple_async_result_take_error(fetch_result, error);
+        g_task_return_error(task, error);
         goto end;
     }
 
-    proxy = g_async_result_get_source_object(G_ASYNC_RESULT(fetch_result));
+    proxy = g_async_result_get_source_object(G_ASYNC_RESULT(task));
 
     set_ca_cert_from_data(OVIRT_PROXY(proxy), cert_data, cert_length);
     /* takes ownership of cert_data */
     set_display_ca_cert_from_data(OVIRT_PROXY(proxy),
                                   cert_data, cert_length);
     g_object_unref(proxy);
-    g_simple_async_result_set_op_res_gboolean(fetch_result, TRUE);
+    g_task_return_boolean(task, TRUE);
 
 end:
-    g_simple_async_result_complete (fetch_result);
-    g_object_unref(fetch_result);
+    g_object_unref(task);
 }
 
 void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
@@ -682,7 +675,7 @@ void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
                                             gpointer user_data)
 {
     GFile *ca_file;
-    GSimpleAsyncResult *result;
+    GTask *task;
 
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
@@ -690,11 +683,12 @@ void ovirt_proxy_fetch_ca_certificate_async(OvirtProxy *proxy,
     ca_file = get_ca_cert_file(proxy);
     g_return_if_fail(ca_file != NULL);
 
-    result = g_simple_async_result_new(G_OBJECT(proxy), callback,
-                                       user_data,
-                                       ovirt_proxy_fetch_ca_certificate_async);
+    task = g_task_new(G_OBJECT(proxy),
+		              cancellable,
+		              callback,
+		              user_data);
 
-    g_file_load_contents_async(ca_file, cancellable, ca_file_loaded_cb, result);
+    g_file_load_contents_async(ca_file, cancellable, ca_file_loaded_cb, task);
     g_object_unref(ca_file);
 }
 
@@ -708,12 +702,10 @@ GByteArray *ovirt_proxy_fetch_ca_certificate_finish(OvirtProxy *proxy,
                                                     GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(proxy),
-                                                        ovirt_proxy_fetch_ca_certificate_async),
-                         NULL);
+    g_return_val_if_fail(g_task_is_valid(G_TASK(result), proxy), NULL);
     g_return_val_if_fail(err == NULL || *err == NULL, NULL);
 
-    if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
+    if (g_task_had_error(G_TASK(result)))
         return NULL;
 
     return get_ca_cert_data(proxy);
@@ -1201,15 +1193,16 @@ void ovirt_proxy_fetch_api_async(OvirtProxy *proxy,
                                  GAsyncReadyCallback callback,
                                  gpointer user_data)
 {
-    GSimpleAsyncResult *result;
+    GTask *task;
 
     g_return_if_fail(OVIRT_IS_PROXY(proxy));
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
 
-    result = g_simple_async_result_new (G_OBJECT(proxy), callback,
-                                        user_data,
-                                        ovirt_proxy_fetch_api_async);
-    ovirt_proxy_get_collection_xml_async(proxy, "/ovirt-engine/api", result, cancellable,
+    task = g_task_new(G_OBJECT(proxy),
+		              cancellable,
+		              callback,
+		              user_data);
+    ovirt_proxy_get_collection_xml_async(proxy, "/ovirt-engine/api", task, cancellable,
                                          fetch_api_async_cb, NULL, NULL);
 }
 
@@ -1228,11 +1221,9 @@ ovirt_proxy_fetch_api_finish(OvirtProxy *proxy,
                              GError **err)
 {
     g_return_val_if_fail(OVIRT_IS_PROXY(proxy), NULL);
-    g_return_val_if_fail(g_simple_async_result_is_valid(result, G_OBJECT(proxy),
-                                                        ovirt_proxy_fetch_api_async),
-                         NULL);
+    g_return_val_if_fail(g_task_is_valid(G_TASK(result), proxy), NULL);
 
-    if (g_simple_async_result_propagate_error(G_SIMPLE_ASYNC_RESULT(result), err))
+    if (g_task_had_error(G_TASK(result)))
         return NULL;
 
     return proxy->priv->api;
