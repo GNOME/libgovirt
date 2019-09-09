@@ -1,15 +1,15 @@
 # Turkish translation for libgovirt.
-# Copyright (C) 2014 libgovirt's COPYRIGHT HOLDER
+# Copyright (C) 2014-2019 libgovirt's COPYRIGHT HOLDER
 # This file is distributed under the same license as the libgovirt package.
+#
 # Muhammet Kara <muhammetk@gmail.com>, 2014.
 # Necdet Yücel <necdetyucel@gmail.com>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: libgovirt master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=libgovi"
-"rt&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2014-12-11 15:35+0000\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
+"POT-Creation-Date: 2019-03-27 18:38+0000\n"
 "PO-Revision-Date: 2014-12-22 23:56+0000\n"
 "Last-Translator: Necdet Yücel <necdetyucel@gmail.com>\n"
 "Language-Team: Türkçe <gnome-turk@gnome.org>\n"
@@ -21,112 +21,101 @@ msgstr ""
 "X-Generator: Pootle 2.5.1.1\n"
 "X-POOTLE-MTIME: 1419292569.000000\n"
 
-#: ../govirt/ovirt-action-rest-call.c:57
-#: ../govirt/ovirt-resource-rest-call.c:146
-#, c-format
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
 msgid "Unexpected parameter type in REST call"
 msgstr "REST çağrısında beklenmeyen parametre"
 
-#: ../govirt/ovirt-collection.c:241
+#: govirt/ovirt-collection.c:253
 #, c-format
 msgid "Got '%s' node, expected '%s'"
 msgstr "'%1$s' beklenirken, '%2$s' alındı"
 
-#: ../govirt/ovirt-options.c:54
+#: govirt/ovirt-options.c:52
 msgid "Root CA certificate file for secure SSL connections"
 msgstr "Güvenli SSL bağlantıları için Kök CA sertifika dosyası"
 
-#: ../govirt/ovirt-options.c:54
+#: govirt/ovirt-options.c:52
 msgid "<file>"
 msgstr "<dosya>"
 
-#: ../govirt/ovirt-options.c:56
+#: govirt/ovirt-options.c:54
 msgid "Display libgovirt version information"
 msgstr "libgovirt sürüm bilgisini görüntüle"
 
-#: ../govirt/ovirt-options.c:61
+#: govirt/ovirt-options.c:59
 msgid "oVirt Options:"
 msgstr "oVirt Seçenekleri:"
 
-#: ../govirt/ovirt-options.c:61
+#: govirt/ovirt-options.c:59
 msgid "Show oVirt Options"
 msgstr "oVirt Seçeneklerini Göster"
 
-#: ../govirt/ovirt-proxy.c:499
-#, c-format
-msgid "Failed to write to '%s': %s"
-msgstr "'%s'e yazma başarısız oldu: %s"
+#: govirt/ovirt-proxy.c:366
+msgid "Failed to parse response from collection"
+msgstr "Koleksiyondan gelen yanıt ayrıştırılamadı"
 
-#: ../govirt/ovirt-proxy.c:517
-#, c-format
-msgid "Failed to close '%s': %s"
-msgstr "'%s'i kapatma başarısız oldu: %s"
-
-#: ../govirt/ovirt-proxy.c:583
-#, c-format
+#: govirt/ovirt-proxy.c:631
 msgid "Could not extract CA certificate filename from URI"
 msgstr "URI kullanılarak CA sertifika dosya adı çıkartılamadı"
 
-#: ../govirt/ovirt-resource.c:179
+#: govirt/ovirt-resource.c:183
 msgid "Cancellable initialization not supported"
 msgstr "İptal edilebilir başlatma desteklenmiyor"
 
-#: ../govirt/ovirt-resource.c:430
-#, c-format
+#: govirt/ovirt-resource.c:432
 msgid "Missing mandatory 'id' attribute"
 msgstr "Zorunlu 'id' özniteliği eksik"
 
-#: ../govirt/ovirt-resource.c:437
-#, c-format
+#: govirt/ovirt-resource.c:439
 msgid "Missing mandatory 'href' attribute"
 msgstr "Zorunlu 'href' özniteliği eksik"
 
-#: ../govirt/ovirt-resource.c:691
-#, c-format
+#: govirt/ovirt-resource.c:695
 msgid "Could not find 'status' node"
 msgstr "'durum' (status) düğümü bulunamadı"
 
-#: ../govirt/ovirt-resource.c:697
-#, c-format
+#: govirt/ovirt-resource.c:701
 msgid "Could not find 'state' node"
 msgstr "'hal' (state) düğümü bulunamadı"
 
-#: ../govirt/ovirt-resource.c:705
-#, c-format
+#: govirt/ovirt-resource.c:709
 msgid "Action is pending"
 msgstr "Eylem beklemede"
 
-#: ../govirt/ovirt-resource.c:709
-#, c-format
+#: govirt/ovirt-resource.c:713
 msgid "Action is in progress"
 msgstr "Eylem devam ediyor"
 
-#: ../govirt/ovirt-resource.c:713
-#, c-format
+#: govirt/ovirt-resource.c:717
 msgid "Action has failed"
 msgstr "Eylem başarısız oldu"
 
-#: ../govirt/ovirt-resource.c:718
-#, c-format
+#: govirt/ovirt-resource.c:722
 msgid "Unknown action failure"
 msgstr "Eylem bilinmeyen sebeple başarısız oldu"
 
-#: ../govirt/ovirt-utils.c:193
-#, c-format
+#: govirt/ovirt-resource.c:875
+msgid "Failed to parse response from resource"
+msgstr "Kaynaktan gelen yanıt ayrıştırılamadı"
+
+#: govirt/ovirt-utils.c:357
 msgid "Could not find 'reason' node"
 msgstr "'sebep' (reason) düğümü bulunamadı"
 
-#: ../govirt/ovirt-vm.c:265
-#, c-format
+#: govirt/ovirt-vm.c:404
 msgid "Could not find 'ticket' node"
 msgstr "'bilet' (ticket) düğümü bulunamadı"
 
-#: ../govirt/ovirt-vm.c:271
-#, c-format
+#: govirt/ovirt-vm.c:414
 msgid "Could not find 'value' node"
 msgstr "'değer' (value) düğümü bulunamadı"
 
-#: ../govirt/ovirt-vm.c:284
-#, c-format
+#: govirt/ovirt-vm.c:421
 msgid "Could not find 'expiry' node"
 msgstr "'zamanaşımı' (expiry) düğümü bulunamadı"
+
+#~ msgid "Failed to write to '%s': %s"
+#~ msgstr "'%s'e yazma başarısız oldu: %s"
+
+#~ msgid "Failed to close '%s': %s"
+#~ msgstr "'%s'i kapatma başarısız oldu: %s"
