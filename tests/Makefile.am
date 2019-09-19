@@ -8,6 +8,7 @@ EXTRA_DIST =				\
 	https-cert/server-key.csr	\
 	https-cert/server-key.pem	\
 	mock-xml-data			\
+	meson.build			\
 	$(NULL)
 
 AM_LDFLAGS =					\
