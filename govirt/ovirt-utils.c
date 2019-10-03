@@ -181,6 +181,7 @@ _set_property_value_from_type(GValue *value,
     const char *value_str;
     GType type = prop->value_type;
 
+    /* These types do not require a value associated */
     if (g_type_is_a(type, OVIRT_TYPE_RESOURCE)) {
         OvirtResource *resource_value = ovirt_resource_new_from_xml(type, node, NULL);
         g_value_set_object(value, resource_value);
@@ -209,6 +210,10 @@ _set_property_value_from_type(GValue *value,
         GParamSpecEnum *enum_prop = G_PARAM_SPEC_ENUM(prop);
         int enum_value = ovirt_utils_genum_get_value(type, value_str, enum_prop->default_value);
         g_value_set_enum(value, enum_value);
+        goto end;
+    } else if (g_type_is_a(type, G_TYPE_BYTE_ARRAY)) {
+        GByteArray *array = g_byte_array_new_take((guchar *)g_strdup(value_str), strlen(value_str));
+        g_value_take_boxed(value, array);
         goto end;
     }
 

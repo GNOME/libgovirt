@@ -331,6 +331,9 @@ static gboolean ovirt_vm_display_set_from_xml(OvirtVmDisplay *display, RestXmlNo
         { .prop_name = "proxy-url",
           .xml_path = "proxy",
         },
+        { .prop_name = "ca-cert",
+          .xml_path = "certificate/content",
+        },
         { NULL, },
     };
 
