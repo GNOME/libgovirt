@@ -568,7 +568,7 @@ static void ovirt_proxy_update_vm_display_ca(OvirtProxy *proxy)
             g_object_get(G_OBJECT(display), "ca-cert", &ca_cert, NULL);
             if (ca_cert != NULL) {
                 g_byte_array_unref(ca_cert);
-                ca_cert = NULL;
+                g_object_unref(display);
                 continue;
             }
 
