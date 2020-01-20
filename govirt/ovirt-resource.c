@@ -677,7 +677,6 @@ static enum OvirtResponseStatus parse_action_status(RestXmlNode *root,
 {
     RestXmlNode *node;
     const char *status_key = g_intern_string("status");
-    const char *state_key = g_intern_string("state");
 
     g_return_val_if_fail(g_strcmp0(root->name, "action") == 0,
                          OVIRT_RESPONSE_UNKNOWN);
@@ -688,12 +687,6 @@ static enum OvirtResponseStatus parse_action_status(RestXmlNode *root,
     if (node == NULL) {
         g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
                     _("Could not find 'status' node"));
-        g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
-    }
-    node = g_hash_table_lookup(node->children, state_key);
-    if (node == NULL) {
-        g_set_error(error, OVIRT_ERROR, OVIRT_ERROR_PARSING_FAILED,
-                    _("Could not find 'state' node"));
         g_return_val_if_reached(OVIRT_RESPONSE_UNKNOWN);
     }
     g_debug("State: %s\n", node->content);

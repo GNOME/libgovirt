@@ -860,7 +860,6 @@ static void ovirt_proxy_constructed(GObject *gobject)
     /* FIXME: to set or not to set ?? */
     ovirt_proxy_add_header(OVIRT_PROXY(gobject), "All-Content", "true");
     ovirt_proxy_add_header(OVIRT_PROXY(gobject), "Prefer", "persistent-auth");
-    ovirt_proxy_add_header(OVIRT_PROXY(gobject), "Version", "3");
 
     /* Chain up to the parent class */
     if (G_OBJECT_CLASS(ovirt_proxy_parent_class)->constructed)

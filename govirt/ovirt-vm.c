@@ -198,7 +198,7 @@ static gboolean ovirt_vm_init_from_xml(OvirtResource *resource,
           .xml_attr = "id",
         },
         { .prop_name = "state",
-          .xml_path = "status/state",
+          .xml_path = "status",
         },
         { NULL, },
     };
