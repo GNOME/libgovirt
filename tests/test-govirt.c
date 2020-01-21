@@ -171,7 +171,7 @@ static void test_govirt_list_vms(void)
                               <vm href=\"/ovirt-engine/api/vms/uuid1\" id=\"uuid1\"> \
                                 <name>vm1</name> \
                                 <type>desktop</type> \
-                                <status><state>up</state></status> \
+                                <status>up</status> \
                                 <display> \
                                     <type>spice</type> \
                                     <address>10.0.0.123</address> \
