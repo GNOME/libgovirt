@@ -29,6 +29,9 @@ struct _OvirtStorageDomainPrivate {
     OvirtCollection *files;
     GStrv data_center_ids;
 
+    gchar *data_center_href;
+    gchar *data_center_id;
+
     OvirtStorageDomainType type;
     gboolean is_master;
     guint64 available;
@@ -50,7 +53,26 @@ enum {
     PROP_VERSION,
     PROP_STATE,
     PROP_DATA_CENTER_IDS,
+    PROP_DATA_CENTER_HREF,
+    PROP_DATA_CENTER_ID,
 };
+
+static char *ensure_href_from_id(const char *id,
+                                 const char *path)
+{
+    if (id == NULL)
+        return NULL;
+
+    return g_strdup_printf("%s/%s", path, id);
+}
+
+static const char *get_data_center_href(OvirtStorageDomain *domain)
+{
+    if (domain->priv->data_center_href == NULL)
+        domain->priv->data_center_href = ensure_href_from_id(domain->priv->data_center_id, "/ovirt-engine/api/datacenters");
+
+    return domain->priv->data_center_href;
+}
 
 static void ovirt_storage_domain_get_property(GObject *object,
                                               guint prop_id,
@@ -83,6 +105,12 @@ static void ovirt_storage_domain_get_property(GObject *object,
         break;
     case PROP_DATA_CENTER_IDS:
         g_value_set_boxed(value, domain->priv->data_center_ids);
+        break;
+    case PROP_DATA_CENTER_HREF:
+        g_value_set_string(value, get_data_center_href(domain));
+        break;
+    case PROP_DATA_CENTER_ID:
+        g_value_set_string(value, domain->priv->data_center_id);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -123,6 +151,14 @@ static void ovirt_storage_domain_set_property(GObject *object,
         g_strfreev(domain->priv->data_center_ids);
         domain->priv->data_center_ids = g_value_dup_boxed(value);
         break;
+    case PROP_DATA_CENTER_HREF:
+        g_free(domain->priv->data_center_href);
+        domain->priv->data_center_href = g_value_dup_string(value);
+        break;
+    case PROP_DATA_CENTER_ID:
+        g_free(domain->priv->data_center_id);
+        domain->priv->data_center_id = g_value_dup_string(value);
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
         break;
@@ -137,6 +173,8 @@ ovirt_storage_domain_dispose(GObject *obj)
 
     g_clear_object(&domain->priv->files);
     g_clear_pointer(&domain->priv->data_center_ids, g_strfreev);
+    g_clear_pointer(&domain->priv->data_center_href, g_free);
+    g_clear_pointer(&domain->priv->data_center_id, g_free);
 
     G_OBJECT_CLASS(ovirt_storage_domain_parent_class)->dispose(obj);
 }
@@ -172,6 +210,14 @@ static gboolean ovirt_storage_domain_init_from_xml(OvirtResource *resource,
         },
         { .prop_name = "data-center-ids",
           .xml_path = "data_centers",
+          .xml_attr = "id",
+        },
+        { .prop_name = "data-center-href",
+          .xml_path = "data_center",
+          .xml_attr = "href",
+        },
+        { .prop_name = "data-center-id",
+          .xml_path = "data_center",
           .xml_attr = "id",
         },
         { NULL , }
@@ -285,6 +331,26 @@ static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
                                     G_PARAM_STATIC_STRINGS);
     g_object_class_install_property(object_class,
                                     PROP_DATA_CENTER_IDS,
+                                    param_spec);
+
+    param_spec = g_param_spec_string("data-center-href",
+                                     "Data Center href",
+                                     "Data Center href for the Storage Domain",
+                                     NULL,
+                                     G_PARAM_READWRITE |
+                                     G_PARAM_STATIC_STRINGS);
+    g_object_class_install_property(object_class,
+                                    PROP_DATA_CENTER_HREF,
+                                    param_spec);
+
+    param_spec = g_param_spec_string("data-center-id",
+                                     "Data Center Id",
+                                     "Data Center Id for the Storage Domain",
+                                     NULL,
+                                     G_PARAM_READWRITE |
+                                     G_PARAM_STATIC_STRINGS);
+    g_object_class_install_property(object_class,
+                                    PROP_DATA_CENTER_ID,
                                     param_spec);
 }
 
