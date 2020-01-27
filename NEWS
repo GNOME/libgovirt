@@ -1,3 +1,20 @@
+0.3.7 - Jan 27th 2020
+=====================
+
+Changes since 0.3.6
+
+- Use GTask API instead of deprecated GSimpleAsyncResult
+- Fixed issue preventing adding parameters to action
+- Prefer certificate from XML data instead of the command line
+- Added support for oVirt API v4
+- Initial support for building with meson, should be replacing autotools in future release.
+- Updated Translations:
+        * Slovenian (Matej Urbančič)
+        * Swedish (Anders Jonsson)
+        * Turkish (Sabri Ünal)
+        * Serbian (Марко Костић)
+        * Czech (Marek Černock)
+
 0.3.6 - May 22nd 2019
 =====================
 

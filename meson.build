@@ -2,7 +2,7 @@
 # project definition
 #
 project('libgovirt', 'c',
-        version : '0.3.4',
+        version : '0.3.7',
         license : 'LGPLv2.1',
         meson_version: '>= 0.49.0')
 
@@ -26,7 +26,7 @@ govirt_deps = []
 # REVISION	If the API and ABI remains the same, but bugs are fixed.
 # AGE		Don't use.
 govirt_current = 4
-govirt_revision = 1
+govirt_revision = 2
 govirt_age = 2
 govirt_so_version = '@0@.@1@.@2@'.format(govirt_current - govirt_age,
                                          govirt_age,
