@@ -1,0 +1,109 @@
+# Ukrainian translation for libgovirt.
+# Copyright (C) 2020 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+#
+# Yuri Chornoivan <yurchor@ukr.net>, 2020.
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
+"POT-Creation-Date: 2020-03-07 22:24+0000\n"
+"PO-Revision-Date: 2020-04-01 12:00+0300\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
+"%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Lokalize 20.07.70\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "Неочікуваний тип параметра у виклику REST"
+
+#: govirt/ovirt-collection.c:248
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Отримано вузол «%s», мав бути «%s»"
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Файл кореневого сертифіката CA для захисту з'єднань SSL"
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr "<файл>"
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "Вивести дані щодо версії libgovirt"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "Параметри oVirt:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "Показати параметри oVirt"
+
+#: govirt/ovirt-proxy.c:358
+msgid "Failed to parse response from collection"
+msgstr "Не вдалося обробити відповідь від збірки"
+
+#: govirt/ovirt-proxy.c:627
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Не вдалося видобути назву файла сертифіката CA з адреси"
+
+#: govirt/ovirt-resource.c:178
+msgid "Cancellable initialization not supported"
+msgstr "Підтримки ініціалізації з можливістю скасування не передбачено"
+
+#: govirt/ovirt-resource.c:427
+msgid "Missing mandatory 'id' attribute"
+msgstr "Пропущено обов'язковий атрибут «id»"
+
+#: govirt/ovirt-resource.c:434
+msgid "Missing mandatory 'href' attribute"
+msgstr "Пропущено обов'язковий атрибут «href»"
+
+#: govirt/ovirt-resource.c:689
+msgid "Could not find 'status' node"
+msgstr "Не вдалося знайти вузол «status»"
+
+#: govirt/ovirt-resource.c:697
+msgid "Action is pending"
+msgstr "Очікуємо на виконання дії"
+
+#: govirt/ovirt-resource.c:701
+msgid "Action is in progress"
+msgstr "Виконуємо дію"
+
+#: govirt/ovirt-resource.c:705
+msgid "Action has failed"
+msgstr "Помилка під час виконання дії"
+
+#: govirt/ovirt-resource.c:710
+msgid "Unknown action failure"
+msgstr "Невідома помилка під час виконання дії"
+
+#: govirt/ovirt-resource.c:863
+msgid "Failed to parse response from resource"
+msgstr "Не вдалося обробити відповідь від ресурсу"
+
+#: govirt/ovirt-utils.c:362
+msgid "Could not find 'reason' node"
+msgstr "Не вдалося знайти вузол «reason»"
+
+#: govirt/ovirt-vm.c:403
+msgid "Could not find 'ticket' node"
+msgstr "Не вдалося знайти вузол «ticket»"
+
+#: govirt/ovirt-vm.c:413
+msgid "Could not find 'value' node"
+msgstr "Не вдалося знайти вузол «value»"
+
+#: govirt/ovirt-vm.c:420
+msgid "Could not find 'expiry' node"
+msgstr "Не вдалося знайти вузол «expiry»"
