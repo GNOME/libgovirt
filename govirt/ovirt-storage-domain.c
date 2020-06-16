@@ -27,6 +27,7 @@
 
 struct _OvirtStorageDomainPrivate {
     OvirtCollection *files;
+    OvirtCollection *disks;
     GStrv data_center_ids;
 
     gchar *data_center_href;
@@ -172,6 +173,7 @@ ovirt_storage_domain_dispose(GObject *obj)
     OvirtStorageDomain *domain = OVIRT_STORAGE_DOMAIN(obj);
 
     g_clear_object(&domain->priv->files);
+    g_clear_object(&domain->priv->disks);
     g_clear_pointer(&domain->priv->data_center_ids, g_strfreev);
     g_clear_pointer(&domain->priv->data_center_href, g_free);
     g_clear_pointer(&domain->priv->data_center_id, g_free);
@@ -398,4 +400,30 @@ OvirtCollection *ovirt_storage_domain_get_files(OvirtStorageDomain *domain)
                                                                      "file");
 
     return domain->priv->files;
+}
+
+/**
+ * ovirt_storage_domain_get_disks:
+ * @domain: a #OvirtStorageDomain
+ *
+ * Gets a #OvirtCollection representing the list of remote disks from a
+ * storage domain object.  This method does not initiate any network
+ * activity, the remote file list must be then be fetched using
+ * ovirt_collection_fetch() or ovirt_collection_fetch_async().
+ *
+ * Return value: (transfer none): a #OvirtCollection representing the list
+ * of disks associated with @domain.
+ */
+OvirtCollection *ovirt_storage_domain_get_disks(OvirtStorageDomain *domain)
+{
+    g_return_val_if_fail(OVIRT_IS_STORAGE_DOMAIN(domain), NULL);
+
+    if (domain->priv->disks == NULL)
+        domain->priv->disks = ovirt_sub_collection_new_from_resource(OVIRT_RESOURCE(domain),
+                                                                     "disks",
+                                                                     "disks",
+                                                                     OVIRT_TYPE_DISK,
+                                                                     "disk");
+
+    return domain->priv->disks;
 }

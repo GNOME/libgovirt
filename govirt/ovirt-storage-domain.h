@@ -86,6 +86,7 @@ GType ovirt_storage_domain_get_type(void);
 OvirtStorageDomain *ovirt_storage_domain_new(void);
 
 OvirtCollection *ovirt_storage_domain_get_files(OvirtStorageDomain *domain);
+OvirtCollection *ovirt_storage_domain_get_disks(OvirtStorageDomain *domain);
 
 G_END_DECLS
 

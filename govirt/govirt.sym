@@ -146,5 +146,7 @@ GOVIRT_0.4.1 {
         ovirt_disk_get_type;
         ovirt_disk_content_type_get_type;
         ovirt_disk_new;
+
+        ovirt_storage_domain_get_disks;
 } GOVIRT_0.4.0;
 # .... define new API here using predicted next version number ....
