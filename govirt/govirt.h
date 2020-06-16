@@ -28,6 +28,7 @@
 #include <govirt/ovirt-cluster.h>
 #include <govirt/ovirt-collection.h>
 #include <govirt/ovirt-data-center.h>
+#include <govirt/ovirt-disk.h>
 #include <govirt/ovirt-error.h>
 #include <govirt/ovirt-host.h>
 #include <govirt/ovirt-options.h>
