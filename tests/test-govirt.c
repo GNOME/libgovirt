@@ -37,6 +37,7 @@ static void ovirt_proxy_set_mock_ca(OvirtProxy *proxy)
     gsize size;
     GByteArray *cacert;
 
+    /* check_return: Calling "g_file_get_contents("/builddir/build/BUILD/libgovirt-0.3.7/tests/https-cert/ca-cert.pem", &data, &size, NULL)" without checking return value. This library function may fail and return an error code. */
     g_file_get_contents(abs_srcdir "/https-cert/ca-cert.pem", &data, &size, NULL);
     cacert = g_byte_array_new_take((guint8 *)data, size);
     g_object_set(proxy, "ca-cert", cacert, NULL);
@@ -263,6 +264,7 @@ static void govirt_mock_httpd_add_vms(GovirtMockHttpd *httpd, MockOvirtVm vms[],
         } else if (vm->filename != NULL) {
             char *body;
 
+            /* uninit_use_in_call: Using uninitialized value "body" when calling "g_file_get_contents". */
             if (!g_file_get_contents(g_test_build_filename(G_TEST_DIST, srcdir, "mock-xml-data", vm->filename, NULL),
                                      &body, NULL, NULL)) {
                 g_warn_if_reached();
@@ -422,6 +424,7 @@ static void test_govirt_http_404(void)
 
     proxy = ovirt_proxy_new("localhost:" G_STRINGIFY(GOVIRT_HTTPS_PORT));
     ovirt_proxy_set_mock_ca(proxy);
+    /* warning: Value stored to 'api' is never read */
     api = ovirt_proxy_fetch_api(proxy, &error);
     g_test_assert_expected_messages();
     g_assert_error(error, REST_PROXY_ERROR, 404);
