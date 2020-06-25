@@ -77,7 +77,7 @@ static gboolean ovirt_disk_init_from_xml(OvirtResource *resource,
     gboolean parsed_ok;
     OvirtResourceClass *parent_class;
     OvirtXmlElement disk_elements[] = {
-        { .prop_name = "content_type",
+        { .prop_name = "content-type",
           .xml_path = "content_type",
         },
         { NULL , }
@@ -103,7 +103,7 @@ static void ovirt_disk_class_init(OvirtDiskClass *klass)
     object_class->get_property = ovirt_disk_get_property;
     object_class->set_property = ovirt_disk_set_property;
 
-    param_spec = g_param_spec_enum("type",
+    param_spec = g_param_spec_enum("content-type",
                                    "Content Type",
                                    "The actual content residing on the disk",
                                    OVIRT_TYPE_DISK_CONTENT_TYPE,
