@@ -1,0 +1,108 @@
+# Romanian translation for libgovirt.
+# Copyright (C) 2020 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# Florentina Mușat <florentina.musat.28@gmail.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
+"POT-Creation-Date: 2020-06-25 16:47+0000\n"
+"PO-Revision-Date: 2020-07-13 14:03+0300\n"
+"Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);;\n"
+"Last-Translator: Florentina Mușat <florentina.musat.28@gmail.com>\n"
+"X-Generator: Poedit 2.3.1\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "Tip de parametru neașteptat în apelul REST"
+
+#: govirt/ovirt-collection.c:248
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "S-a obținut nodul „%s”, s-a așteptat „%s”"
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Fișier de certificat CA rădăcină pentru conexiunile SSL sigure"
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr "<file>"
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "Afișează informațiile de versiune ale libgovirt"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "opțiuni oVirt:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "Arată opțiunile oVirt"
+
+#: govirt/ovirt-proxy.c:358
+msgid "Failed to parse response from collection"
+msgstr "Nu s-a putut parsa răspunsul de la colecție"
+
+#: govirt/ovirt-proxy.c:627
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Nu s-a putut extrage numele de fișier al certificatului CA de la URI"
+
+#: govirt/ovirt-resource.c:178
+msgid "Cancellable initialization not supported"
+msgstr "Inițializarea care se poate anula nu este suportată"
+
+#: govirt/ovirt-resource.c:427
+msgid "Missing mandatory 'id' attribute"
+msgstr "Lipsește atributul de „id” obligatoriu"
+
+#: govirt/ovirt-resource.c:434
+msgid "Missing mandatory 'href' attribute"
+msgstr "Lipsește atributul „href” obligatoriu"
+
+#: govirt/ovirt-resource.c:689
+msgid "Could not find 'status' node"
+msgstr "Nu s-a putut găsi nodul „stare”"
+
+#: govirt/ovirt-resource.c:697
+msgid "Action is pending"
+msgstr "Acțiunea este în așteptare"
+
+#: govirt/ovirt-resource.c:701
+msgid "Action is in progress"
+msgstr "Acțiunea este în progres"
+
+#: govirt/ovirt-resource.c:705
+msgid "Action has failed"
+msgstr "Acțiunea a eșuat"
+
+#: govirt/ovirt-resource.c:710
+msgid "Unknown action failure"
+msgstr "Eșec al acțiunii necunoscut"
+
+#: govirt/ovirt-resource.c:863
+msgid "Failed to parse response from resource"
+msgstr "Nu s-a putut parsa răspunsul de la resursă"
+
+#: govirt/ovirt-utils.c:362
+msgid "Could not find 'reason' node"
+msgstr "Nu s-a putut găsi nodul „motiv”"
+
+#: govirt/ovirt-vm.c:403
+msgid "Could not find 'ticket' node"
+msgstr "Nu s-a putut găsi nodul „bilet”"
+
+#: govirt/ovirt-vm.c:413
+msgid "Could not find 'value' node"
+msgstr "Nu s-a putut găsi nodul „valoare”"
+
+#: govirt/ovirt-vm.c:420
+msgid "Could not find 'expiry' node"
+msgstr "Nu s-a putut găsi nodul „expirare”"
