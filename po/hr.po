@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: libgovirt master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
 "POT-Creation-Date: 2020-09-06 19:53+0000\n"
-"PO-Revision-Date: 2020-09-16 00:11+0200\n"
+"PO-Revision-Date: 2020-09-16 00:12+0200\n"
 "Language-Team: Croatian <hr@li.org>\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +29,7 @@ msgstr "Dobiven je '%s' čvor, očekivan je '%s'"
 
 #: govirt/ovirt-options.c:52
 msgid "Root CA certificate file for secure SSL connections"
-msgstr "Korijenska datoteka CA vjerodajnica za sigurno SSL povezivanje"
+msgstr "Korijenska datoteka CA vjerodajnice za sigurno SSL povezivanje"
 
 #: govirt/ovirt-options.c:52
 msgid "<file>"
