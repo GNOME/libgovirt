@@ -1,0 +1,108 @@
+# Croatian translation for libgovirt.
+# Copyright (C) 2020 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
+"POT-Creation-Date: 2020-09-06 19:53+0000\n"
+"PO-Revision-Date: 2020-09-16 00:11+0200\n"
+"Language-Team: Croatian <hr@li.org>\n"
+"Language: hr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Last-Translator: gogo <trebelnik2@gmail.com>\n"
+"X-Generator: Poedit 2.3\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "Neočekivana vrsta parametra u REST pozivu"
+
+#: govirt/ovirt-collection.c:248
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Dobiven je '%s' čvor, očekivan je '%s'"
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Korijenska datoteka CA vjerodajnica za sigurno SSL povezivanje"
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr "<datoteka>"
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "Prikaži libgovirt informaciju inačice"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "oVirt mogućnosti:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "Prikaži oVirt mogućnosti"
+
+#: govirt/ovirt-proxy.c:358
+msgid "Failed to parse response from collection"
+msgstr "Nemoguća obrada odgovora iz kolekcije"
+
+#: govirt/ovirt-proxy.c:627
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Nemoguće izdvajanje naziva datoteke CA vjerodajnice iz URI-ja"
+
+#: govirt/ovirt-resource.c:178
+msgid "Cancellable initialization not supported"
+msgstr "Prekidanje pokretanja nije podržano"
+
+#: govirt/ovirt-resource.c:427
+msgid "Missing mandatory 'id' attribute"
+msgstr "Nedostaje obavezno 'id' svojstvo"
+
+#: govirt/ovirt-resource.c:434
+msgid "Missing mandatory 'href' attribute"
+msgstr "Nedostaje obavezno 'href' svojstvo"
+
+#: govirt/ovirt-resource.c:689
+msgid "Could not find 'status' node"
+msgstr "Nemoguć pronalazak 'status' čvora"
+
+#: govirt/ovirt-resource.c:697
+msgid "Action is pending"
+msgstr "Radnja je na čekanju"
+
+#: govirt/ovirt-resource.c:701
+msgid "Action is in progress"
+msgstr "Radnja je u tijeku"
+
+#: govirt/ovirt-resource.c:705
+msgid "Action has failed"
+msgstr "Radnja nije uspjela"
+
+#: govirt/ovirt-resource.c:710
+msgid "Unknown action failure"
+msgstr "Nepoznat neuspjeh radnje"
+
+#: govirt/ovirt-resource.c:863
+msgid "Failed to parse response from resource"
+msgstr "Neuspješna obrada odgovora iz resursa"
+
+#: govirt/ovirt-utils.c:362
+msgid "Could not find 'reason' node"
+msgstr "Nemoguć pronalazak 'reason' čvora"
+
+#: govirt/ovirt-vm.c:403
+msgid "Could not find 'ticket' node"
+msgstr "Nemoguć pronalazak 'ticket' čvora"
+
+#: govirt/ovirt-vm.c:413
+msgid "Could not find 'value' node"
+msgstr "Nemoguć pronalazak 'value' čvora"
+
+#: govirt/ovirt-vm.c:420
+msgid "Could not find 'expiry' node"
+msgstr "Nemoguć pronalazak 'expiry' čvora"
