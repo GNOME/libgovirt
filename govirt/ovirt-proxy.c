@@ -242,7 +242,6 @@ static void rest_call_async_set_error(RestProxyCall *call, GTask *task, const GE
     if (root != NULL && ovirt_utils_gerror_from_xml_fault(root, &local_error)) {
         g_debug("ovirt_rest_call_async(): %s", local_error->message);
         g_task_return_error(task, local_error);
-        g_clear_error(&local_error);
     } else {
         g_task_return_error(task, (GError *) error);
     }
@@ -272,7 +271,7 @@ call_async_cb(RestProxyCall *call, const GError *error,
                                               data->call_user_data,
                                               &call_error);
         if (call_error != NULL) {
-            rest_call_async_set_error(call, task, error);
+            rest_call_async_set_error(call, task, call_error);
             goto exit;
         }
     }
