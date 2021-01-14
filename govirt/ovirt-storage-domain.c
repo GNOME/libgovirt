@@ -40,13 +40,14 @@ struct _OvirtStorageDomainPrivate {
     guint64 committed;
     OvirtStorageDomainFormatVersion version;
     OvirtStorageDomainState state;
+    OvirtStorageDomainStorageType storage_type;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE(OvirtStorageDomain, ovirt_storage_domain, OVIRT_TYPE_RESOURCE);
 
 enum {
     PROP_0,
-    PROP_STORAGE_TYPE,
+    PROP_TYPE,
     PROP_MASTER,
     PROP_AVAILABLE,
     PROP_USED,
@@ -56,6 +57,7 @@ enum {
     PROP_DATA_CENTER_IDS,
     PROP_DATA_CENTER_HREF,
     PROP_DATA_CENTER_ID,
+    PROP_STORAGE_TYPE,
 };
 
 static char *ensure_href_from_id(const char *id,
@@ -83,7 +85,7 @@ static void ovirt_storage_domain_get_property(GObject *object,
     OvirtStorageDomain *domain = OVIRT_STORAGE_DOMAIN(object);
 
     switch (prop_id) {
-    case PROP_STORAGE_TYPE:
+    case PROP_TYPE:
         g_value_set_enum(value, domain->priv->type);
         break;
     case PROP_MASTER:
@@ -113,6 +115,9 @@ static void ovirt_storage_domain_get_property(GObject *object,
     case PROP_DATA_CENTER_ID:
         g_value_set_string(value, domain->priv->data_center_id);
         break;
+    case PROP_STORAGE_TYPE:
+        g_value_set_enum(value, domain->priv->storage_type);
+        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
         break;
@@ -127,7 +132,7 @@ static void ovirt_storage_domain_set_property(GObject *object,
     OvirtStorageDomain *domain = OVIRT_STORAGE_DOMAIN(object);
 
     switch (prop_id) {
-    case PROP_STORAGE_TYPE:
+    case PROP_TYPE:
         domain->priv->type = g_value_get_enum(value);
         break;
     case PROP_MASTER:
@@ -159,6 +164,9 @@ static void ovirt_storage_domain_set_property(GObject *object,
     case PROP_DATA_CENTER_ID:
         g_free(domain->priv->data_center_id);
         domain->priv->data_center_id = g_value_dup_string(value);
+        break;
+    case PROP_STORAGE_TYPE:
+        domain->priv->storage_type = g_value_get_enum(value);
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -222,6 +230,9 @@ static gboolean ovirt_storage_domain_init_from_xml(OvirtResource *resource,
           .xml_path = "data_center",
           .xml_attr = "id",
         },
+        { .prop_name = "storage-type",
+          .xml_path = "storage/type",
+        },
         { NULL , }
     };
 
@@ -254,7 +265,7 @@ static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
                                    G_PARAM_READWRITE |
                                    G_PARAM_STATIC_STRINGS);
     g_object_class_install_property(object_class,
-                                    PROP_STORAGE_TYPE,
+                                    PROP_TYPE,
                                     param_spec);
 
     param_spec = g_param_spec_boolean("master",
@@ -354,6 +365,18 @@ static void ovirt_storage_domain_class_init(OvirtStorageDomainClass *klass)
     g_object_class_install_property(object_class,
                                     PROP_DATA_CENTER_ID,
                                     param_spec);
+
+    param_spec = g_param_spec_enum("storage-type",
+                                   "Host Storage Type",
+                                   "Type of the storage domain host storage",
+                                   OVIRT_TYPE_STORAGE_DOMAIN_STORAGE_TYPE,
+                                   OVIRT_STORAGE_DOMAIN_STORAGE_TYPE_NFS,
+                                   G_PARAM_READWRITE |
+                                   G_PARAM_STATIC_STRINGS);
+    g_object_class_install_property(object_class,
+                                    PROP_STORAGE_TYPE,
+                                    param_spec);
+
 }
 
 static void ovirt_storage_domain_init(OvirtStorageDomain *domain)
