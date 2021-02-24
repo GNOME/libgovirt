@@ -1,3 +1,28 @@
+0.3.8 - Feb 24th 2020
+=====================
+
+Changes since 0.3.7
+
+- API additions:
+        - ovirt_disk_get_type()
+        - ovirt_disk_content_type_get_type()
+        - ovirt_disk_new()
+
+        - ovirt_storage_domain_get_disks()
+        - ovirt_storage_domain_storage_type_get_type()
+
+- Initial support for Disks
+- Properly handle StorageDomains of DATA type
+- Fixed crash with error handling of GTask API
+- New Translations:
+        * Ukraninan (Yuri Chornoivan)
+        * Romanian (Florentina Mușat)
+        * Croatian (Goran Vidović)
+- Updated Translations:
+        * Dutch (Nathan Follens)
+        * Lithuanian (Aurimas Černius)
+        * German (Tim Sabsch)
+
 0.3.7 - Jan 27th 2020
 =====================
 

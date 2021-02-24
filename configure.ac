@@ -4,7 +4,7 @@ AC_PREREQ(2.63)
 
 m4_define([govirt_major_version], [0])
 m4_define([govirt_minor_version], [3])
-m4_define([govirt_micro_version], [7])
+m4_define([govirt_micro_version], [8])
 m4_define([govirt_version],
           [govirt_major_version.govirt_minor_version.govirt_micro_version])
 
@@ -39,9 +39,9 @@ AC_SUBST(G_OVIRT_MICRO_VERSION)
 #
 # See https://developer.gnome.org/programming-guidelines/stable/versioning.html.en#libtool-versioning
 # for details
-LT_CURRENT=4
-LT_REVISION=2
-LT_AGE=2
+LT_CURRENT=5
+LT_REVISION=0
+LT_AGE=3
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
