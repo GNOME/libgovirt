@@ -1,0 +1,107 @@
+# Catalan translation for libgovirt.
+# Copyright (C) 2021 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# maite <maite.guix@gmail.com>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
+"POT-Creation-Date: 2021-05-01 15:54+0000\n"
+"PO-Revision-Date: 2021-11-02 15:33+0100\n"
+"Language-Team: Catalan <gnome@llistes.softcatala.org>\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: maite guix <maite.guix@me.com>\n"
+"X-Generator: Poedit 3.0\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "Tipus de paràmetre inesperat a la trucada REST"
+
+#: govirt/ovirt-collection.c:248
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "S'ha obtingut el node «%s», s'esperava «%s»"
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Fitxer de certificat d'arrel CA per a connexions SSL segures"
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr "<file>"
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "Visualitza la informació de la versió libgovirt"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "Opcions oVirt:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "Mostra les opcions de l'oVirt"
+
+#: govirt/ovirt-proxy.c:357
+msgid "Failed to parse response from collection"
+msgstr "No s'ha pogut analitzar la resposta de la col·lecció"
+
+#: govirt/ovirt-proxy.c:626
+msgid "Could not extract CA certificate filename from URI"
+msgstr "No s' ha pogut extreure el nom de fitxer de certificat CA de l'URI"
+
+#: govirt/ovirt-resource.c:178
+msgid "Cancellable initialization not supported"
+msgstr "No s'admet la inicialització cancel·lable"
+
+#: govirt/ovirt-resource.c:427
+msgid "Missing mandatory 'id' attribute"
+msgstr "Falta l'atribut obligatori «id»"
+
+#: govirt/ovirt-resource.c:434
+msgid "Missing mandatory 'href' attribute"
+msgstr "Falta l'atribut obligatori «href»"
+
+#: govirt/ovirt-resource.c:689
+msgid "Could not find 'status' node"
+msgstr "No s'ha pogut trobar el node «status»"
+
+#: govirt/ovirt-resource.c:697
+msgid "Action is pending"
+msgstr "L'acció està pendent"
+
+#: govirt/ovirt-resource.c:701
+msgid "Action is in progress"
+msgstr "L'acció està en curs"
+
+#: govirt/ovirt-resource.c:705
+msgid "Action has failed"
+msgstr "L'acció ha fallat"
+
+#: govirt/ovirt-resource.c:710
+msgid "Unknown action failure"
+msgstr "Error d'acció desconegut"
+
+#: govirt/ovirt-resource.c:863
+msgid "Failed to parse response from resource"
+msgstr "No s'ha pogut analitzar la resposta del recurs"
+
+#: govirt/ovirt-utils.c:362
+msgid "Could not find 'reason' node"
+msgstr "No s'ha pogut trobar el node «reason»"
+
+#: govirt/ovirt-vm.c:403
+msgid "Could not find 'ticket' node"
+msgstr "No s' ha pogut trobar el node «ticket»"
+
+#: govirt/ovirt-vm.c:413
+msgid "Could not find 'value' node"
+msgstr "No s'ha pogut trobar el node «value»"
+
+#: govirt/ovirt-vm.c:420
+msgid "Could not find 'expiry' node"
+msgstr "No s'ha pogut trobar el node «expiry»"
