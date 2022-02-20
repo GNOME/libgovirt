@@ -129,5 +129,10 @@ pkgconfig.generate(govirt_lib,
                    filebase : 'govirt-1.0',
                    description : 'goVirt is a GLib binding for oVirt REST API',
                    subdirs : 'govirt-1.0',
+                   requires : [
+                       gobject_dep,
+                       gio_dep,
+                       rest_dep,
+                   ],
                    variables : 'exec_prefix=${prefix}')
 

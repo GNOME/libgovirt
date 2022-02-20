@@ -38,15 +38,17 @@ govirt_so_version = '@0@.@1@.@2@'.format(govirt_current - govirt_age,
 glib_version_info = '>= 2.38'
 glib_encoded_version = 'GLIB_VERSION_2_38'
 
-deps = {'gobject-2.0' : glib_version_info,
-        'gio-2.0' : glib_version_info,
-        'gthread-2.0' : glib_version_info,
-        'gobject-introspection-1.0' : '>= 1.30.0',
-        'rest-0.7' : '>= 0.7.92',}
+gobject_dep = dependency('gobject-2.0', version : glib_version_info)
+gio_dep = dependency('gio-2.0', version : glib_version_info)
+gthread_dep = dependency('gthread-2.0', version : glib_version_info)
+rest_dep = dependency('rest-0.7', version : '>= 0.7.92')
 
-foreach dep, version : deps
-  govirt_deps += dependency(dep, version : version)
-endforeach
+govirt_deps += [
+    gobject_dep,
+    gio_dep,
+    gthread_dep,
+    rest_dep,
+]
 
 #
 # global C defines
