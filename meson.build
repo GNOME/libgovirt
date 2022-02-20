@@ -3,7 +3,7 @@
 #
 project('libgovirt', 'c',
         version : '0.3.8',
-        license : 'LGPLv2.1',
+        license : 'LGPL-2.1-or-later',
         meson_version: '>= 0.49.0')
 
 #
