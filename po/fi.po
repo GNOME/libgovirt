@@ -1,0 +1,108 @@
+# Finnish translation for libgovirt.
+# Copyright (C) 2022 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
+"POT-Creation-Date: 2021-11-05 15:26+0000\n"
+"PO-Revision-Date: 2022-03-10 20:44+0200\n"
+"Last-Translator: \n"
+"Language-Team: Finnish <lokalisointi-lista@googlegroups.com>\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "Odottamaton parametrityyppi REST-kutsussa"
+
+#: govirt/ovirt-collection.c:248
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr ""
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr ""
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr ""
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "Näytä libgovirtin versiotiedot"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "oVirt-valinnat:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "Näytä oVirt-valinnat"
+
+#: govirt/ovirt-proxy.c:357
+msgid "Failed to parse response from collection"
+msgstr "Vastauksen jäsentäminen kokoelmasta epäonnistui"
+
+#: govirt/ovirt-proxy.c:626
+msgid "Could not extract CA certificate filename from URI"
+msgstr ""
+
+#: govirt/ovirt-resource.c:178
+msgid "Cancellable initialization not supported"
+msgstr ""
+
+#: govirt/ovirt-resource.c:427
+msgid "Missing mandatory 'id' attribute"
+msgstr "Pakollinen 'id'-attribuutti puuttuu"
+
+#: govirt/ovirt-resource.c:434
+msgid "Missing mandatory 'href' attribute"
+msgstr "Pakollinen 'href'-attribuutti puuttuu"
+
+#: govirt/ovirt-resource.c:689
+msgid "Could not find 'status' node"
+msgstr "Ei löytynyt 'status'-solmua"
+
+#: govirt/ovirt-resource.c:697
+msgid "Action is pending"
+msgstr "Toiminto odottaa"
+
+#: govirt/ovirt-resource.c:701
+msgid "Action is in progress"
+msgstr "Toiminto on meneillään"
+
+#: govirt/ovirt-resource.c:705
+msgid "Action has failed"
+msgstr "Toiminto epäonnistui"
+
+#: govirt/ovirt-resource.c:710
+msgid "Unknown action failure"
+msgstr ""
+
+#: govirt/ovirt-resource.c:863
+msgid "Failed to parse response from resource"
+msgstr "Vastauksen jäsentäminen resurssista epäonnistui"
+
+#: govirt/ovirt-utils.c:362
+msgid "Could not find 'reason' node"
+msgstr "Ei löytynyt 'reason'-solmua"
+
+#: govirt/ovirt-vm.c:403
+msgid "Could not find 'ticket' node"
+msgstr "Ei löytynyt 'ticket'-solmua"
+
+#: govirt/ovirt-vm.c:413
+msgid "Could not find 'value' node"
+msgstr "Ei löytynyt 'value'-solmua"
+
+#: govirt/ovirt-vm.c:420
+msgid "Could not find 'expiry' node"
+msgstr "Ei löytynyt 'expiry'-solmua"
