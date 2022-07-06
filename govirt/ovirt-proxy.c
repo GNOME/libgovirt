@@ -252,26 +252,26 @@ static void rest_call_async_set_error(RestProxyCall *call, GTask *task, const GE
 }
 
 static void
-call_async_cb(RestProxyCall *call, const GError *error,
-              G_GNUC_UNUSED GObject *weak_object,
+call_async_cb(GObject *source_obj,
+              GAsyncResult *result,
               gpointer user_data)
 {
+    RestProxyCall *call = REST_PROXY_CALL(source_obj);
+    GError *error = NULL;
     OvirtProxyCallAsyncData *data = user_data;
     GTask *task = data->task;
     gboolean callback_result = TRUE;
 
+    rest_proxy_call_invoke_finish(call, result, &error);
     if (error != NULL) {
-        rest_call_async_set_error(call, task, error);
         goto exit;
     }
 
     if (data->call_async_cb != NULL) {
-        GError *call_error = NULL;
         callback_result = data->call_async_cb(data->proxy, call,
                                               data->call_user_data,
-                                              &call_error);
-        if (call_error != NULL) {
-            rest_call_async_set_error(call, task, call_error);
+                                              &error);
+        if (error != NULL) {
             goto exit;
         }
     }
@@ -279,6 +279,9 @@ call_async_cb(RestProxyCall *call, const GError *error,
     g_task_return_boolean(task, callback_result);
 
 exit:
+    if (error != NULL) {
+        rest_call_async_set_error(call, task, error);
+    }
     ovirt_proxy_call_async_data_free(data);
 }
 
@@ -291,7 +294,6 @@ void ovirt_rest_call_async(OvirtRestCall *call,
                            GDestroyNotify destroy_func)
 {
     OvirtProxy *proxy;
-    GError *error = NULL;
     OvirtProxyCallAsyncData *data;
 
     g_return_if_fail((cancellable == NULL) || G_IS_CANCELLABLE(cancellable));
@@ -311,12 +313,7 @@ void ovirt_rest_call_async(OvirtRestCall *call,
                                                         call, NULL);
     }
 
-    if (!rest_proxy_call_async(REST_PROXY_CALL(call), call_async_cb, NULL,
-                               data, &error)) {
-        g_warning("Error while getting collection XML");
-        g_task_return_error(task, error);
-        ovirt_proxy_call_async_data_free(data);
-    }
+    rest_proxy_call_invoke_async(REST_PROXY_CALL (call), cancellable, call_async_cb, data);
 }
 
 

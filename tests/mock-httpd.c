@@ -67,32 +67,34 @@ govirt_mock_htttpd_request_free (GovirtMockHttpdRequest *request)
 
 
 static void
-server_callback (SoupServer *server, SoupMessage *msg,
+server_callback (SoupServer *server, SoupServerMessage *msg,
 		 const char *path, GHashTable *query,
-		 SoupClientContext *context, gpointer data)
+		 gpointer data)
 {
 	SoupMessageHeadersIter iter;
 	const char *name, *value;
 	const char *content;
 	GovirtMockHttpd *mock_httpd = data;
 
-	g_debug ("%s %s HTTP/1.%d\n", msg->method, path,
-		 soup_message_get_http_version (msg));
-	soup_message_headers_iter_init (&iter, msg->request_headers);
+	g_debug ("%s %s HTTP/1.%d\n", soup_server_message_get_method(msg), path,
+		 soup_server_message_get_http_version (msg));
+	soup_message_headers_iter_init (&iter, soup_server_message_get_request_headers(msg));
 	while (soup_message_headers_iter_next (&iter, &name, &value))
 		g_debug ("%s: %s\n", name, value);
-	if (msg->request_body->length)
-		g_debug ("%s\n", msg->request_body->data);
+	if (soup_server_message_get_request_body(msg)->length)
+		g_debug ("%s\n", soup_server_message_get_request_body(msg)->data);
 
-	content = govirt_mock_httpd_find_request(mock_httpd, msg->method, path);
+	content = govirt_mock_httpd_find_request(mock_httpd, soup_server_message_get_method(msg), path);
 	if (content == NULL) {
-		soup_message_set_status (msg, SOUP_STATUS_NOT_FOUND);
+		soup_server_message_set_status (msg, SOUP_STATUS_NOT_FOUND, NULL);
 	} else {
-		soup_message_body_append (msg->response_body, SOUP_MEMORY_STATIC,
+		soup_message_body_append (soup_server_message_get_response_body(msg), SOUP_MEMORY_STATIC,
 					  content, strlen(content));
-		soup_message_set_status (msg, SOUP_STATUS_OK);
+		soup_server_message_set_status (msg, SOUP_STATUS_OK, NULL);
 	}
-	g_debug ("  -> %d %s\n\n", msg->status_code, msg->reason_phrase);
+	g_debug ("  -> %d %s\n\n",
+		 soup_server_message_get_status(msg),
+		 soup_server_message_get_reason_phrase(msg));
 }
 
 
@@ -114,16 +116,16 @@ govirt_httpd_run (gpointer user_data)
 		cert = g_tls_certificate_new_from_files (abs_srcdir "/https-cert/server-cert.pem",
 							 abs_srcdir "/https-cert/server-key.pem",
 							 &error);
-		g_assert (error == NULL);
-		server = soup_server_new (SOUP_SERVER_SERVER_HEADER, "simple-soup-httpd ",
-					  SOUP_SERVER_TLS_CERTIFICATE, cert,
+		g_assert_no_error (error);
+		server = soup_server_new ("server-header", "simple-soup-httpd ",
+					  "tls-certificate", cert,
 					  NULL);
 		g_object_unref (cert);
 
 		soup_server_listen_local (server, mock_httpd->port,
 					  SOUP_SERVER_LISTEN_HTTPS, &error);
 	} else {
-		server = soup_server_new (SOUP_SERVER_SERVER_HEADER, "simple-soup-httpd ",
+		server = soup_server_new ("server-header", "simple-soup-httpd ",
 					  NULL);
 		soup_server_listen_local (server, mock_httpd->port, 0, &error);
 	}
@@ -135,10 +137,10 @@ govirt_httpd_run (gpointer user_data)
 	uris = soup_server_get_uris (server);
 	for (u = uris; u; u = u->next) {
 		char *str;
-		str = soup_uri_to_string (u->data, FALSE);
+		str = g_uri_to_string (u->data);
 		g_debug ("Listening on %s\n", str);
 		g_free (str);
-		soup_uri_free (u->data);
+		g_uri_unref (u->data);
 	}
 	g_slist_free (uris);
 
