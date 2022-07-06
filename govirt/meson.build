@@ -47,8 +47,7 @@ govirt_private_headers = [
 ]
 
 govirt_enum_types_private = gnome.mkenums_simple('ovirt-enum-types-private',
-                                                 sources : govirt_private_headers,
-                                                 install : false)
+                                                 sources : govirt_private_headers)
 
 #
 # libgovirt.so
