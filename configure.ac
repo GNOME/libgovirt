@@ -101,7 +101,7 @@ AC_SUBST(WARNINGFLAGS_C)
 dnl ---------------------------------------------------------------------------
 dnl - Check library dependencies
 dnl ---------------------------------------------------------------------------
-PKG_CHECK_MODULES([GLIB], [gobject-2.0 gio-2.0 gthread-2.0 >= 2.38.0])
+PKG_CHECK_MODULES([GLIB], [gobject-2.0 gio-2.0 gthread-2.0 >= 2.66.0])
 
 # Setup GLIB_MKENUMS to use glib-mkenums even if GLib is uninstalled.
 GLIB_MKENUMS=`$PKG_CONFIG --variable=glib_mkenums glib-2.0`
@@ -110,7 +110,7 @@ AC_SUBST(GLIB_MKENUMS)
 GOBJECT_INTROSPECTION_CHECK([1.30.0])
 
 dnl **** Check for librest ****
-PKG_CHECK_MODULES([REST], [rest-0.7 >= 0.7.92])
+PKG_CHECK_MODULES([REST], [rest-1.0 >= 0.9])
 
 dnl ---------------------------------------------------------------------------
 dnl - Build self tests
