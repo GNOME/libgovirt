@@ -195,8 +195,6 @@ RestXmlNode *ovirt_proxy_get_collection_xml(OvirtProxy *proxy,
 typedef struct {
     OvirtProxy *proxy;
     GTask *task;
-    GCancellable *cancellable;
-    gulong cancellable_cb_id;
     OvirtProxyCallAsyncCb call_async_cb;
     gpointer call_user_data;
     GDestroyNotify destroy_call_data;
@@ -211,28 +209,8 @@ static void ovirt_proxy_call_async_data_free(OvirtProxyCallAsyncData *data)
     g_clear_object(&data->proxy);
     g_clear_object(&data->task);
 
-    if ((data->cancellable != NULL) && (data->cancellable_cb_id != 0)) {
-        if (g_cancellable_is_cancelled(data->cancellable)) {
-            /* Cancellable has already been cancelled, we don't need to use
-             * g_cancellable_disconnect() to disconnect the signal handler
-             * as we know the 'cancelled' signal is no longer going to be emitted
-             */
-            g_signal_handler_disconnect(data->cancellable, data->cancellable_cb_id);
-        } else {
-            g_cancellable_disconnect(data->cancellable, data->cancellable_cb_id);
-        }
-    }
-    g_clear_object(&data->cancellable);
     g_slice_free(OvirtProxyCallAsyncData, data);
 }
-
-static void
-call_async_cancelled_cb (G_GNUC_UNUSED GCancellable *cancellable,
-                         RestProxyCall *call)
-{
-    rest_proxy_call_cancel(call);
-}
-
 
 static void rest_call_async_set_error(RestProxyCall *call, GTask *task, const GError *error)
 {
@@ -306,12 +284,6 @@ void ovirt_rest_call_async(OvirtRestCall *call,
     data->call_async_cb = callback;
     data->call_user_data = user_data;
     data->destroy_call_data = destroy_func;
-    if (cancellable != NULL) {
-        data->cancellable = g_object_ref(cancellable);
-        data->cancellable_cb_id = g_cancellable_connect(cancellable,
-                                                        G_CALLBACK (call_async_cancelled_cb),
-                                                        call, NULL);
-    }
 
     rest_proxy_call_invoke_async(REST_PROXY_CALL (call), cancellable, call_async_cb, data);
 }
