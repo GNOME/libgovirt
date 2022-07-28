@@ -1,0 +1,108 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
+"POT-Creation-Date: 2022-07-07 15:25+0000\n"
+"PO-Revision-Date: 2022-07-28 09:05+0200\n"
+"Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
+"Language-Team: \n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.1.1\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "REST გამოძახებაში არსებული პარამეტრის მოულოდნელი ტიპი"
+
+#: govirt/ovirt-collection.c:248
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "მიღებულია '%s' კვანძი. მოვალოდი'%s'-ს"
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Root CA სერტიფიკატის ფაილი დაცული SSL შეერთებებისთვის"
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr "<ფაილი>"
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "Libgovirt-ის ვერსიის ინფორმაციის ჩვენება"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "oVirt ის პარამეტრები:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "\"oVirt\"- ის პარამეტრების ჩვენება"
+
+#: govirt/ovirt-proxy.c:326
+msgid "Failed to parse response from collection"
+msgstr "კოლექციიდან მიღებული პასუხის დამუშავების შეცდომა"
+
+#: govirt/ovirt-proxy.c:595
+msgid "Could not extract CA certificate filename from URI"
+msgstr "URI-დან CA სერტიფიკატის ფაილის სახელის ამოღების შეცდომა"
+
+#: govirt/ovirt-resource.c:178
+msgid "Cancellable initialization not supported"
+msgstr "გაუქმებადი ინიციალიზაცია მხარდაჭერილი არაა"
+
+#: govirt/ovirt-resource.c:427
+msgid "Missing mandatory 'id' attribute"
+msgstr "აკლია აუცილებელი ატრიბუტი: 'id'"
+
+#: govirt/ovirt-resource.c:434
+msgid "Missing mandatory 'href' attribute"
+msgstr "აკლია აუცილებელი ატრიბუტი:'href'"
+
+#: govirt/ovirt-resource.c:689
+msgid "Could not find 'status' node"
+msgstr "'status' კვანძის პოვნა შეუძლებელია"
+
+#: govirt/ovirt-resource.c:697
+msgid "Action is pending"
+msgstr "ქმედება მოლოდინშია"
+
+#: govirt/ovirt-resource.c:701
+msgid "Action is in progress"
+msgstr "მქდება მიმდინარეობს"
+
+#: govirt/ovirt-resource.c:705
+msgid "Action has failed"
+msgstr "ქმედების შეცდომა"
+
+#: govirt/ovirt-resource.c:710
+msgid "Unknown action failure"
+msgstr "ქმედების უცნობი შეცდომა"
+
+#: govirt/ovirt-resource.c:863
+msgid "Failed to parse response from resource"
+msgstr "რესურსიდან მიღებული პასუხის დამუშავების შეცდომა"
+
+#: govirt/ovirt-utils.c:362
+msgid "Could not find 'reason' node"
+msgstr "'reason' კვანძის პოვნა შეუძლებელია"
+
+#: govirt/ovirt-vm.c:403
+msgid "Could not find 'ticket' node"
+msgstr "'ticket' კვანძის პოვნა შეუძლებელია"
+
+#: govirt/ovirt-vm.c:413
+msgid "Could not find 'value' node"
+msgstr "'value' კვანძის პოვნა შეუძლებელია"
+
+#: govirt/ovirt-vm.c:420
+msgid "Could not find 'expiry' node"
+msgstr "'expiry' კვანძის პოვნა შეუძლებელია"
