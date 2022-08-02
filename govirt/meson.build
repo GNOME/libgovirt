@@ -116,7 +116,7 @@ gnome.generate_gir(govirt_lib,
                    identifier_prefix : 'Ovirt',
                    symbol_prefix : 'ovirt',
                    export_packages : 'govirt-1.0',
-                   includes : ['Gio-2.0', 'GObject-2.0', 'Rest-0.7' ],
+                   includes : ['Gio-2.0', 'GObject-2.0', 'Rest-1.0' ],
                    install : true,
                    extra_args : ['--c-include=govirt/govirt.h'])
 

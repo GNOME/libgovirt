@@ -157,7 +157,7 @@ if HAVE_INTROSPECTION
 introspection_sources = $(libgovirt_la_SOURCES) $(libgovirt_la_HEADERS) $(builddir)/ovirt-enum-types.c $(builddir)/ovirt-enum-types.h
 
 GoVirt-1.0.gir: libgovirt.la Makefile
-GoVirt_1_0_gir_INCLUDES = Gio-2.0 GObject-2.0 Rest-0.7
+GoVirt_1_0_gir_INCLUDES = Gio-2.0 GObject-2.0 Rest-1.0
 GoVirt_1_0_gir_CFLAGS = $(AM_CPPFLAGS) -I$(top_builddir)
 GoVirt_1_0_gir_LIBS = libgovirt.la
 GoVirt_1_0_gir_FILES = $(introspection_sources)
