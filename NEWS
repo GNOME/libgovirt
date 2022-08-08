@@ -1,3 +1,20 @@
+0.3.9 - Aug 08th 2022
+=====================
+
+Changes since 0.3.8
+
+- Update librest dependency to 0.9.
+- Update to libsoup3.
+- Remove autotools in favor of meson.
+- New Translations:
+        * Catalan (Jordi Mas i Hernandez)
+        * Finnish (Jiri Grönroos)
+- Updated Translations:
+        * Basque (Asier Sarasua Garmendia)
+        * Danish (Alan Mortensen)
+        * Portuguese (Hugo Carvalho)
+        * Chinese (Luming Zh)
+
 0.3.8 - Feb 24th 2020
 =====================
 
