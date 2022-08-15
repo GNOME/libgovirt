@@ -129,7 +129,7 @@ govirt_httpd_run (gpointer user_data)
 					  NULL);
 		soup_server_listen_local (server, mock_httpd->port, 0, &error);
 	}
-	g_assert (error == NULL);
+	g_assert_no_error (error);
 
 	soup_server_add_handler (server, NULL,
 				 server_callback, mock_httpd, NULL);
