@@ -1,0 +1,108 @@
+# Korean translation for libgovirt.
+# Copyright (C) 2023 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# Seong-ho Cho <shcho@gnome.org>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues\n"
+"POT-Creation-Date: 2023-01-25 20:46+0000\n"
+"PO-Revision-Date: 2023-03-04 18:19+0900\n"
+"Language-Team: Korean <gnome-kr@googlegroups.com>\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Last-Translator: Seong-ho Cho <darkcircle.0426@gmail.com>\n"
+"X-Generator: Poedit 2.3.1\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "REST 호출에 예기치 못한 매개변수 형식"
+
+#: govirt/ovirt-collection.c:248
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "'%s' 노드가 있지만, '%s' 노드가 필요합니다"
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "보안 SSL 연결에 필요한 최상위 CA 인증서 파일"
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr "<파일>"
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "libgovirt 버전 정보를 나타냅니다"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "oVirt 옵션:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "oVirt 옵션을 표시합니다"
+
+#: govirt/ovirt-proxy.c:326
+msgid "Failed to parse response from collection"
+msgstr "모음의 응답 해석 실패"
+
+#: govirt/ovirt-proxy.c:595
+msgid "Could not extract CA certificate filename from URI"
+msgstr "URI에서 CA 인증서 파일 이름을 가져올 수 없습니다"
+
+#: govirt/ovirt-resource.c:178
+msgid "Cancellable initialization not supported"
+msgstr "취소 가능 초기화를 지원하지 않습니다"
+
+#: govirt/ovirt-resource.c:427
+msgid "Missing mandatory 'id' attribute"
+msgstr "필수 'id' 속성 빠짐"
+
+#: govirt/ovirt-resource.c:434
+msgid "Missing mandatory 'href' attribute"
+msgstr "필수 'href' 속성 빠짐"
+
+#: govirt/ovirt-resource.c:689
+msgid "Could not find 'status' node"
+msgstr "'status' 노드를 찾을 수 없습니다"
+
+#: govirt/ovirt-resource.c:697
+msgid "Action is pending"
+msgstr "동작이 대기중입니다"
+
+#: govirt/ovirt-resource.c:701
+msgid "Action is in progress"
+msgstr "동작을 실행중입니다"
+
+#: govirt/ovirt-resource.c:705
+msgid "Action has failed"
+msgstr "동작에 실패했습니다"
+
+#: govirt/ovirt-resource.c:710
+msgid "Unknown action failure"
+msgstr "알 수 없는 동작 실패"
+
+#: govirt/ovirt-resource.c:863
+msgid "Failed to parse response from resource"
+msgstr "자원 응답 해석에 실패했습니다"
+
+#: govirt/ovirt-utils.c:362
+msgid "Could not find 'reason' node"
+msgstr "'reason' 노드를 찾을 수 없습니다"
+
+#: govirt/ovirt-vm.c:403
+msgid "Could not find 'ticket' node"
+msgstr "'ticket' 노드를 찾을 수 없습니다"
+
+#: govirt/ovirt-vm.c:413
+msgid "Could not find 'value' node"
+msgstr "'value' 노드를 찾을 수 없습니다"
+
+#: govirt/ovirt-vm.c:420
+msgid "Could not find 'expiry' node"
+msgstr "'expiry' 노드를 찾을 수 없습니다"
