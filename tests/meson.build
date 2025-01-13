@@ -9,4 +9,4 @@ test_govirt = executable('test-govirt', test_govirt_sources,
                          dependencies: govirt_lib_dep,
                          c_args : test_c_args)
 
-test('test-govirt', test_govirt)
+test('test-govirt', test_govirt, env : ['GIO_USE_NETWORK_MONITOR=base'])
