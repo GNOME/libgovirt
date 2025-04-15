@@ -18,6 +18,8 @@
 
 #define GOVIRT_HTTPS_PORT 8088
 
+static GMutex run_mutex;
+
 struct GovirtMockHttpd {
     GThread *thread;
     GMainLoop *loop;
@@ -145,6 +147,7 @@ govirt_httpd_run (gpointer user_data)
 	g_slist_free (uris);
 
 	g_debug ("Waiting for requests...\n");
+	g_mutex_unlock(&run_mutex);
 
 	g_main_loop_run (mock_httpd->loop);
 	g_main_context_pop_thread_default (context);
@@ -166,6 +169,7 @@ govirt_mock_httpd_new (guint port)
 	context = g_main_context_new ();
 	mock_httpd->loop = g_main_loop_new (context, TRUE);
 	g_main_context_unref (context);
+	g_mutex_lock(&run_mutex);
 
 	mock_httpd->requests = g_hash_table_new_full (g_str_hash, g_str_equal,
 						      NULL,
@@ -216,6 +220,7 @@ govirt_mock_httpd_start (GovirtMockHttpd *mock_httpd)
 
 	mock_httpd->thread = g_thread_new ("simple-soup-httpd",
 					   govirt_httpd_run, mock_httpd);
+	g_mutex_lock(&run_mutex);
 }
 
 
@@ -251,4 +256,5 @@ govirt_mock_httpd_stop (GovirtMockHttpd *mock_httpd)
 	g_hash_table_unref (mock_httpd->requests);
 	g_main_loop_unref (mock_httpd->loop);
 	g_free (mock_httpd);
+	g_mutex_unlock(&run_mutex);
 }
