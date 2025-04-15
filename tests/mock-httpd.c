@@ -76,13 +76,13 @@ server_callback (SoupServer *server, SoupServerMessage *msg,
 	const char *content;
 	GovirtMockHttpd *mock_httpd = data;
 
-	g_debug ("%s %s HTTP/1.%d\n", soup_server_message_get_method(msg), path,
+	g_debug ("%s %s HTTP/1.%d", soup_server_message_get_method(msg), path,
 		 soup_server_message_get_http_version (msg));
 	soup_message_headers_iter_init (&iter, soup_server_message_get_request_headers(msg));
 	while (soup_message_headers_iter_next (&iter, &name, &value))
-		g_debug ("%s: %s\n", name, value);
+		g_debug ("%s: %s", name, value);
 	if (soup_server_message_get_request_body(msg)->length)
-		g_debug ("%s\n", soup_server_message_get_request_body(msg)->data);
+		g_debug ("%s", soup_server_message_get_request_body(msg)->data);
 
 	content = govirt_mock_httpd_find_request(mock_httpd, soup_server_message_get_method(msg), path);
 	if (content == NULL) {
@@ -138,13 +138,13 @@ govirt_httpd_run (gpointer user_data)
 	for (u = uris; u; u = u->next) {
 		char *str;
 		str = g_uri_to_string (u->data);
-		g_debug ("Listening on %s\n", str);
+		g_debug ("Listening on %s", str);
 		g_free (str);
 		g_uri_unref (u->data);
 	}
 	g_slist_free (uris);
 
-	g_debug ("\nWaiting for requests...\n");
+	g_debug ("Waiting for requests...\n");
 
 	g_main_loop_run (mock_httpd->loop);
 	g_main_context_pop_thread_default (context);
