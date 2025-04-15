@@ -56,11 +56,11 @@ static void test_govirt_https_ca(void)
              https://gitlab.gnome.org/GNOME/librest/-/merge_requests/28
     */
     return;
+    g_setenv("GOVIRT_NO_SSL_STRICT", "1", TRUE);
     httpd = govirt_mock_httpd_new(GOVIRT_HTTPS_PORT);
     govirt_mock_httpd_add_request(httpd, "GET", "/ovirt-engine/api", "<api></api>");
     govirt_mock_httpd_start(httpd);
 
-    g_setenv("GOVIRT_NO_SSL_STRICT", "1", TRUE);
     g_test_expect_message("libgovirt", G_LOG_LEVEL_WARNING,
                           "Disabling strict checking of SSL certificates");
     g_test_expect_message("libgovirt", G_LOG_LEVEL_CRITICAL,
@@ -105,12 +105,12 @@ static void test_govirt_http(void)
     GError *error = NULL;
     GovirtMockHttpd *httpd;
 
+    g_setenv("GOVIRT_DISABLE_HTTPS", "1", TRUE);
     httpd = govirt_mock_httpd_new(GOVIRT_HTTPS_PORT);
     govirt_mock_httpd_disable_tls(httpd, TRUE);
     govirt_mock_httpd_add_request(httpd, "GET", "/ovirt-engine/api", "<api></api>");
     govirt_mock_httpd_start(httpd);
 
-    g_setenv("GOVIRT_DISABLE_HTTPS", "1", TRUE);
     g_test_expect_message("libgovirt", G_LOG_LEVEL_WARNING,
                           "Using plain text HTTP connection");
     g_test_expect_message("libgovirt", G_LOG_LEVEL_CRITICAL,
