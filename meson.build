@@ -4,7 +4,11 @@
 project('libgovirt', 'c',
         version : '0.3.9',
         license : 'LGPL-2.1-or-later',
-        meson_version: '>= 0.49.0')
+        meson_version: '>= 0.49.0',
+        default_options : ['c_std=c99',
+                           'werror=true',
+                           'warning_level=2'])
+
 
 #
 # global vars
@@ -53,13 +57,9 @@ govirt_deps += [
 #
 # global C defines
 #
-govirt_global_cflags = ['-std=c99',
-                        '-DG_LOG_DOMAIN="libgovirt"',
+govirt_global_cflags = ['-DG_LOG_DOMAIN="libgovirt"',
                         '-DGLIB_VERSION_MIN_REQUIRED=@0@'.format(glib_encoded_version),
                         '-DGLIB_VERSION_MAX_ALLOWED=@0@'.format(glib_encoded_version),
-                        '-Wall',
-                        '-Wextra',
-                        '-Werror',
                         '-Wcast-align',
                         '-Wno-error=cast-align',
                         '-Wmissing-declarations',
