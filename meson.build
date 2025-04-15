@@ -86,9 +86,8 @@ govirt_global_cflags = ['-DG_LOG_DOMAIN="libgovirt"',
                         '-Woverride-init',
                         '-Wno-unused-parameter']
 
-foreach arg : govirt_global_cflags
-  add_project_arguments(arg, language : 'c')
-endforeach
+add_project_arguments(compiler.get_supported_arguments(govirt_global_cflags),
+                      language : 'c')
 
 subdir('govirt')
 subdir('po')
