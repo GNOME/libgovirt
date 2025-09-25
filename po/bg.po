@@ -1,0 +1,110 @@
+# Bulgarian translation for libgovirt.
+# Copyright (C) 2025 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# twlvnn kraftwerk <kraft_werk@tutanota.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues/\n"
+"POT-Creation-Date: 2025-08-10 21:56+0000\n"
+"PO-Revision-Date: 2025-08-23 15:44+0200\n"
+"Last-Translator: twlvnn kraftwerk <kraft_werk@tutanota.com>\n"
+"Language-Team: Bulgarian <dict-notifications@fsa-bg.org>\n"
+"Language: bg\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"X-Generator: Gtranslator 48.0\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "Неочакван вид параметър в REST повикване"
+
+#: govirt/ovirt-collection.c:248
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Очакваше се „%s“, но полученият елемент е „%s“"
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Основен сертификат на удостоверител за сигурни SSL връзки"
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr "<файл>"
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "Извеждане на версията на libgovirt"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "Опции на oVirt:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "Показване на опциите на oVirt"
+
+#: govirt/ovirt-proxy.c:326
+msgid "Failed to parse response from collection"
+msgstr "Отговорът от колекцията не може да бъде разчетен"
+
+#: govirt/ovirt-proxy.c:595
+msgid "Could not extract CA certificate filename from URI"
+msgstr ""
+"Името на файла на сертификата на удостоверителя не може да бъде извлечен от "
+"адреса"
+
+#: govirt/ovirt-resource.c:178
+msgid "Cancellable initialization not supported"
+msgstr "Отменяема стартиране не се поддържа"
+
+#: govirt/ovirt-resource.c:427
+msgid "Missing mandatory 'id' attribute"
+msgstr "Задължителният атрибут „id“ липсва"
+
+#: govirt/ovirt-resource.c:434
+msgid "Missing mandatory 'href' attribute"
+msgstr "Задължителният атрибут „href“ липсва"
+
+#: govirt/ovirt-resource.c:689
+msgid "Could not find 'status' node"
+msgstr "Елементът „status“ не може да бъде намерен"
+
+#: govirt/ovirt-resource.c:697
+msgid "Action is pending"
+msgstr "Изчаква се за действие"
+
+#: govirt/ovirt-resource.c:701
+msgid "Action is in progress"
+msgstr "Действието е в ход"
+
+#: govirt/ovirt-resource.c:705
+msgid "Action has failed"
+msgstr "Действието е неуспешно"
+
+#: govirt/ovirt-resource.c:710
+msgid "Unknown action failure"
+msgstr "Неизвестна грешка при действието"
+
+#: govirt/ovirt-resource.c:863
+msgid "Failed to parse response from resource"
+msgstr "Отговорът от ресурса не може да бъде разчетен"
+
+#: govirt/ovirt-utils.c:362
+msgid "Could not find 'reason' node"
+msgstr "Елементът „reason“ не може да бъде намерен"
+
+#: govirt/ovirt-vm.c:403
+msgid "Could not find 'ticket' node"
+msgstr "Елементът „ticket“ не може да бъде намерен"
+
+#: govirt/ovirt-vm.c:413
+msgid "Could not find 'value' node"
+msgstr "Елементът „value“ не може да бъде намерен"
+
+#: govirt/ovirt-vm.c:420
+msgid "Could not find 'expiry' node"
+msgstr "Елементът „expiry“ не може да бъде намерен"
