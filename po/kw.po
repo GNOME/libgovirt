@@ -1,0 +1,115 @@
+# Cornish translation for libgovirt.
+# Copyright (C) 2026 libgovirt's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libgovirt package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Flynn Peck <cirilla@tuta.io>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libgovirt master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libgovirt/issues/\n"
+"POT-Creation-Date: 2022-07-07 11:45+0000\n"
+"PO-Revision-Date: 2026-01-29 14:27+0000\n"
+"Last-Translator: Flynn Peck <cirilla@tuta.io>\n"
+"Language-Team: kw\n"
+"Language: kw\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-DL-VCS-Web: https://gitlab.gnome.org/GNOME/libgovirt/\n"
+"X-DL-Lang: kw\n"
+"X-DL-Module: libgovirt\n"
+"X-DL-Branch: master\n"
+"X-DL-Domain: po\n"
+"X-DL-State: Translating\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Gtranslator 49.0\n"
+
+#: govirt/ovirt-action-rest-call.c:54 govirt/ovirt-resource-rest-call.c:142
+msgid "Unexpected parameter type in REST call"
+msgstr "Eghen oberadow angwaytys yn galow REST"
+
+#: govirt/ovirt-collection.c:248
+#, c-format
+msgid "Got '%s' node, expected '%s'"
+msgstr "Kavosys poynt '%s', gwaytyas '%s'"
+
+#: govirt/ovirt-options.c:52
+msgid "Root CA certificate file for secure SSL connections"
+msgstr "Restren testskrif CA gwreydhen rag junyansow saw SSL"
+
+#: govirt/ovirt-options.c:52
+msgid "<file>"
+msgstr "<file>"
+
+#: govirt/ovirt-options.c:54
+msgid "Display libgovirt version information"
+msgstr "Diskwedhes kedhlow versyon libgovirt"
+
+#: govirt/ovirt-options.c:59
+msgid "oVirt Options:"
+msgstr "Dewisyow oVirt:"
+
+#: govirt/ovirt-options.c:59
+msgid "Show oVirt Options"
+msgstr "Diskwedhes Dewisyow oVirt"
+
+#: govirt/ovirt-proxy.c:326
+msgid "Failed to parse response from collection"
+msgstr "Y fyllis redya gorthyp rag kuntel"
+
+#: govirt/ovirt-proxy.c:595
+msgid "Could not extract CA certificate filename from URI"
+msgstr "Ny yllir estenna hanow restren testskrif CA rag URI"
+
+#: govirt/ovirt-resource.c:178
+msgid "Cancellable initialization not supported"
+msgstr "Dalleth hedhadow anskoodhys"
+
+#: govirt/ovirt-resource.c:427
+msgid "Missing mandatory 'id' attribute"
+msgstr "Teythien a res 'id' fyllis"
+
+#: govirt/ovirt-resource.c:434
+msgid "Missing mandatory 'href' attribute"
+msgstr "Teythien a res 'href' fyllis"
+
+#: govirt/ovirt-resource.c:689
+msgid "Could not find 'status' node"
+msgstr "Ny yllir kavos poynt 'status'"
+
+#: govirt/ovirt-resource.c:697
+msgid "Action is pending"
+msgstr "Gwrians yw ow gortos"
+
+#: govirt/ovirt-resource.c:701
+msgid "Action is in progress"
+msgstr "Gwrians yw yn avonsyans"
+
+#: govirt/ovirt-resource.c:705
+msgid "Action has failed"
+msgstr "Gwrians yw fyllis"
+
+#: govirt/ovirt-resource.c:710
+msgid "Unknown action failure"
+msgstr "Difyk gwrians ankoth"
+
+#: govirt/ovirt-resource.c:863
+msgid "Failed to parse response from resource"
+msgstr "Y fyllis redya gorthyp rag asnodh"
+
+#: govirt/ovirt-utils.c:362
+msgid "Could not find 'reason' node"
+msgstr "Ny yllir kavos poynt 'reason'"
+
+#: govirt/ovirt-vm.c:403
+msgid "Could not find 'ticket' node"
+msgstr "Ny yllir kavos poynt 'ticket'"
+
+#: govirt/ovirt-vm.c:413
+msgid "Could not find 'value' node"
+msgstr "Ny yllir kavos poynt 'value'"
+
+#: govirt/ovirt-vm.c:420
+msgid "Could not find 'expiry' node"
+msgstr "Ny yllir kavos poynt 'expiry'"
