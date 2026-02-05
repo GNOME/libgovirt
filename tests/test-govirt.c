@@ -52,10 +52,6 @@ static void test_govirt_https_ca(void)
     GError *error = NULL;
     GovirtMockHttpd *httpd;
 
-    /*FIXME: https://gitlab.gnome.org/GNOME/librest/-/issues/16
-             https://gitlab.gnome.org/GNOME/librest/-/merge_requests/28
-    */
-    return;
     g_setenv("GOVIRT_NO_SSL_STRICT", "1", TRUE);
     httpd = govirt_mock_httpd_new(GOVIRT_HTTPS_PORT);
     govirt_mock_httpd_add_request(httpd, "GET", "/ovirt-engine/api", "<api></api>");
@@ -73,8 +69,6 @@ static void test_govirt_https_ca(void)
     g_object_unref(proxy);
     g_unsetenv("GOVIRT_NO_SSL_STRICT");
 
-    g_test_expect_message("Rest", G_LOG_LEVEL_WARNING,
-                          "*runtime check failed*");
     g_test_expect_message("libgovirt", G_LOG_LEVEL_WARNING,
                           "Error while getting collection: Unacceptable TLS certificate");
     proxy = ovirt_proxy_new("localhost:" G_STRINGIFY(GOVIRT_HTTPS_PORT));
