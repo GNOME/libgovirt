@@ -45,7 +45,7 @@ glib_encoded_version = 'GLIB_VERSION_2_66'
 gobject_dep = dependency('gobject-2.0', version : glib_version_info)
 gio_dep = dependency('gio-2.0', version : glib_version_info)
 gthread_dep = dependency('gthread-2.0', version : glib_version_info)
-rest_dep = dependency('rest-1.0', version : '>= 0.9')
+rest_dep = dependency('rest-1.0', version : '>= 0.10.2')
 
 govirt_deps += [
     gobject_dep,
