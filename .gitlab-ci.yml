@@ -15,7 +15,7 @@ build-libgovirt:
     - tags
   script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
-    - meson _build
+    - meson setup _build
     - meson compile -C _build
     - meson test -C _build
   artifacts:
