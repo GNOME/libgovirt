@@ -2,7 +2,7 @@
 # project definition
 #
 project('libgovirt', 'c',
-        version : '0.3.10',
+        version : '0.3.11',
         license : 'LGPL-2.1-or-later',
         meson_version: '>= 0.49.0',
         default_options : ['c_std=c99',

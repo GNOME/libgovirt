@@ -1,3 +1,11 @@
+0.3.11 - Feb 10th 2026
+=====================
+
+Changes since 0.3.10
+
+- Add release pipeline
+- Remove workaround for rest bug in tests
+
 0.3.10 - Feb 05th 2026
 =====================
 
