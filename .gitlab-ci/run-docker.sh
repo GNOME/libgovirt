@@ -2,7 +2,7 @@
 
 set -e
 
-TAG="registry.gitlab.gnome.org/gnome/librest/master:v1"
+TAG="registry.gitlab.gnome.org/gnome/libgovirt/master:v1"
 
 SUDO_CMD="sudo"
 if docker -v |& grep -q podman; then
