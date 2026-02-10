@@ -6,6 +6,7 @@ include:
 
 stages:
   - build
+  - deploy
 
 build-libgovirt:
   image: registry.gitlab.gnome.org/gnome/libgovirt/master:v1
