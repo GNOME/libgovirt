@@ -1,0 +1,38 @@
+include:
+  - component: "gitlab.gnome.org/GNOME/citemplates/release-service@master"
+    inputs:
+      dist-job-name: "distcheck"
+      tarball-artifact-path: "_build/meson-dist/$CI_PROJECT_NAME-$CI_COMMIT_TAG.tar.xz"
+
+stages:
+  - build
+
+build-libgovirt:
+  image: registry.gitlab.gnome.org/gnome/libgovirt/master:v1
+  stage: build
+  except:
+    - tags
+  script:
+    - git config --global --add safe.directory $CI_PROJECT_DIR
+    - meson _build
+    - meson compile -C _build
+    - meson test -C _build
+  artifacts:
+    reports:
+      junit: "_build/meson-logs/testlog.junit.xml"
+    name: "libgovirt-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+    when: always
+    paths:
+      - "_build/config.h"
+      - "_build/meson-logs"
+
+distcheck:
+  image: registry.gitlab.gnome.org/gnome/libgovirt/master:v1
+  stage: build
+  script:
+    - git config --global --add safe.directory $CI_PROJECT_DIR
+    - meson setup _build --auto-features=enabled
+    - meson dist -C _build
+  artifacts:
+    paths:
+      - "_build/meson-dist/*.xz"
